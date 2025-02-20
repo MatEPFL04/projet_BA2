@@ -57,7 +57,7 @@ public record Journey(List<Leg> legs) {
      * used to encapsulate the notion of step of a journey
      * implemented only by Transport and Foot as an intermediate stop doesn't
      * have the notion of movement
-     * astract methods are automatically implemented by the records who implement the interface
+     * abtract methods are automatically implemented by the records who implement the interface
      */
     public sealed interface Leg{
 
