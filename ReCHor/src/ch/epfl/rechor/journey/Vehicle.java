@@ -2,6 +2,12 @@ package ch.epfl.rechor.journey;
 
 import java.util.List;
 
+
+/**
+ * @author Matteo Lazzari (397247)
+ * enum used to list all the vehicules that can be used for a transport
+ */
+
 public enum Vehicle {
     TRAM,
     METRO,
@@ -10,7 +16,6 @@ public enum Vehicle {
     FERRY,
     AERIAL_LIFT,
     FUNICULAR;
-    static Vehicle[] tableau = values();
-    public static final List<Vehicle> ALL =List.of(tableau);
+    public static final List<Vehicle> ALL =List.of(values());
 
 }
