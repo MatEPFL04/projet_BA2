@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * The journey Record represents a journey in public transport.
+ * It contains
  * @author Matteo Lazzari (397247)
- * @param legs
- *      a list of legs (steps) that constitute the Journey
+ * @param legs a list of legs (steps) that constitute the Journey
  * @throws NullPointerException
  *      in case the name of the stop is null
  * @throws IllegalArgumentException
@@ -28,26 +29,23 @@ public record Journey(List<Leg> legs) {
 
         Preconditions.checkArgument(!legs.isEmpty());
         boolean isItAlternating = true;
-        for (int i = 1; i < legs.size(); i++){
-            if (legs.get(i-1) instanceof Leg.Foot && legs.get(i) instanceof Leg.Foot){
-                isItAlternating  = false;
-            }
-            if (legs.get(i-1) instanceof Leg.Transport && legs.get(i) instanceof Leg.Transport){
-                isItAlternating = false;
-            }
-        }
-        Preconditions.checkArgument(isItAlternating);
-
         boolean depPrecedesArr = true;
         boolean stopConfirmity = true;
-        for (int i = 1; i < legs.size(); i++){
-            if (legs.get(i).depTime().isBefore(legs.get(i-1).arrTime())){
+        for (int i = 1; i < legs.size(); i++) {
+            if (legs.get(i-1) instanceof Leg.Foot && legs.get(i) instanceof Leg.Foot)
+                isItAlternating  = false;
+
+            if (legs.get(i-1) instanceof Leg.Transport && legs.get(i) instanceof Leg.Transport)
+                isItAlternating = false;
+
+            if (legs.get(i).depTime().isBefore(legs.get(i-1).arrTime()))
                 depPrecedesArr = false;
-            }
-            if (!legs.get(i).depStop().equals(legs.get(i-1).arrStop())){
+
+            if (!legs.get(i).depStop().equals(legs.get(i-1).arrStop()))
                 stopConfirmity = false;
-            }
+
         }
+        Preconditions.checkArgument(isItAlternating);
         Preconditions.checkArgument(depPrecedesArr);
         Preconditions.checkArgument(stopConfirmity);
         legs = List.copyOf(legs);
@@ -112,7 +110,7 @@ public record Journey(List<Leg> legs) {
          * @param destination
          */
 
-        public record Transport(Stop depStop,LocalDateTime depTime, Stop arrStop,LocalDateTime arrTime,
+        record Transport(Stop depStop,LocalDateTime depTime, Stop arrStop,LocalDateTime arrTime,
                                 List<IntermediateStop> intermediateStops,Vehicle vehicle,String route,String destination) implements Leg{
             public Transport{
                 Objects.requireNonNull(depStop);
@@ -136,7 +134,7 @@ public record Journey(List<Leg> legs) {
          * @param arrTime
          */
 
-        public record Foot(Stop depStop,LocalDateTime depTime,Stop arrStop,LocalDateTime arrTime) implements Leg{
+        record Foot(Stop depStop,LocalDateTime depTime,Stop arrStop,LocalDateTime arrTime) implements Leg{
 
             @Override
             public List<IntermediateStop> intermediateStops() {
@@ -151,7 +149,7 @@ public record Journey(List<Leg> legs) {
     }
 
     /**
-     *
+     * the first Stop of the journey
      * @return the first Stop of the journey
      */
 
@@ -159,7 +157,7 @@ public record Journey(List<Leg> legs) {
         return legs.getFirst().depStop();
     }
 
-    /**
+    /**the last Stop of the journey
      * @return the last Stop of the journey
      */
 

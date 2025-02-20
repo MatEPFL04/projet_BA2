@@ -18,6 +18,15 @@ import java.util.Objects;
  */
 
 public record Stop(String name, String platformName, double longitude, double latitude) {
+    /**
+     *
+     * @param name
+     * @param platformName
+     * @param longitude
+     * @param latitude
+     * @throws NullPointerException thrown if no name is given
+     * @throws IllegalArgumentException in the case the location, consisting of the longitude, latitude is incorrect
+     */
 
     public Stop {
         Objects.requireNonNull(name);
