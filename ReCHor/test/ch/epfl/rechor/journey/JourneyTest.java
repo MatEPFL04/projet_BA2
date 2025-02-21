@@ -184,6 +184,7 @@ class JourneyTest {
         var h = "Rorschach";
         for (int m = 0; m < 120; m += 1) {
             var aT = dT.plusMinutes(m);
+            System.out.println(m);
 
             var f = new Journey.Leg.Foot(dS, dT, aS, aT);
             assertEquals(Duration.ofMinutes(m), f.duration());

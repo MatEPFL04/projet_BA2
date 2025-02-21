@@ -30,7 +30,7 @@ public record Stop(String name, String platformName, double longitude, double la
 
     public Stop {
         Objects.requireNonNull(name);
-        Preconditions.checkArgument(Math.abs(longitude) <= 180 || Math.abs(latitude) <= 90);
+        Preconditions.checkArgument(Math.abs(longitude) <= 180 && Math.abs(latitude) <= 90);
     }
 }
 

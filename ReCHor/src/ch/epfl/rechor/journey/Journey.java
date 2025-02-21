@@ -91,9 +91,8 @@ public record Journey(List<Leg> legs) {
              */
             public IntermediateStop{
                 Objects.requireNonNull(stop);
-                Preconditions.checkArgument(depTime.isBefore(arrTime));
+                Preconditions.checkArgument(!depTime.isBefore(arrTime));
             }
-
 
         }
 
@@ -120,7 +119,7 @@ public record Journey(List<Leg> legs) {
                 Objects.requireNonNull(vehicle);
                 Objects.requireNonNull(route);
                 Objects.requireNonNull(destination);
-                Preconditions.checkArgument(depTime.isBefore(arrTime));
+                Preconditions.checkArgument(!depTime.isAfter(arrTime));
                 intermediateStops = List.copyOf(intermediateStops);
 
             }
@@ -135,6 +134,13 @@ public record Journey(List<Leg> legs) {
          */
 
         record Foot(Stop depStop,LocalDateTime depTime,Stop arrStop,LocalDateTime arrTime) implements Leg{
+            public Foot{
+                Objects.requireNonNull(depStop);
+                Objects.requireNonNull(arrStop);
+                Objects.requireNonNull(depTime);
+                Objects.requireNonNull(arrTime);
+                Preconditions.checkArgument(!arrTime.isBefore(depTime));
+            }
 
             @Override
             public List<IntermediateStop> intermediateStops() {
@@ -162,7 +168,7 @@ public record Journey(List<Leg> legs) {
      */
 
     public Stop arrStop(){
-        return legs.getLast().depStop();
+        return legs.getLast().arrStop();
     }
 
     /**
@@ -182,7 +188,7 @@ public record Journey(List<Leg> legs) {
      * @return the time elapsed betweeen the start and the end of the Journey
      */
     public Duration duration(){
-        return Duration.between(legs.getFirst().depTime(), legs.getLast().depTime());
+        return Duration.between(legs.getFirst().depTime(), legs.getLast().arrTime());
 
     }
 

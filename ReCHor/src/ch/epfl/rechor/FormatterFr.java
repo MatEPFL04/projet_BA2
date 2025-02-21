@@ -40,9 +40,7 @@ public final class FormatterFr {
         long totalHours = totalMinutes/60;
         long remainingMinutes = totalMinutes % 60;
 
-        if (totalMinutes == 0) {
-            return "0 min";
-        } else if (totalMinutes < 60) {
+        if (totalMinutes < 60) {
             return totalMinutes +" min";
         }
         else {
@@ -104,7 +102,6 @@ public final class FormatterFr {
         } else {
             sb.append("trajet à pied");
         }
-
         sb.append(" (").append(formatDuration(footLeg.duration())).append(")");
         return sb.toString();
     }
