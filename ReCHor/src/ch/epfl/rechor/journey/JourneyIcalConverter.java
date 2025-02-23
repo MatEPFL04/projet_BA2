@@ -7,12 +7,27 @@ import java.time.LocalDateTime;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+/**
+ * public class, not-instantiable,
+ *      containing a unique static method used to transform a journey into a string formatted in .ics
+ */
+
 public class JourneyIcalConverter {
+    /**
+     * private constructor as the class is not-instantiable
+     */
     private JourneyIcalConverter() {}
+
+    /**
+     *
+     * @param journey the journey that needs to be converted into a string in the right format (.ics format)
+     * @return a string corresponding to the journey expressed in an Icalendar format.
+     */
 
     public static String toIcalendar (Journey journey) {
 
         IcalBuilder journeyCalendar = new IcalBuilder();
+
         String firstLegStopName = journey.legs().getFirst().depStop().name();
         String lastLegStopName = journey.legs().getLast().arrStop().name();
         StringBuilder sb = new StringBuilder();
@@ -21,14 +36,15 @@ public class JourneyIcalConverter {
                 .append(lastLegStopName);
         String summary = sb.toString();
 
-        String description = "";
+        StringBuilder descriptBuilder = new StringBuilder();
         StringJoiner j = new StringJoiner("\\n");
         for (int i = 0; i < journey.legs().size(); i++) {
             switch (journey.legs().get(i)) {
-                case Journey.Leg.Foot f -> description += j.add(FormatterFr.formatLeg(f));
-                case Journey.Leg.Transport t -> description += j.add(FormatterFr.formatLeg(t));
+                case Journey.Leg.Foot f -> descriptBuilder.append(j.add(FormatterFr.formatLeg(f)));
+                case Journey.Leg.Transport t -> descriptBuilder.append(j.add(FormatterFr.formatLeg(t)));
             }
         }
+        String description = descriptBuilder.toString();
 
 
         journeyCalendar.begin(IcalBuilder.Component.VCALENDAR)

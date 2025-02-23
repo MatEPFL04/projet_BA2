@@ -8,25 +8,25 @@ import java.util.Objects;
 
 /**
  * The journey Record represents a journey in public transport.
- * It contains
  * @author Matteo Lazzari (397247)
  * @param legs a list of legs (steps) that constitute the Journey
- * @throws NullPointerException
- *      in case the name of the stop is null
- * @throws IllegalArgumentException
- *      in the case the location, consisting of the longitude, latitude is incorrect
  *
  */
 
 public record Journey(List<Leg> legs) {
 
     /**
-     * checks whether the given informations concerning the legs are valid,
-     * @param legs
-     *
+     * checks whether the given information concerning the legs are valid,
+     * @param legs the list steps that constitute the journey
+     * @throws IllegalArgumentException if:
+     *      - the given list legs is empty,
+     *      - if there is no alternance betweem steps in public transports and steps by foot,
+     *      - if one departure time precedes the arrival time of the previous leg
+     *      - if the arrival stop of a leg doesn't correspond to the departure stop of the next leg.
+
      */
     public Journey{
-
+        legs = List.copyOf(legs);
         Preconditions.checkArgument(!legs.isEmpty());
         boolean isItAlternating = true;
         boolean depPrecedesArr = true;
@@ -48,8 +48,6 @@ public record Journey(List<Leg> legs) {
         Preconditions.checkArgument(isItAlternating);
         Preconditions.checkArgument(depPrecedesArr);
         Preconditions.checkArgument(stopConfirmity);
-        legs = List.copyOf(legs);
-
 
     }
 
