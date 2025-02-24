@@ -36,15 +36,14 @@ public class JourneyIcalConverter {
                 .append(lastLegStopName);
         String summary = sb.toString();
 
-        StringBuilder descriptBuilder = new StringBuilder();
         StringJoiner j = new StringJoiner("\\n");
         for (int i = 0; i < journey.legs().size(); i++) {
             switch (journey.legs().get(i)) {
-                case Journey.Leg.Foot f -> descriptBuilder.append(j.add(FormatterFr.formatLeg(f)));
-                case Journey.Leg.Transport t -> descriptBuilder.append(j.add(FormatterFr.formatLeg(t)));
+                case Journey.Leg.Foot f -> j.add(FormatterFr.formatLeg(f));
+                case Journey.Leg.Transport t -> j.add(FormatterFr.formatLeg(t));
             }
         }
-        String description = descriptBuilder.toString();
+        String description = j.toString();
 
 
         journeyCalendar.begin(IcalBuilder.Component.VCALENDAR)
@@ -57,7 +56,6 @@ public class JourneyIcalConverter {
                 .add(IcalBuilder.Name.DTEND, journey.arrTime())
                 .add(IcalBuilder.Name.SUMMARY,summary)
                 .add(IcalBuilder.Name.DESCRIPTION, description)
-                .end()
                 .end();
 
         return journeyCalendar.build();

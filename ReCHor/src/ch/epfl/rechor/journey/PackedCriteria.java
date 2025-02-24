@@ -24,10 +24,9 @@ public final class PackedCriteria {
      */
 
     public static long pack(int arrMins, int changes, int payload) {
-        Preconditions.checkArgument(arrMins > 0 && changes > 0);
         Preconditions.checkArgument((changes >> 7) == 0  && (arrMins >> 12) == 0);
         long payLoadAdjusted = Integer.toUnsignedLong(payload);
-        long arrMinsShifted = ((long) arrMins) << 38; // 39 (intervalle "bas" h.d'arr 2.2.5) - 1
+        long arrMinsShifted = ((long) (4095 - (arrMins - 240))) << 38; // 39 (intervalle "bas" h.d'arr 2.2.5) - 1
         long changesShifted = ((long) changes) << 31;
         return arrMinsShifted | changesShifted | payLoadAdjusted;
 
@@ -71,7 +70,7 @@ public final class PackedCriteria {
      */
 
     public static int arrMins(long criteria) {
-        return (int) (((criteria >> 38) & 0xFFF) -240);
+        return (int) (((criteria >> 38) & 0xFFF) - 240);
 
     }
 
@@ -140,8 +139,10 @@ public final class PackedCriteria {
 
     public static long withDepMins(long criteria, int depMins1) {
         Preconditions.checkArgument((depMins1 >> 12) == 0);
+        Preconditions.checkArgument(-240 <= depMins1 && depMins1 < 2880);
+        int positiveMinutes = depMins1 + 240;
         long cleanedCriteria = withoutDepMins(criteria);
-        return cleanedCriteria | ((long) depMins1 << 50);
+        return cleanedCriteria | ((long) positiveMinutes << 50);
     }
 
     /**

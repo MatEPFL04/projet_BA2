@@ -49,11 +49,22 @@ public final class IcalBuilder {
      */
 
     public IcalBuilder add (Name name, String value) {
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(value);
         Preconditions.checkArgument(!value.isEmpty());
-        stringBuilder.append(name).append(":").append(value).append("\r\n");
 
+        int currentLineSize = name.toString().length() + 1;
+        stringBuilder.append(name).append(":");
+        for (int i = 0; i < value.length(); i++) {
+            if (currentLineSize < 75) {
+                stringBuilder.append(value.charAt(i));
+                currentLineSize++;
+            }
+            else {
+                currentLineSize = 0;
+                stringBuilder.append("\r\n");
+                stringBuilder.append(" ").append(value.charAt(i));
+            }
+        }
+        stringBuilder.append("\n");
         return this;
     }
 
@@ -66,14 +77,13 @@ public final class IcalBuilder {
     private String icsFormatDate (LocalDateTime date) {
         DateTimeFormatter fmt = new DateTimeFormatterBuilder()
                 .appendValue(ChronoField.YEAR)
-                .appendValue(ChronoField.MONTH_OF_YEAR)
-                .appendValue(ChronoField.DAY_OF_MONTH)
+                .appendValue(ChronoField.MONTH_OF_YEAR,2)
+                .appendValue(ChronoField.DAY_OF_MONTH,2)
                 .appendLiteral("T")
-                .appendValue(ChronoField.HOUR_OF_DAY)
-                .appendValue(ChronoField.MINUTE_OF_HOUR)
-                .appendValue(ChronoField.SECOND_OF_DAY)
+                .appendValue(ChronoField.HOUR_OF_DAY,2)
+                .appendValue(ChronoField.MINUTE_OF_HOUR,2)
+                .appendValue(ChronoField.SECOND_OF_MINUTE,2)
                 .toFormatter();
-
         return date.format(fmt);
 
     }
@@ -86,8 +96,8 @@ public final class IcalBuilder {
      */
 
     public IcalBuilder add (Name name, LocalDateTime dateTime) {
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(dateTime);
+        //Objects.requireNonNull(name);
+        //Objects.requireNonNull(dateTime);
         stringBuilder.append(name)
                 .append(":")
                 .append(icsFormatDate(dateTime))
@@ -105,7 +115,7 @@ public final class IcalBuilder {
      */
 
     public IcalBuilder begin (Component component) {
-        Objects.requireNonNull(component);
+        //Objects.requireNonNull(component);
         stringBuilder.append(Name.BEGIN)
                 .append(":")
                 .append(component)

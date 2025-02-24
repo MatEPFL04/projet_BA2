@@ -1,5 +1,7 @@
 package ch.epfl.rechor.journey;
 
+import ch.epfl.rechor.FormatterFr;
+import ch.epfl.rechor.IcalBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -55,9 +57,7 @@ public class MyJourneyIcalConverterTest {
 
     @Test
     void IcalConverterWorksNormally(){
-        Journey testJourney = new Journey(exampleLegs());
-        System.out.println(JourneyIcalConverter.toIcalendar(testJourney));
-
+        Journey journey = new Journey(exampleLegs());
 
     }
 
