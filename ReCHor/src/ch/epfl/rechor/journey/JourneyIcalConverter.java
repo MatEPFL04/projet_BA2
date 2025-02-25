@@ -56,7 +56,9 @@ public class JourneyIcalConverter {
                 .add(IcalBuilder.Name.DTEND, journey.arrTime())
                 .add(IcalBuilder.Name.SUMMARY,summary)
                 .add(IcalBuilder.Name.DESCRIPTION, description)
+                .end()
                 .end();
+
 
         return journeyCalendar.build();
     }

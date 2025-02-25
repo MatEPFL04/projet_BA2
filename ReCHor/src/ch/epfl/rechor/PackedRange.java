@@ -22,6 +22,9 @@ public final class PackedRange {
      */
 
     public static int pack(int startInclusive, int endExclusive) {
+        System.out.println("FIN" + endExclusive);
+        System.out.println("DEBUT" + startInclusive);
+        System.out.println("I" + (endExclusive-startInclusive));
         Preconditions.checkArgument(((startInclusive >> 24) == 0)
                 && ((endExclusive - startInclusive) >> 8 == 0));
         return (startInclusive << 8) | (endExclusive - startInclusive);
@@ -47,7 +50,7 @@ public final class PackedRange {
 
     public static int startInclusive(int interval) {
         int shiftedStart = interval >> 8;
-        return shiftedStart & 0xFF;
+        return shiftedStart & 0xFFFFFF;
 
     }
 

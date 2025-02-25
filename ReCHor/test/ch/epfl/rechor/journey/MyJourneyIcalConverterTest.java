@@ -56,8 +56,15 @@ public class MyJourneyIcalConverterTest {
     }
 
     @Test
-    void IcalConverterWorksNormally(){
+    void print(){
         Journey journey = new Journey(exampleLegs());
+        String value = JourneyIcalConverter.toIcalendar(journey);
+        System.out.println(value);
+
+    }
+
+    @Test
+    void eachComponentMustBeEnded() {
 
     }
 

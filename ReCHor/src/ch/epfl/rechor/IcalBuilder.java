@@ -59,9 +59,9 @@ public final class IcalBuilder {
                 currentLineSize++;
             }
             else {
-                currentLineSize = 0;
-                stringBuilder.append("\r\n");
+                stringBuilder.append("\n");
                 stringBuilder.append(" ").append(value.charAt(i));
+                currentLineSize = 2;
             }
         }
         stringBuilder.append("\n");
@@ -115,7 +115,6 @@ public final class IcalBuilder {
      */
 
     public IcalBuilder begin (Component component) {
-        //Objects.requireNonNull(component);
         stringBuilder.append(Name.BEGIN)
                 .append(":")
                 .append(component)
@@ -136,12 +135,13 @@ public final class IcalBuilder {
     public IcalBuilder end() {
         Preconditions.checkArgument(!components.isEmpty());
         Component lastComponentStarted = components.getLast();
+        components.removeLast();
+        Preconditions.checkArgument(components.isEmpty());
         stringBuilder.append(Name.END)
                 .append(":")
                 .append(lastComponentStarted)
                 .append("\n");
 
-        components.removeLast();
         return this;
 
     }

@@ -26,8 +26,9 @@ public final class PackedCriteria {
     public static long pack(int arrMins, int changes, int payload) {
         Preconditions.checkArgument((changes >> 7) == 0  && (arrMins >> 12) == 0);
         long payLoadAdjusted = Integer.toUnsignedLong(payload);
-        long arrMinsShifted = ((long) ((arrMins - 240))) << 38; // 39 (intervalle "bas" h.d'arr 2.2.5) - 1
-        long changesShifted = ((long) changes) << 31;
+        long arrMinsShifted = ((long) ((arrMins + 240))) << 39; // 39 (intervalle "bas" h.d'arr 2.2.5) - 1
+        long changesShifted = ((long) changes) << 32;
+
         return arrMinsShifted | changesShifted | payLoadAdjusted;
 
     }
@@ -55,7 +56,7 @@ public final class PackedCriteria {
 
     public static int depMins(long criteria) {
         Preconditions.checkArgument(hasDepMins(criteria));
-        return (int)  (4095 - ((criteria >> 50) + 240));
+        return (int)  (4095 - ((criteria >> 51) + 240));
 
     }
 
@@ -68,7 +69,7 @@ public final class PackedCriteria {
      */
 
     public static int arrMins(long criteria) {
-        return (int) (240 +((criteria >> 38) & 0xFFF));
+        return (int) (((criteria >> 39) - 240) & 0xFFF);
 
     }
 
@@ -81,7 +82,7 @@ public final class PackedCriteria {
      */
 
     public static int changes(long criteria) {
-        return (int) ((criteria) >> 31) & 0x7F;
+        return (int) ((criteria) >> 32) & 0x7F;
 
     }
 
@@ -110,26 +111,21 @@ public final class PackedCriteria {
      */
 
     public static boolean dominatesOrIsEqual(long criteria1, long criteria2) {
-        /*
-        boolean criteria1hasDepMins = true;
-        boolean criteria2hasDepMns = true;
-        try {
-            criteria1hasDepMns = hasDepMins(criteria1);
-        }
-        catch (IllegalArgumentException exception) {
-            criteria1hasDepMns = false;
-        }
-
-         */
-
 
         Preconditions.checkArgument(hasDepMins(criteria1)==hasDepMins(criteria2));
+        if (hasDepMins(criteria1)) {
 
-        return (depMins(criteria1) >= depMins(criteria2))
-                && (arrMins(criteria1) >= arrMins(criteria2))
-                && (changes(criteria1) >= changes(criteria2));
+
+            return (depMins(criteria1) >= depMins(criteria2))
+                    && (arrMins(criteria1) <= arrMins(criteria2))
+                    && (changes(criteria1) <= changes(criteria2));
+        }
+        else {
+            return (arrMins(criteria1) <= arrMins(criteria2))
+                    && (changes(criteria1) <= changes(criteria2));
+        }
+
     }
-
     /**
      * function used to remove the information in bits 51-62 about the departure time
      * @param criteria given criteria
@@ -153,7 +149,7 @@ public final class PackedCriteria {
         Preconditions.checkArgument(-240 <= depMins1 && depMins1 < 2880);
         int positiveComplementedMinutes = 4095 - (depMins1 + 240);
         long cleanedCriteria = withoutDepMins(criteria);
-        return cleanedCriteria | ((long) positiveComplementedMinutes << 50);
+        return cleanedCriteria | ((long) positiveComplementedMinutes << 51);
     }
 
     /**
@@ -164,7 +160,7 @@ public final class PackedCriteria {
 
     public static long withAdditionalChange(long criteria) {
         int newChange = changes(criteria) + 1;
-        return criteria | ((long) newChange << 31);
+        return criteria | ((long) newChange << 32);
 
     }
 

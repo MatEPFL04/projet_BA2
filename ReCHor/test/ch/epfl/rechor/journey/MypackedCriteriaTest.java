@@ -7,19 +7,22 @@ public class MypackedCriteriaTest {
 
     @Test
     void packingAndUnpackingArrTimeWorks () {
-        int expectedArrTime = 0b110101010;
-        long criteriaPacked = PackedCriteria.pack(expectedArrTime, 0, 0);
+        int expectedArrTime = 0b100000000111;
+        int changes = 0b1000000;
+        int payLoad = 0b11111111111111111111111111111111;
+        long criteriaPacked = PackedCriteria.pack(expectedArrTime, changes, payLoad);
         int currentArrTimeExtracted = PackedCriteria.arrMins(criteriaPacked);
         assertEquals(expectedArrTime, currentArrTimeExtracted);
     }
 
     @Test
     void packingAndUnpackingDepTimeWorks () {
+        int depmins = 0b101001111000;
         long criteria = PackedCriteria.pack(240,0,0);
-        long criteriaWithDepMins = PackedCriteria.withDepMins(criteria,1237);
-        int expectedMin = 1237;
-        assertEquals(expectedMin,PackedCriteria.depMins(criteriaWithDepMins));
+        long criteriaWithDepMins = PackedCriteria.withDepMins(criteria,depmins);
+        assertEquals(depmins,PackedCriteria.depMins(criteriaWithDepMins));
     }
+
 
     @Test
     void packingAndUnpackingChangesWork () {
@@ -72,10 +75,48 @@ public class MypackedCriteriaTest {
         assertTrue(PackedCriteria.dominatesOrIsEqual(criteria1,criteria2));
     }
 
+    @Test
+    void evaluatingCriteriaWithDepMinsAndDrawWork () {
+        int depMins = 0b101010;
+        int arrMins = 0b01011010101;
+        int changes = 12;
+        int payload = 0x7FFAB;
+        long criteria = PackedCriteria.pack(arrMins,changes,payload);
+        long newCriteria1 = PackedCriteria.withDepMins(criteria,depMins);
+        long newCriteria2 = PackedCriteria.withDepMins(criteria,depMins);
+        assertTrue(PackedCriteria.dominatesOrIsEqual(newCriteria1,newCriteria2));
+    }
 
+    @Test
+    void evualatingCriteriaWorksWhenTheFirstLooses () {
+        int depMins = 50;
+        int arrMins1 = 100;
+        int arrMins2 = 90;
+        int changes = 5;
+        int payload = 2000;
+        long criteria1 = PackedCriteria.pack(arrMins1,changes,payload);
+        long criteria2 = PackedCriteria.pack(arrMins2,changes,payload);
+        long criteria1WithDepMins = PackedCriteria.withDepMins(criteria1,depMins);
+        long criteria2WithDepMins = PackedCriteria.withDepMins(criteria2, depMins);
 
+        assertFalse(PackedCriteria.dominatesOrIsEqual(criteria1WithDepMins,criteria2WithDepMins));
+    }
 
+    @Test
+    void evualatingCriteriaWorksWhenTheFirstLoosesOn1AndWinsOnAnOther() {
+        int depMins1 = 50; //gagne
+        int depMins2 = 40;
+        int arrMins1 = 100; //perd
+        int arrMins2 = 90;
+        int changes = 5;
+        int payload = 2000;
+        long criteria1 = PackedCriteria.pack(arrMins1,changes,payload);
+        long criteria2 = PackedCriteria.pack(arrMins2,changes,payload);
+        long criteria1WithDepMins = PackedCriteria.withDepMins(criteria1,depMins1);
+        long criteria2WithDepMins = PackedCriteria.withDepMins(criteria2, depMins2);
 
+        assertFalse(PackedCriteria.dominatesOrIsEqual(criteria2WithDepMins,criteria1WithDepMins));
+    }
 
 
 }
