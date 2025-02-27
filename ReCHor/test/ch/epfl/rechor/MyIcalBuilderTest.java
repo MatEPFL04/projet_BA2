@@ -19,15 +19,35 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MyIcalBuilderTest {
+
+
     @Test
-    void exceptionThrownWhenAComponentIsNotEnded() {
+    void addmethodWorksWithSmallTexts () {
         IcalBuilder journeyCalendar = new IcalBuilder();
+        journeyCalendar.add(IcalBuilder.Name.PRODID,"ReCHor");
+        String expectedString = "PRODID:ReCHor\r\n";
+        assertEquals(expectedString,journeyCalendar.build());
+    }
+    @Test
+    void addmethodWorksWithBigTexts () {
+        IcalBuilder journeyCalendar = new IcalBuilder();
+        String textAdded = "Ceci est un test du déroulage des lignes lorsque les " +
+                "caractères d'une ligne excèdent la limite de la norme icalendar de 75 caractères";
+        journeyCalendar.add(IcalBuilder.Name.DTSTART,textAdded);
+        String expectedString = "DTSTART:Ceci est un test du déroulage des lignes lorsque les caractères d'u" +"\r\n" + " " + "ne ligne excèdent la limite de la norme icalendar de 75 caractères" + "\r\n";
+
+        assertEquals(expectedString,journeyCalendar.build());
+
+    }
 
 
+    @Test
+    void exceptionThrownWhenAComponentIsNotEndedWhenBuilt() {
+    IcalBuilder journeyCalendar = new IcalBuilder();
         assertThrows(IllegalArgumentException.class, () -> {
             journeyCalendar.begin(IcalBuilder.Component.VCALENDAR)
                     .begin(IcalBuilder.Component.VEVENT)
-                    .end();
+                    .end().build();
         });
     }
 
@@ -36,7 +56,7 @@ public class MyIcalBuilderTest {
         IcalBuilder journeyCalendar = new IcalBuilder();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            journeyCalendar.add(IcalBuilder.Name.UID,LocalDateTime.now()).end();
+            journeyCalendar.end();
         });
     }
 
@@ -45,8 +65,12 @@ public class MyIcalBuilderTest {
         IcalBuilder journeyCalendar = new IcalBuilder();
         var d = LocalDate.of(2025, Month.FEBRUARY, 18);
         LocalDateTime dateToFormat = d.atTime(20, 10,59);
-        String expectedLineWhenNewDateIsAdded = "DTSTAMP:20250218T201059\n";
+        String expectedLineWhenNewDateIsAdded = "DTSTAMP:20250218T201059\r\n";
         journeyCalendar.add(IcalBuilder.Name.DTSTAMP, dateToFormat);
         assertEquals(expectedLineWhenNewDateIsAdded,journeyCalendar.build());
     }
+
+
+
+
 }

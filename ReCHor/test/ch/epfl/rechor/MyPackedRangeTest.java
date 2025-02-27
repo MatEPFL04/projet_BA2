@@ -15,7 +15,7 @@ public class MyPackedRangeTest {
 
     @Test
     void packingAndUnpackingEndExclsuive () {
-        int expectedFinalValue = 0b010101011;
+        int expectedFinalValue = 0xFFAE;
         int pack = PackedRange.pack(expectedFinalValue -20,expectedFinalValue);
         int endExtracted = PackedRange.endExclusive(pack);
         assertEquals(expectedFinalValue, endExtracted);
@@ -38,7 +38,7 @@ public class MyPackedRangeTest {
 
     @Test
     void lengthIsCalculatedCorrectly() {
-        int start = 0b1010101;
+        int start = 0xFAAAB;
         int end = start + 20;
         int pack = PackedRange.pack(start,end);
         int expectedInterval = end - start;

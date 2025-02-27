@@ -44,8 +44,7 @@ public class JourneyIcalConverter {
             }
         }
         String description = j.toString();
-
-
+        
         journeyCalendar.begin(IcalBuilder.Component.VCALENDAR)
                 .add(IcalBuilder.Name.VERSION,"2.0")
                 .add(IcalBuilder.Name.PRODID,"ReCHor")
@@ -58,7 +57,6 @@ public class JourneyIcalConverter {
                 .add(IcalBuilder.Name.DESCRIPTION, description)
                 .end()
                 .end();
-
 
         return journeyCalendar.build();
     }

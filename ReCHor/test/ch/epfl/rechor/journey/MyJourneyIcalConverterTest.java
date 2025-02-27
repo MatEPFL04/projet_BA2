@@ -63,9 +63,4 @@ public class MyJourneyIcalConverterTest {
 
     }
 
-    @Test
-    void eachComponentMustBeEnded() {
-
-    }
-
 }
