@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * builder class, used to construct events in an Icalendar format,
@@ -48,8 +49,9 @@ public final class IcalBuilder {
      * @return the current instantiation of IcalBuilder
      */
 
+    /*
     public IcalBuilder add (Name name, String value) {
-        Preconditions.checkArgument(!value.isEmpty());
+
 
         int currentLineSize = name.toString().length() + 1;
         stringBuilder.append(name).append(":");
@@ -57,16 +59,50 @@ public final class IcalBuilder {
             if (currentLineSize < 75) {
                 stringBuilder.append(value.charAt(i));
                 currentLineSize++;
-            }
-            else {
-                stringBuilder.append("\n");
-                stringBuilder.append(" ").append(value.charAt(i));
+            } else {
+                stringBuilder.append("\r\n ");
+                stringBuilder.append(value.charAt(i));
                 currentLineSize = 2;
             }
         }
-        stringBuilder.append("\n");
+        stringBuilder.append("\r\n");
         return this;
     }
+
+     */
+
+
+
+    public IcalBuilder add (Name name, String value) {
+
+        String text = name.toString().concat(":").concat(value);
+        StringBuilder sb = new StringBuilder();
+
+        double numberOfReturns = Math.floor((text.length()) / 75.0);
+
+        for (int i = 0; i <= numberOfReturns; i++) {
+            int startIncluded = 75*i;
+            int length = sb.isEmpty() ? 75 : 74;
+            int endExcluded = Math.min(startIncluded + length, text.length());
+
+            sb.append(text, startIncluded, endExcluded).append("\r\n");
+
+            if (text.length() > endExcluded) {
+                sb.append(" ");
+            }
+        }
+
+        stringBuilder.append(sb);
+        return this;
+    }
+
+
+
+
+
+
+
+
 
     /**
      * private method used to format a date for the .ics file
@@ -96,12 +132,10 @@ public final class IcalBuilder {
      */
 
     public IcalBuilder add (Name name, LocalDateTime dateTime) {
-        //Objects.requireNonNull(name);
-        //Objects.requireNonNull(dateTime);
         stringBuilder.append(name)
                 .append(":")
                 .append(icsFormatDate(dateTime))
-                .append("\n");
+                .append("\r\n");
 
         return this;
 
@@ -118,7 +152,7 @@ public final class IcalBuilder {
         stringBuilder.append(Name.BEGIN)
                 .append(":")
                 .append(component)
-                .append("\n");
+                .append("\r\n");
 
 
         components.add(component);
@@ -136,11 +170,10 @@ public final class IcalBuilder {
         Preconditions.checkArgument(!components.isEmpty());
         Component lastComponentStarted = components.getLast();
         components.removeLast();
-        Preconditions.checkArgument(components.isEmpty());
         stringBuilder.append(Name.END)
                 .append(":")
                 .append(lastComponentStarted)
-                .append("\n");
+                .append("\r\n");
 
         return this;
 
