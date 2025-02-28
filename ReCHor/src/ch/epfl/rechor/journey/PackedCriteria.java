@@ -145,9 +145,9 @@ public final class PackedCriteria {
      */
 
     public static long withDepMins(long criteria, int depMins1) {
-        Preconditions.checkArgument((depMins1 >> 12) == 0);
         Preconditions.checkArgument(-240 <= depMins1 && depMins1 < 2880);
         int positiveComplementedMinutes = 4095 - (depMins1 + 240);
+
         long cleanedCriteria = withoutDepMins(criteria);
         return cleanedCriteria | ((long) positiveComplementedMinutes << 51);
     }

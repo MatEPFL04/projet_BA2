@@ -103,6 +103,17 @@ public class MypackedCriteriaTest {
     }
 
     @Test
+    void minimalDepMinsDoesNotThrowException(){
+        int arrMins = 1000;
+        int depMins = - 240;
+        int changes = 20;
+        int payload = 2000;
+        long criteria1 = PackedCriteria.pack(arrMins,changes,payload);
+        long criteria1WithDepMins = PackedCriteria.withDepMins(criteria1,depMins);
+        assertEquals(depMins,PackedCriteria.depMins(criteria1WithDepMins));
+    }
+
+    @Test
     void evualatingCriteriaWorksWhenTheFirstLoosesOn1AndWinsOnAnOther() {
         int depMins1 = 50; //gagne
         int depMins2 = 40;

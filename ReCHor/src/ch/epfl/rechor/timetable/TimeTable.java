@@ -22,7 +22,9 @@ public interface TimeTable {
 
     default int stationId(int stopId) {
         if (isPlatformId(stopId)) {
-            return stopId - stations().size();
+            int idxPlatform = stopId - stations().size();
+
+            return platforms().stationId(idxPlatform);
         }
         else {
             return stopId;
@@ -30,7 +32,8 @@ public interface TimeTable {
     }
 
     default String platformName(int stopId) {
-        return isPlatformId(stopId) ? platforms().name(stationId(stopId)) : null;
+        int idxPlatform = stopId - stations().size();
+        return isPlatformId(stopId) ? platforms().name(idxPlatform) : null;
     }
 
 }

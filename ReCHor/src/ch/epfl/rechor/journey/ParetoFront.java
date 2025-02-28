@@ -28,28 +28,30 @@ public final class ParetoFront {
         throw new NoSuchElementException ();
     }
 
-    /*
-    public void forEach(LongConsumer action) {
-        ParetoFront paretoFront =
-        paretoFront.forEach(value -> { forEach(action); });
 
+    public void forEach(LongConsumer action) {
+        for (int i = 0; i < size(); i++) {
+            action.accept(frontTuples[i]);
+        }
     }
 
-     */
+
+
     public String toString () {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size(); i++) {
             if (PackedCriteria.hasDepMins(frontTuples[i])) {
-                return " tuple " + i + ": (" +
+                sb.append(" tuple " + i + ": (" +
                         PackedCriteria.depMins(frontTuples[i]) + " , " +
                         PackedCriteria.arrMins(frontTuples[i]) + " , " +
-                        PackedCriteria.changes(frontTuples[i]) + ")";
+                        PackedCriteria.changes(frontTuples[i]) + ")");
             } else {
-                return " tuple " + i + ": (" +
+                sb.append(" tuple " + i + ": (" +
                         PackedCriteria.arrMins(frontTuples[i]) + " , " +
-                        PackedCriteria.changes(frontTuples[i]) + ")";
+                        PackedCriteria.changes(frontTuples[i]) + ")");
             }
         }
-        return null;
+        return sb.toString();
     }
 
 
