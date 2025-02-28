@@ -54,26 +54,40 @@ public final class ParetoFront {
     }
 
     public static class Builder {
-        private ParetoFront frontInConstruction;
+        private long [] frontInConstruction;
+        private int effectiveSize;
 
 
         public Builder() {
-            frontInConstruction = EMPTY;
+            frontInConstruction = new long[10];
+            effectiveSize = 0;
 
         }
 
         public Builder (Builder that) {
             frontInConstruction = that.frontInConstruction;
+            effectiveSize = that.effectiveSize;
 
         }
 
         boolean isEmpty(){
-            return (frontInConstruction.frontTuples.length == 0);
+            return (effectiveSize == 0);
         }
 
         Builder clear(){
-            frontInConstruction = EMPTY;
+            frontInConstruction = new long[10];
+            effectiveSize = 0;
+
             return this;
+        }
+
+
+
+        Builder add(long PackedTuple) {
+            for (int i = 0; i < frontInConstruction.length; i++) {
+
+
+            }
         }
 
 
