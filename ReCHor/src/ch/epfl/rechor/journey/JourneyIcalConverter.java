@@ -32,7 +32,7 @@ public class JourneyIcalConverter {
         String lastLegStopName = journey.legs().getLast().arrStop().name();
         StringBuilder sb = new StringBuilder();
         sb.append(firstLegStopName)
-                .append(" -> ")
+                .append(" → ")
                 .append(lastLegStopName);
         String summary = sb.toString();
 

@@ -70,7 +70,43 @@ public class MyIcalBuilderTest {
         assertEquals(expectedLineWhenNewDateIsAdded,journeyCalendar.build());
     }
 
+    @Test
+    void add() {
+        String veryLongValue = "This is an even longer test value that exceeds 200 characters. It should be folded correctly by the IcalBuilder method. We want to ensure that every line has 75 characters or fewer and that the folding mechanism works as expected in this case.";
+        IcalBuilder builder = new IcalBuilder();
+        builder.add(IcalBuilder.Name.SUMMARY, veryLongValue);
+        String result = builder.build();
+        System.out.println(result);
+        assertTrue(result.contains("SUMMARY:"), "The result does not contain the expected attribute name.");
+    }
 
+    // tests 2
 
+    @Test
+    void addLocalDateTime() {
+        LocalDateTime dateTime = LocalDateTime.of(2025, 3, 15, 14, 30, 0);
+        String expectedFormattedDate = dateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"));
+
+        IcalBuilder builder = new IcalBuilder();
+        builder.add(IcalBuilder.Name.DTSTART, dateTime);
+
+        String result = builder.build();
+        System.out.println(result);
+
+        assertTrue(result.contains("DTSTART:" + expectedFormattedDate));
+    }
+
+    @Test
+    void addShortString() {
+        String shortValue = "Short summary without folding.";
+
+        IcalBuilder builder = new IcalBuilder();
+        builder.add(IcalBuilder.Name.SUMMARY, shortValue);
+
+        String result = builder.build();
+        System.out.println(result);
+
+        assertTrue(result.contains("SUMMARY:" + shortValue));
+    }
 
 }

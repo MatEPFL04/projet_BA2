@@ -5,8 +5,12 @@ import ch.epfl.rechor.IcalBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MyJourneyIcalConverterTest {
     private static List<Journey.Leg> exampleLegs() {
@@ -63,4 +67,86 @@ public class MyJourneyIcalConverterTest {
 
     }
 
+    // test 2
+
+
+    @Test
+    void testToIcalendar_WithValidJourney() {
+
+        LocalDateTime depTime = LocalDateTime.of(2025, 2, 26, 10, 0);
+        LocalDateTime footArrTime = LocalDateTime.of(2025, 2, 26, 10, 5);
+        LocalDateTime transportDepTime = footArrTime;
+        LocalDateTime transportArrTime = LocalDateTime.of(2025, 2, 26, 10, 50);
+        LocalDateTime finalFootDepTime = transportArrTime;
+        LocalDateTime finalFootArrTime = LocalDateTime.of(2025, 2, 26, 10, 55);
+
+        Stop depStop = new Stop("Station A", "voie 4", 0, 0);
+        Stop midStop = new Stop("Station Mid", "voie 2", 0, 0);
+        Stop arrStop = new Stop("Station B", "voie 3", 0, 0);
+
+
+        Journey.Leg.Foot footLeg1 = new Journey.Leg.Foot(depStop, depTime, midStop, footArrTime);
+        Journey.Leg.Transport transportLeg = new Journey.Leg.Transport(
+                midStop, transportDepTime, arrStop, transportArrTime, List.of(), Vehicle.TRAIN, "Train Line X", "Destination");
+        Journey.Leg.Foot footLeg2 = new Journey.Leg.Foot(arrStop, finalFootDepTime, arrStop, finalFootArrTime);
+
+        Journey journey = new Journey(List.of(footLeg1, transportLeg, footLeg2));
+
+        String ical = JourneyIcalConverter.toIcalendar(journey);
+        assertTrue(ical.contains("BEGIN:VCALENDAR"));
+        assertTrue(ical.contains("VERSION:2.0"));
+        assertTrue(ical.contains("PRODID:ReCHor"));
+        assertTrue(ical.contains("BEGIN:VEVENT"));
+        assertTrue(ical.contains("DTSTART:20250226T100000"));
+        assertTrue(ical.contains("DTEND:20250226T105500"));
+        assertTrue(ical.contains("SUMMARY:Station A → Station B"));
+        assertTrue(ical.contains("END:VEVENT"));
+        assertTrue(ical.contains("END:VCALENDAR"));
+    }
+
+    /*
+
+    @Test
+    void testToIcalendar_WithNullValues() {
+        String ical = JourneyIcalConverter.toIcalendar(null);
+
+        String expectedIcal = """
+        BEGIN:VCALENDAR
+        VERSION:2.0
+        PRODID:ReCHor
+        BEGIN:VEVENT
+        END:VEVENT
+        END:VCALENDAR
+        """;
+
+        assertEquals(expectedIcal.strip(), ical.strip());
+    }
+*/
+
+    @Test
+    void testFormatDescription() {
+        LocalDateTime depTime = LocalDateTime.of(2025, 2, 26, 10, 0);
+        LocalDateTime footArrTime = LocalDateTime.of(2025, 2, 26, 10, 5);
+        LocalDateTime transportDepTime = LocalDateTime.of(2025, 2, 26, 10, 10);
+        LocalDateTime transportArrTime = LocalDateTime.of(2025, 2, 26, 10, 15);
+
+        Stop depStop = new Stop("Station A", "4", 0, 0);
+        Stop midStop = new Stop("Station Mid", "2", 0, 0);
+        Stop arrStop = new Stop("Station B", "3", 0, 0);
+
+        Journey.Leg.Foot footLeg1 = new Journey.Leg.Foot(depStop, depTime, midStop, footArrTime);
+        Journey.Leg.Transport transportLeg = new Journey.Leg.Transport(
+                midStop, transportDepTime, arrStop, transportArrTime, List.of(), Vehicle.TRAIN, "Train Line X", "Destination");
+
+        Journey journey = new Journey(List.of(footLeg1, transportLeg));
+
+        String ical = JourneyIcalConverter.toIcalendar(journey);
+        System.out.println("Description générée :");
+        System.out.println(ical);
+
+        assertTrue(ical.contains("DESCRIPTION:"));
+        assertTrue(ical.contains("10h00 Station A (voie 4) → Station Mid"));
+        assertTrue(ical.contains("trajet à"));
+        assertTrue(ical.contains("10h10 Station Mid (voie 2) → Station B (arr. 10h15 voie 3)"));
+    }
 }
