@@ -30,10 +30,27 @@ public class MyPackedRangeTest {
 
     @Test
     void exceptionThrownWhenStartIntervalIsTooBig () {
-        int largeStart = 0b1001010101010010101000101111111;
+        int largeStart = 1 << 24;
         assertThrows(IllegalArgumentException.class, () -> {
-            PackedRange.pack(largeStart, largeStart+1 );
+            PackedRange.pack(largeStart, largeStart + 1 );
         });
+    }
+    @Test
+    void exceptionNotThrownWhenStartIntervalIsAsTheLimit () {
+        int largeStart = (1 << 24) - 1;
+        int packedBigInterval = PackedRange.pack(largeStart,largeStart + 3);
+        assertEquals(largeStart,PackedRange.startInclusive(packedBigInterval));
+
+    }
+
+    @Test
+    void exceptionThrownWhenValuesAreInverted () {
+        int largeStart = 10;
+        int end = 3;
+        assertThrows(IllegalArgumentException.class, () -> {
+            PackedRange.pack(largeStart,end);
+        });
+
     }
 
     @Test
@@ -44,6 +61,28 @@ public class MyPackedRangeTest {
         int expectedInterval = end - start;
         assertEquals(expectedInterval,PackedRange.length(pack));
     }
+
+    @Test
+    void maxLengthDoesNotThrowAnException() {
+        int start = 0xFAAAB;
+        int length = (1 << 8) - 1;
+        int end = start + length;
+        int packedRange = PackedRange.pack(start,end);
+        assertEquals(start,PackedRange.startInclusive(packedRange));
+    }
+
+    @Test
+    void moreThanMaxLengthDoesThrowAnException() {
+        int start = 0xFAAAB;
+        int length = (1 << 8);
+        int end = start + length;
+        assertThrows(IllegalArgumentException.class, () -> {
+            PackedRange.pack(start,end);
+        });
+
+    }
+
+
 
 
 

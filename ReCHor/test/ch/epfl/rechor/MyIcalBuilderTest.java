@@ -72,7 +72,9 @@ public class MyIcalBuilderTest {
 
     @Test
     void add() {
-        String veryLongValue = "This is an even longer test value that exceeds 200 characters. It should be folded correctly by the IcalBuilder method. We want to ensure that every line has 75 characters or fewer and that the folding mechanism works as expected in this case.";
+        String veryLongValue = "This is an even longer test value that exceeds 200 characters. " +
+                "It should be folded correctly by the IcalBuilder method. We want to ensure that every line has 75 characters" +
+                " or fewer and that the folding mechanism works as expected in this case.";
         IcalBuilder builder = new IcalBuilder();
         builder.add(IcalBuilder.Name.SUMMARY, veryLongValue);
         String result = builder.build();

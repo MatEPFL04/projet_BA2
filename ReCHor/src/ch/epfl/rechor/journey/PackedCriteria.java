@@ -159,6 +159,7 @@ public final class PackedCriteria {
      */
 
     public static long withAdditionalChange(long criteria) {
+        Preconditions.checkArgument(changes(criteria) < 255);
         int newChange = changes(criteria) + 1;
         return criteria | ((long) newChange << 32);
 

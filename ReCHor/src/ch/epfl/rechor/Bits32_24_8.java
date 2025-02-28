@@ -17,7 +17,7 @@ public final class Bits32_24_8 {
      * @return an int value consisting of bits24 for the most significant bits and bits8 for the 8 least significant bits
      */
     public static int pack(int bits24, int bits8) {
-        Preconditions.checkArgument(((bits24 >> 24) == 0) && ((bits8 >> 8) == 0));
+        Preconditions.checkArgument(((bits24 >>> 24) == 0) && ((bits8 >>> 8) == 0));
         return (bits24 << 8) | bits8;
     }
 
@@ -27,7 +27,7 @@ public final class Bits32_24_8 {
      * @return an integer value consisting of bits from the position 8-32
      */
     public static int unpack24(int bits32) {
-        return bits32 >> 8;
+        return bits32 >>> 8;
 
     }
 

@@ -1,5 +1,7 @@
 package ch.epfl.rechor;
 
+import ch.epfl.rechor.journey.PackedCriteria;
+
 /**
  * Utility class used to work with intervals, creating intervals,
  * as well as extracting the data out of an interval.
@@ -23,9 +25,8 @@ public final class PackedRange {
 
     public static int pack(int startInclusive, int endExclusive) {
 
-        Preconditions.checkArgument(((startInclusive >> 24) == 0)
-                && ((endExclusive - startInclusive) >> 8 == 0));
-        return (startInclusive << 8) | (endExclusive - startInclusive);
+        return Bits32_24_8.pack(startInclusive, (endExclusive - startInclusive));
+
 
     }
 

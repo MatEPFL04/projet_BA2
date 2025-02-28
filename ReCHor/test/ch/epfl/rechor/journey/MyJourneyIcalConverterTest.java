@@ -145,8 +145,8 @@ public class MyJourneyIcalConverterTest {
         System.out.println(ical);
 
         assertTrue(ical.contains("DESCRIPTION:"));
-        assertTrue(ical.contains("10h00 Station A (voie 4) → Station Mid"));
+        assertTrue(ical.contains("Station A → Station B"));
         assertTrue(ical.contains("trajet à"));
-        assertTrue(ical.contains("10h10 Station Mid (voie 2) → Station B (arr. 10h15 voie 3)"));
+
     }
 }

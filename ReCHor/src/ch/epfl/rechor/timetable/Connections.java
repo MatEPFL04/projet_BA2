@@ -1,5 +1,9 @@
 package ch.epfl.rechor.timetable;
 
+/**
+ * Interface representing all the connections of the swiss trains.
+ */
+
 public interface Connections extends Indexed {
     int depStopId(int id);
     int depMins(int id);

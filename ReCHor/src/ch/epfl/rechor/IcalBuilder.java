@@ -16,6 +16,8 @@ import java.util.StringJoiner;
 public final class IcalBuilder {
     private final ArrayList<Component> components = new ArrayList<>();
     private final StringBuilder stringBuilder = new StringBuilder();
+    private final static int LINE_SIZE = 75;
+    private final static String CRLF = "\r\n";
 
     /**
      * enum used to keep track of the opened Components
@@ -78,14 +80,14 @@ public final class IcalBuilder {
         String text = name.toString().concat(":").concat(value);
         StringBuilder sb = new StringBuilder();
 
-        double numberOfReturns = Math.floor((text.length()) / 75.0);
+        double numberOfReturns = Math.floor((double) (text.length()) / LINE_SIZE);
 
         for (int i = 0; i <= numberOfReturns; i++) {
-            int startIncluded = 75*i;
-            int length = sb.isEmpty() ? 75 : 74;
+            int startIncluded = LINE_SIZE*i;
+            int length = sb.isEmpty() ? LINE_SIZE : LINE_SIZE - 1;
             int endExcluded = Math.min(startIncluded + length, text.length());
 
-            sb.append(text, startIncluded, endExcluded).append("\r\n");
+            sb.append(text, startIncluded, endExcluded).append(CRLF);
 
             if (text.length() > endExcluded) {
                 sb.append(" ");
@@ -135,7 +137,7 @@ public final class IcalBuilder {
         stringBuilder.append(name)
                 .append(":")
                 .append(icsFormatDate(dateTime))
-                .append("\r\n");
+                .append(CRLF);
 
         return this;
 
@@ -152,7 +154,7 @@ public final class IcalBuilder {
         stringBuilder.append(Name.BEGIN)
                 .append(":")
                 .append(component)
-                .append("\r\n");
+                .append(CRLF);
 
 
         components.add(component);
@@ -173,7 +175,7 @@ public final class IcalBuilder {
         stringBuilder.append(Name.END)
                 .append(":")
                 .append(lastComponentStarted)
-                .append("\r\n");
+                .append(CRLF);
 
         return this;
 
