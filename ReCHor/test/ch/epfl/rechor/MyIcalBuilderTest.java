@@ -111,4 +111,5 @@ public class MyIcalBuilderTest {
         assertTrue(result.contains("SUMMARY:" + shortValue));
     }
 
+
 }
