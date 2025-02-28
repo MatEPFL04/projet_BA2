@@ -25,7 +25,7 @@ public final class ParetoFront {
                 return frontTuples[i];
             }
         }
-        throw new NoSuchElementException ();
+        throw new NoSuchElementException();
     }
 
 
@@ -34,7 +34,6 @@ public final class ParetoFront {
             action.accept(frontTuples[i]);
         }
     }
-
 
 
     public String toString () {
@@ -52,6 +51,32 @@ public final class ParetoFront {
             }
         }
         return sb.toString();
+    }
+
+    public static class Builder {
+        private ParetoFront frontInConstruction;
+
+
+        public Builder() {
+            frontInConstruction = EMPTY;
+
+        }
+
+        public Builder (Builder that) {
+            frontInConstruction = that.frontInConstruction;
+
+        }
+
+        boolean isEmpty(){
+            return (frontInConstruction.frontTuples.length == 0);
+        }
+
+        Builder clear(){
+            frontInConstruction = EMPTY;
+            return this;
+        }
+
+
     }
 
 
