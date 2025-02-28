@@ -84,10 +84,8 @@ public final class ParetoFront {
 
 
         Builder add(long PackedTuple) {
-            for (int i = 0; i < frontInConstruction.length; i++) {
 
-
-            }
+            return this;
         }
 
 
