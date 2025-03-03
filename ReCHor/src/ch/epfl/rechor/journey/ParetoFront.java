@@ -18,6 +18,7 @@ public final class ParetoFront {
     }
 
     public long get(int arrMins, int changes) throws NoSuchElementException {
+
         for (int i = 0; i < size(); i++) {
             if (PackedCriteria.arrMins(frontTuples[i]) == arrMins
                     && PackedCriteria.changes(frontTuples[i]) == changes) {
@@ -26,7 +27,6 @@ public final class ParetoFront {
         }
         throw new NoSuchElementException();
     }
-
 
     public void forEach(LongConsumer action) {
         for (int i = 0; i < size(); i++) {
@@ -117,36 +117,51 @@ public final class ParetoFront {
             }
         }
 
+        private int compactNonDominated(long[] array, long packedTuple) {
+            int nbrOfNonDominatedTupples = 0;
+
+            for (int i = 0; i < effectiveSize; i += 1) {
+                if (PackedCriteria.dominatesOrIsEqual(packedTuple, array[i])) {
+                    continue;
+                }
+                if (nbrOfNonDominatedTupples != i) {
+                    array[nbrOfNonDominatedTupples] = array[i];
+                }
+                nbrOfNonDominatedTupples += 1;
+            }
+
+            return nbrOfNonDominatedTupples;
+        }
+
+        /**
+         * We first find the correct insertion index,
+         * then we check if the new tuple is dominated,
+         * after we shift elements right from the insertion index
+         * and lastly we remove the dominated tuples with the compact method.
+         * @param packedTuple
+         * @return the new paretoFront
+         */
+
         public Builder add(long packedTuple) {
 
             if (!isTupleInTheFront(packedTuple))
                 return this;
+
             int insertionIdx = getInsertionIdx(packedTuple);
             frontResize();
 
-            if (PackedCriteria.dominatesOrIsEqual(packedTuple,frontInConstruction[insertionIdx])) {
-                int lastOneToDelete = insertionIdx;
-                for (int i = insertionIdx + 1; i < effectiveSize ; i++) {
-                    if (PackedCriteria.dominatesOrIsEqual(packedTuple,frontInConstruction[i])) {
-                        lastOneToDelete++;
-                    }
-                    else{
-                        break;
-                    }
+            for (int i = 0; i < insertionIdx; i++) {
+                if (PackedCriteria.dominatesOrIsEqual(frontInConstruction[i], packedTuple)) {
+                    return this;
                 }
-                int lengthOfShiftedPart = effectiveSize - (lastOneToDelete + 1);
-                System.arraycopy(frontInConstruction, lastOneToDelete + 1,frontInConstruction,insertionIdx + 1, lengthOfShiftedPart);
-                frontInConstruction[insertionIdx] = packedTuple;
-                System.arraycopy(frontInConstruction,0,frontInConstruction,0, (insertionIdx + 1 + lengthOfShiftedPart));
             }
 
-            //aucune dominance: juste un ajout à insertionIdx
-            else{
-                System.arraycopy(frontInConstruction,insertionIdx,frontInConstruction,insertionIdx + 1,effectiveSize - insertionIdx);
-                frontInConstruction[insertionIdx] = packedTuple;
-                effectiveSize++;
+            System.arraycopy(frontInConstruction, insertionIdx, frontInConstruction, insertionIdx + 1, effectiveSize - insertionIdx);
+            frontInConstruction[insertionIdx] = packedTuple;
+            effectiveSize++;
 
-            }
+            effectiveSize = compactNonDominated(frontInConstruction, packedTuple);
+
             return this;
         }
 
@@ -159,22 +174,20 @@ public final class ParetoFront {
             long tuple5 = PackedCriteria.pack(120,79,0);
             long tuple6 = PackedCriteria.pack(40,40,0);
 
-            testFront.add(tuple1)
-                    .add(tuple2)
-                            .add(tuple3);
-
-            System.out.println(testFront);
         }
-
 
         public Builder add (int arrMins, int changes, int payload) {
             long packedTuple = PackedCriteria.pack(arrMins,changes,payload);
+
+            /*int changes2  = PackedCriteria.
             add(packedTuple);
+
+             */
             return this;
         }
 
         public Builder addAll(Builder that) {
-            for (int i = effectiveSize; i < that.effectiveSize ; i++) {
+            for (int i = 0; i < that.effectiveSize ; i++) {
                 add(that.frontInConstruction[i]);
             }
             return this;
@@ -208,7 +221,6 @@ public final class ParetoFront {
             return new ParetoFront(Arrays.copyOf(frontInConstruction,effectiveSize));
         }
 
-
         @Override
         public String toString () {
             StringBuilder sb = new StringBuilder();
@@ -229,11 +241,6 @@ public final class ParetoFront {
             sb.append(" }");
             return sb.toString();
         }
-
-
-
-
-
 
     }
 
