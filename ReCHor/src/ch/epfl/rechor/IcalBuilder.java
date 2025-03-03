@@ -51,7 +51,7 @@ public final class IcalBuilder {
      * @return the current instantiation of IcalBuilder
      */
 
-    /*
+
     public IcalBuilder add (Name name, String value) {
 
 
@@ -71,10 +71,9 @@ public final class IcalBuilder {
         return this;
     }
 
-     */
 
 
-
+    /*
     public IcalBuilder add (Name name, String value) {
 
         String text = name.toString().concat(":").concat(value);
@@ -93,10 +92,15 @@ public final class IcalBuilder {
                 sb.append(" ");
             }
         }
-
         stringBuilder.append(sb);
         return this;
     }
+
+     */
+
+
+
+
 
 
 

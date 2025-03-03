@@ -4,7 +4,7 @@ package ch.epfl.sigcheck;
 // destiné à être exécuté. Son seul but est de vérifier, autant que possible,
 // que les noms et les types des différentes entités à définir pour cette
 // étape du projet sont corrects.
-/*
+
 final class SignatureChecks_3 {
     private SignatureChecks_3() {}
 
@@ -123,4 +123,3 @@ final class SignatureChecks_3 {
 
 }
 
- */

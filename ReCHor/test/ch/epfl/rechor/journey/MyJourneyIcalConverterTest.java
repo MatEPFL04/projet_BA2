@@ -67,8 +67,6 @@ public class MyJourneyIcalConverterTest {
 
     }
 
-    // test 2
-
 
     @Test
     void testToIcalendar_WithValidJourney() {
@@ -104,24 +102,6 @@ public class MyJourneyIcalConverterTest {
         assertTrue(ical.contains("END:VCALENDAR"));
     }
 
-    /*
-
-    @Test
-    void testToIcalendar_WithNullValues() {
-        String ical = JourneyIcalConverter.toIcalendar(null);
-
-        String expectedIcal = """
-        BEGIN:VCALENDAR
-        VERSION:2.0
-        PRODID:ReCHor
-        BEGIN:VEVENT
-        END:VEVENT
-        END:VCALENDAR
-        """;
-
-        assertEquals(expectedIcal.strip(), ical.strip());
-    }
-*/
 
     @Test
     void testFormatDescription() {
@@ -141,8 +121,6 @@ public class MyJourneyIcalConverterTest {
         Journey journey = new Journey(List.of(footLeg1, transportLeg));
 
         String ical = JourneyIcalConverter.toIcalendar(journey);
-        System.out.println("Description générée :");
-        System.out.println(ical);
 
         assertTrue(ical.contains("DESCRIPTION:"));
         assertTrue(ical.contains("Station A → Station B"));

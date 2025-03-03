@@ -23,7 +23,6 @@ public interface TimeTable {
     default int stationId(int stopId) {
         if (isPlatformId(stopId)) {
             int idxPlatform = stopId - stations().size();
-
             return platforms().stationId(idxPlatform);
         }
         else {

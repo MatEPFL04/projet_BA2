@@ -78,7 +78,6 @@ public class MyIcalBuilderTest {
         IcalBuilder builder = new IcalBuilder();
         builder.add(IcalBuilder.Name.SUMMARY, veryLongValue);
         String result = builder.build();
-        System.out.println(result);
         assertTrue(result.contains("SUMMARY:"), "The result does not contain the expected attribute name.");
     }
 
@@ -93,7 +92,6 @@ public class MyIcalBuilderTest {
         builder.add(IcalBuilder.Name.DTSTART, dateTime);
 
         String result = builder.build();
-        System.out.println(result);
 
         assertTrue(result.contains("DTSTART:" + expectedFormattedDate));
     }
@@ -106,7 +104,6 @@ public class MyIcalBuilderTest {
         builder.add(IcalBuilder.Name.SUMMARY, shortValue);
 
         String result = builder.build();
-        System.out.println(result);
 
         assertTrue(result.contains("SUMMARY:" + shortValue));
     }
