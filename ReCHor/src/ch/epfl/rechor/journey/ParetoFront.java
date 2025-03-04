@@ -122,7 +122,6 @@ public final class ParetoFront {
          * @return the builder
          */
         public Builder clear(){
-            frontInConstruction = new long[10];
             effectiveSize = 0;
 
             return this;
@@ -133,19 +132,6 @@ public final class ParetoFront {
             return criteria & mask;
         }
 
-        private int getInsertionIdx (long packedTuple) {
-            int insertionIdx = 0;
-
-            for (int i = 0; i < effectiveSize; i++) {
-                if (withoutPayLoad(packedTuple) > withoutPayLoad(frontInConstruction[i])) {
-                    insertionIdx++;
-                }
-                else{
-                    break;
-                }
-            }
-            return insertionIdx;
-        }
 
         private void frontResize() {
             if ((effectiveSize + 1) > frontInConstruction.length) {
@@ -154,11 +140,10 @@ public final class ParetoFront {
             }
         }
 
-        private int compactNonDominated(long[] array, long packedTuple) {
-            int insertionIdx = getInsertionIdx(packedTuple);
-            int destPos = insertionIdx;
+        private int compactNonDominated(long[] array, long packedTuple, int startIndex) {
+            int destPos = startIndex;
 
-            for (int src = insertionIdx; src < effectiveSize; src += 1) {
+            for (int src = destPos; src < effectiveSize; src += 1) {
                 if (PackedCriteria.dominatesOrIsEqual(packedTuple, array[src])) {
                     continue;
                 }
@@ -183,19 +168,21 @@ public final class ParetoFront {
          */
         public Builder add(long packedTuple) {
 
-            int insertionIdx = getInsertionIdx(packedTuple);
-            for (int i = 0; i < insertionIdx; i++) {
-                if (PackedCriteria.dominatesOrIsEqual(frontInConstruction[i], packedTuple)) {
+            int insertionIdx = 0;
+
+            while((insertionIdx < effectiveSize) && withoutPayLoad(packedTuple) > withoutPayLoad(frontInConstruction[insertionIdx])) {
+                if (PackedCriteria.dominatesOrIsEqual(frontInConstruction[insertionIdx], packedTuple)) {
                     return this;
                 }
+                insertionIdx++;
             }
-            effectiveSize = compactNonDominated(frontInConstruction,packedTuple);
+
+            effectiveSize = compactNonDominated(frontInConstruction,packedTuple,insertionIdx);
             frontResize();
 
             System.arraycopy(frontInConstruction, insertionIdx, frontInConstruction, insertionIdx + 1, effectiveSize - insertionIdx);
             frontInConstruction[insertionIdx] = packedTuple;
             effectiveSize++;
-
 
             return this;
         }
@@ -211,9 +198,7 @@ public final class ParetoFront {
             long tuple2 = PackedCriteria.pack(120,80,0);
             long tuple4 = PackedCriteria.pack(130,59,0);
             long tuple5 = PackedCriteria.pack(120,79,0);
-            long tuple6 = PackedCriteria.pack(40,40,0);
-            long tuple7 = PackedCriteria.pack(50,28,0);
-            testFront.add(tuple1).add(tuple2).add(tuple4).add(tuple5).add(tuple6).add(tuple7);
+            testFront.add(tuple1).add(tuple2).add(tuple4).add(tuple5);
             System.out.println(testFront);
 
         }
