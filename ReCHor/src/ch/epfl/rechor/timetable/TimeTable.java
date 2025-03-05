@@ -59,20 +59,19 @@ public interface TimeTable {
     Connections connectionsFor(LocalDate date);
 
     /**
-     * Is station id boolean.
-     *
-     * @param stopId the stop id
-     * @return the boolean
+     * the method checks whether the index given is a station index
+     * @param stopId the stop id given
+     * @return true, if the given index is a station id, false otherwise
      */
     default boolean isStationId(int stopId) {
         return stopId < stations().size();
     }
 
     /**
-     * Is platform id boolean.
+     * the method checks whether the index given is a platform index
      *
-     * @param stopId the stop id
-     * @return the boolean
+     * @param stopId the stop id given
+     * @return true, if the given index is a platfrom id, false otherwise
      */
     default boolean isPlatformId(int stopId) {
         return stopId >= stations().size();
@@ -80,10 +79,10 @@ public interface TimeTable {
     }
 
     /**
-     * Station id int.
+     * Station id, returns the index of the given stop id
      *
      * @param stopId the stop id
-     * @return the int
+     * @return the id of the given platform.
      */
     default int stationId(int stopId) {
         if (isPlatformId(stopId)) {
@@ -96,10 +95,10 @@ public interface TimeTable {
     }
 
     /**
-     * Platform name string.
+     * Method returning the name of the platform of given id
      *
      * @param stopId the stop id
-     * @return the string
+     * @return the platform name if the index concerns a platform, null otherwise
      */
     default String platformName(int stopId) {
         int idxPlatform = stopId - stations().size();

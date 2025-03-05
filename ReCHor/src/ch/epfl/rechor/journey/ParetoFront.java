@@ -14,9 +14,14 @@ import java.util.function.LongConsumer;
 public final class ParetoFront {
     private long [] frontTuples;
     /**
-     * The constant EMPTY.
+     * The constant EMPTY, used to represent an empty front
      */
     public static final ParetoFront EMPTY = new ParetoFront(new long [0]);
+
+    /**
+     * private constructor, so a front can only be built by the bui
+     * @param packedCriteria
+     */
 
     private ParetoFront (long [] packedCriteria) {
         this.frontTuples = packedCriteria;
@@ -194,11 +199,15 @@ public final class ParetoFront {
          */
         public static void main(String[] args) {
             Builder testFront = new Builder();
-            long tuple1 = PackedCriteria.pack(100,100,0);
-            long tuple2 = PackedCriteria.pack(120,80,0);
-            long tuple4 = PackedCriteria.pack(130,59,0);
-            long tuple5 = PackedCriteria.pack(120,79,0);
-            testFront.add(tuple1).add(tuple2).add(tuple4).add(tuple5);
+            long tuple1 = PackedCriteria.pack(20,11,0);
+            long tuple2 = PackedCriteria.pack(25,8,0);
+            long tuple4 = PackedCriteria.pack(30,7,0);
+            long tuple5 = PackedCriteria.pack(32,6,0);
+            long tuple6 = PackedCriteria.pack(-240,5,0);
+            long tuple7 = PackedCriteria.pack(35,4,0);
+            long tuple8 = PackedCriteria.pack(38,3,0);
+            long tuple9 = PackedCriteria.pack(27,0,0);
+            testFront.add(tuple1).add(tuple2).add(tuple4).add(tuple5).add(tuple6).add(tuple7).add(tuple8).add(tuple9);
             System.out.println(testFront);
 
         }
