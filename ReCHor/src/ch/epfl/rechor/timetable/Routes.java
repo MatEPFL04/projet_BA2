@@ -3,6 +3,8 @@ package ch.epfl.rechor.timetable;
 import ch.epfl.rechor.journey.Vehicle;
 
 /**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  * interface reoresenting the routes from the swiss timetable.
  */
 

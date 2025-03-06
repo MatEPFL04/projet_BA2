@@ -2,6 +2,8 @@ package ch.epfl.rechor;
 
 
 /**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  * utility class helpful to manipulate positive or null int values (extractions and packing of values)
  */
 public final class Bits32_24_8 {

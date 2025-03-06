@@ -12,6 +12,7 @@ import java.time.temporal.ChronoField;
 /**
  * The formatter class is a utility class that
  * ensures to get every text representation in the right format
+ * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  * @throws NullPointerException
  *      in case the name of the stop is null

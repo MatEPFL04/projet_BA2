@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  * builder class, used to construct events in an Icalendar format,
  *      that can then be exported as a .ics file
  */

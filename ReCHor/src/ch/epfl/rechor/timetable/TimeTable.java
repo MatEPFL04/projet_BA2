@@ -3,6 +3,8 @@ package ch.epfl.rechor.timetable;
 import java.time.LocalDate;
 
 /**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  * The interface Time table.
  */
 public interface TimeTable {
@@ -67,6 +69,8 @@ public interface TimeTable {
         return stopId < stations().size();
     }
 
+    //boollen? à méditer
+
     /**
      * the method checks whether the index given is a platform index
      *
@@ -104,5 +108,4 @@ public interface TimeTable {
         int idxPlatform = stopId - stations().size();
         return isPlatformId(stopId) ? platforms().name(idxPlatform) : null;
     }
-
 }

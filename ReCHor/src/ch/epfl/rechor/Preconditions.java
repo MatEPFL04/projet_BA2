@@ -2,6 +2,7 @@ package ch.epfl.rechor;
 
 /**
  * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  * class used in various files of the project to throw exceptions
  * @
  */

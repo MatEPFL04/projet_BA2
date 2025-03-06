@@ -9,6 +9,8 @@ import java.util.function.LongConsumer;
  * composed of tuples (long values) that represent the characteristics of a journey,
  * We either have two criteria: the arrival time and the changes (in a long), or three criteria, by including the departure time.
  * Instances are created by the builder class, who can instantiate a new front.
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  */
 public final class ParetoFront {
     private long [] frontTuples;
@@ -52,6 +54,8 @@ public final class ParetoFront {
         }
         throw new NoSuchElementException();
     }
+
+    // get depMin?
 
     /**
      * Method used to accept an action on each element in the front

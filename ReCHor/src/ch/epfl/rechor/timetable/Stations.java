@@ -1,5 +1,10 @@
 package ch.epfl.rechor.timetable;
 
+/**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
+ */
+
 public interface Stations extends Indexed {
 
     /**

@@ -10,6 +10,8 @@ import java.util.UUID;
 /**
  * public class, not-instantiable,
  *      containing a unique static method used to transform a journey into a string formatted in .ics
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  */
 
 public class JourneyIcalConverter {

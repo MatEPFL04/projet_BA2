@@ -5,6 +5,7 @@ import java.util.Objects;
 
 /**
  * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  * @param name
  *      name of the location of the stop
  * @param platformName

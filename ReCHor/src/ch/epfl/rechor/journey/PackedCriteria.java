@@ -6,6 +6,8 @@ import ch.epfl.rechor.Preconditions;
 /**
  * non-instantiable class used to extract information concerning departure time, changes  and so on
  *      out of a long value, a criteria
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  */
 
 public final class PackedCriteria {

@@ -9,6 +9,7 @@ import java.util.Objects;
 /**
  * The journey Record represents a journey in public transport.
  * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
  * @param legs a list of legs (steps) that constitute the Journey
  *
  */

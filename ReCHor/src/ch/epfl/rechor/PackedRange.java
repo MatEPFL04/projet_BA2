@@ -3,7 +3,8 @@ package ch.epfl.rechor;
 import ch.epfl.rechor.journey.PackedCriteria;
 
 /**
- * Utility class used to work with intervals, creating intervals,
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)Utility class used to work with intervals, creating intervals,
  * as well as extracting the data out of an interval.
  */
 
