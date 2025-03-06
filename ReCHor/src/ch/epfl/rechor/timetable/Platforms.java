@@ -3,22 +3,24 @@ package ch.epfl.rechor.timetable;
 /**
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
- * interface representing indexed platform from the swiss timetable,
+ * Interface representing indexed platform from the swiss timetable.
+ * All methods throw an IndexOutOfBoundsException if the given index
+ * is out of range, meaning it is less than 0 or greater than or equal to size()
  */
 
 public interface Platforms extends Indexed {
     /**
      *
-     * @param id, the index of the platform in the indexed list
+     * @param id
      * @return the name of the platform with the given id
+     * @throws IndexOutOfBoundsException if the index is out of bounds
      */
-    String name(int id);
+    String name(int id) throws IndexOutOfBoundsException;
 
     /**
-     * method used to return the stationId
-     * @param id the platform id
+     * @param id
      * @return the index of the station
+     * @throws IndexOutOfBoundsException if the index is out of bounds
      */
-    int stationId(int id);
-
+    int stationId(int id) throws IndexOutOfBoundsException;
 }

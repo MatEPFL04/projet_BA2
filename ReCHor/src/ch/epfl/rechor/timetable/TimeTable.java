@@ -12,9 +12,8 @@ public interface TimeTable {
      * Stations stations.
      *
      * @return the stations
-     * @throws IndexOutOfBoundsException the index out of bounds exception
      */
-    Stations stations() throws IndexOutOfBoundsException;
+    Stations stations();
 
     /**
      * Station aliases station aliases.
