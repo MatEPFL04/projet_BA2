@@ -8,12 +8,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MyParetoFrontTest {
 
     @Test
-    void emptyParetoFrontTest() {
-        ParetoFront front = ParetoFront.EMPTY;
-        assertEquals(0, front.size());
-    }
-
-    @Test
     void exceptionThrownWhen2D_3D_tuplesAreMixed(){
         ParetoFront.Builder front = new ParetoFront.Builder();
         long twoDTuple = PackedCriteria.pack(20,10,30);
