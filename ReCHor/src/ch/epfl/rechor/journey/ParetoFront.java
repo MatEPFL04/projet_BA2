@@ -6,10 +6,9 @@ import java.util.function.LongConsumer;
 
 /**
  * final class ParetoFront, used to represent a front,
- * composed of tuples that represent the characteristics of a journey,
- * either two characteristics: the arrival time and the changes (in a long), or three criteria, by including the departure time.
- * <p>
- * The front is created by the builder, who creates an instance of a front
+ * composed of tuples (long values) that represent the characteristics of a journey,
+ * We either have two criteria: the arrival time and the changes (in a long), or three criteria, by including the departure time.
+ * Instances are created by the builder class, who can instantiate a new front.
  */
 public final class ParetoFront {
     private long [] frontTuples;
@@ -19,8 +18,8 @@ public final class ParetoFront {
     public static final ParetoFront EMPTY = new ParetoFront(new long [0]);
 
     /**
-     * private constructor, so a front can only be built by the bui
-     * @param packedCriteria
+     * private constructor, so a front can only be built by the builder nested inside the ParetoFront class
+     * @param packedCriteria, the array that is given by the builder
      */
 
     private ParetoFront (long [] packedCriteria) {
@@ -29,21 +28,20 @@ public final class ParetoFront {
     }
 
     /**
-     * Size int.
-     *
-     * @return the int
+     * Method returning the size of the front
+     * @return the size of the front
      */
     public int size() {
         return frontTuples.length;
     }
 
     /**
-     * Get long.
+     * Method used to search inside a Pareto front a tuple with the given criteria.
      *
-     * @param arrMins the arr mins
-     * @param changes the changes
-     * @return the long
-     * @throws NoSuchElementException the no such element exception
+     * @param arrMins the arrival time we want in the long tuple returned.
+     * @param changes the changes that we want to have ir the front.
+     * @return the long found inside the pareto Front, that meets the given criteria.
+     * @throws NoSuchElementException if no element with the given criteria is found.
      */
     public long get(int arrMins, int changes) throws NoSuchElementException {
         for (int i = 0; i < size(); i++) {
@@ -56,8 +54,7 @@ public final class ParetoFront {
     }
 
     /**
-     * For each.
-     *
+     * Method used to accept an action on each element in the front
      * @param action the action
      */
     public void forEach(LongConsumer action) {
@@ -86,6 +83,9 @@ public final class ParetoFront {
 
     /**
      * The type Builder.
+     * with two private attributes:
+     * a long array, used to store the current front
+     * an int attribute, used to keep track of the effective size of the array.
      */
     public static class Builder {
         private long [] frontInConstruction;
@@ -93,7 +93,7 @@ public final class ParetoFront {
 
 
         /**
-         * Instantiates a new Builder.
+         * Instantiates a new Builder, and initializes the attributes.
          */
         public Builder() {
             frontInConstruction = new long[2];
@@ -102,9 +102,8 @@ public final class ParetoFront {
         }
 
         /**
-         * Instantiates a new Builder.
-         *
-         * @param that the that
+         * Instantiates a new builder using another Pareto front builder
+         * @param that the other builder used to instantiate a new one
          */
         public Builder (Builder that) {
             frontInConstruction = that.frontInConstruction;
@@ -113,17 +112,15 @@ public final class ParetoFront {
         }
 
         /**
-         * Is empty boolean.
-         *
-         * @return the boolean
+         * a method returning true if the current front in construction is empty
+         * @return true if the current front is empty
          */
         public boolean isEmpty(){
             return (effectiveSize == 0);
         }
 
         /**
-         * Clear builder.
-         *
+         * Clear the current front by putting the effective size as 0.
          * @return the builder
          */
         public Builder clear(){
@@ -145,31 +142,17 @@ public final class ParetoFront {
             }
         }
 
-        private int compactNonDominated(long[] array, long packedTuple, int startIndex) {
-            int destPos = startIndex;
-
-            for (int src = destPos; src < effectiveSize; src += 1) {
-                if (PackedCriteria.dominatesOrIsEqual(packedTuple, array[src])) {
-                    continue;
-                }
-                if (destPos != src) {
-                    array[destPos] = array[src];
-                }
-                destPos += 1;
-            }
-
-            return destPos; //l'index de fin de notre tableau avec les éléments non-dominés
-        }
 
         /**
-         * We first find the correct insertion index,
-         * then we check if the new tuple is dominated,
-         * after that, we compact the elements that start at insertionIdx all the way to the effectivesize and
-         * we bring them back as a compact sequence starting at insertionIdx
-         * and lastly we shift the position by once to insert our new tuple
+         * Method used to add a new (long) tuple to the current front in construction, using the following steps:
+         *      - We first find the correct insertion index,
+         *      - then we check if the new tuple is dominated,
+         *      - after that, we compact the elements that start at insertionIdx all the way to the effectivesize and
+         *      - we bring them back as a compact sequence starting at insertionIdx
+         *      - and lastly we shift the position by once to insert our new tuple
          *
          * @param packedTuple the packed tuple
-         * @return the new paretoFront
+         * @return the builder
          */
         public Builder add(long packedTuple) {
 
@@ -182,7 +165,19 @@ public final class ParetoFront {
                 insertionIdx++;
             }
 
-            effectiveSize = compactNonDominated(frontInConstruction,packedTuple,insertionIdx);
+            int compactFrontIdx = insertionIdx;
+
+            for (int src = insertionIdx; src < effectiveSize; src += 1) {
+                if (PackedCriteria.dominatesOrIsEqual(packedTuple, frontInConstruction[src])) {
+                    continue;
+                }
+                if (compactFrontIdx != src) {
+                    frontInConstruction[compactFrontIdx] = frontInConstruction[src];
+                }
+                compactFrontIdx++;
+            }
+
+            effectiveSize = compactFrontIdx;
             frontResize();
 
             System.arraycopy(frontInConstruction, insertionIdx, frontInConstruction, insertionIdx + 1, effectiveSize - insertionIdx);
@@ -193,31 +188,11 @@ public final class ParetoFront {
         }
 
         /**
-         * The entry point of application.
+         * Add a criteria to the front with the given arrival time, changes, and payload but no departure time
          *
-         * @param args the input arguments
-         */
-        public static void main(String[] args) {
-            Builder testFront = new Builder();
-            long tuple1 = PackedCriteria.pack(20,11,0);
-            long tuple2 = PackedCriteria.pack(25,8,0);
-            long tuple4 = PackedCriteria.pack(30,7,0);
-            long tuple5 = PackedCriteria.pack(32,6,0);
-            long tuple6 = PackedCriteria.pack(-240,5,0);
-            long tuple7 = PackedCriteria.pack(35,4,0);
-            long tuple8 = PackedCriteria.pack(38,3,0);
-            long tuple9 = PackedCriteria.pack(27,0,0);
-            testFront.add(tuple1).add(tuple2).add(tuple4).add(tuple5).add(tuple6).add(tuple7).add(tuple8).add(tuple9);
-            System.out.println(testFront);
-
-        }
-
-        /**
-         * Add builder.
-         *
-         * @param arrMins the arr mins
-         * @param changes the changes
-         * @param payload the payload
+         * @param arrMins the given arrival time in minutes
+         * @param changes the given changes
+         * @param payload the given payload
          * @return the builder
          */
         public Builder add (int arrMins, int changes, int payload) {
@@ -241,11 +216,12 @@ public final class ParetoFront {
         }
 
         /**
-         * Fully dominates boolean.
-         *
-         * @param that    the that
-         * @param depMins the dep mins
-         * @return the boolean
+         * Method used to determine whether each tuple from the given builder
+         * are dominated or equal by at least one tuple in "this".
+         * @param that the builder compared to the current builder
+         * @param depMins the departure time that is injected into the tuples of that before the comparisons
+         * @return true, if all the tuples from that are equal
+         * or dominated by at least one tuple in the current builder, false othewise
          */
         public boolean fullyDominates(Builder that, int depMins) {
             for (int i = 0; i < that.effectiveSize; i++) { //itération sur tous les tuples de that
@@ -255,6 +231,7 @@ public final class ParetoFront {
                 for (int j = 0; j < effectiveSize; j++) {
                     if (PackedCriteria.dominatesOrIsEqual(frontInConstruction[j],criteriaWithDepMins)){
                         isTupleFromThatDominatedOrEqualInThis = true;
+                        break;
                     }
                 }
                 if (!isTupleFromThatDominatedOrEqualInThis) {
@@ -266,8 +243,7 @@ public final class ParetoFront {
         }
 
         /**
-         * For each.
-         *
+         * Method used to accept an action on each element in the front that is built.
          * @param action the action
          */
         public void forEach(LongConsumer action) {
@@ -277,9 +253,9 @@ public final class ParetoFront {
         }
 
         /**
-         * Build pareto front.
-         *
-         * @return the pareto front
+         * build method used to create an object of type ParetoFront, once the front is finished.
+         * The front is copied by the constructor.
+         * @return the final pareto front
          */
         public ParetoFront build () {
             return new ParetoFront(Arrays.copyOf(frontInConstruction,effectiveSize));
