@@ -2,12 +2,27 @@ package ch.epfl.rechor.timetable.mapped;
 import ch.epfl.rechor.Preconditions;
 import java.util.Objects;
 
+/**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
+ * The class helps describing the structure of the flattened representation.
+ */
+
 public class Structure {
 
     private short [] firstBytes;
     private short structureSize;
 
+    /**
+     *
+     * @param fields
+     */
+
     public Structure (Field ... fields) {
+
+        /**
+         * @throws checkArgument to check if the indexes are in the right order
+         */
         firstBytes = new short[fields.length];
         for (int i = 0; i < fields.length; i++) {
             Preconditions.checkArgument(fields[i].index == i);
@@ -27,7 +42,6 @@ public class Structure {
                 structureSize += 4;
             }
         }
-
 
     }
 
