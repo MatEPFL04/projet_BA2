@@ -29,17 +29,21 @@ public class Structure {
         }
 
         for (int i = 0; i < fields.length; i++) {
-            if (fields [i].type.equals(FieldType.U8)) {
-                firstBytes[i] = structureSize;
-                structureSize++;
-            }
-            else if (fields[i].type.equals(FieldType.U16)) {
-                firstBytes[i] = structureSize;
-                structureSize += 2;
-            }
-            else if (fields[i].type.equals(FieldType.S32)) {
-                firstBytes[i] = structureSize;
-                structureSize += 4;
+            FieldType currentFieldType = fields[i].type;
+            switch (currentFieldType) {
+                case U8 -> {
+                    firstBytes[i] = structureSize;
+                    structureSize++;
+                }
+                case U16 -> {
+                    firstBytes[i] = structureSize;
+                    structureSize += 2;
+                }
+                case S32 -> {
+                    firstBytes[i] = structureSize;
+                    structureSize += 4;
+                }
+
             }
         }
 
