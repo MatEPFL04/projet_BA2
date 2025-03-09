@@ -53,6 +53,7 @@ public final class IcalBuilder {
      * @return the current instantiation of IcalBuilder
      */
 
+    /*
 
     public IcalBuilder add (Name name, String value) {
 
@@ -73,32 +74,30 @@ public final class IcalBuilder {
         return this;
     }
 
+     */
 
 
-    /*
+
+
     public IcalBuilder add (Name name, String value) {
 
         String text = name.toString().concat(":").concat(value);
-        StringBuilder sb = new StringBuilder();
+        StringJoiner sj = new StringJoiner(CRLF + " ");
 
         double numberOfReturns = Math.floor((double) (text.length()) / LINE_SIZE);
-
+        int includedStartIdx = 0;
         for (int i = 0; i <= numberOfReturns; i++) {
-            int startIncluded = LINE_SIZE*i;
-            int length = sb.isEmpty() ? LINE_SIZE : LINE_SIZE - 1;
-            int endExcluded = Math.min(startIncluded + length, text.length());
-
-            sb.append(text, startIncluded, endExcluded).append(CRLF);
-
-            if (text.length() > endExcluded) {
-                sb.append(" ");
-            }
+           int length = (i == 0) ? LINE_SIZE : LINE_SIZE -1;
+           int endExcludedIdx = Math.min(includedStartIdx + length, text.length());
+           sj.add(text.substring(includedStartIdx,endExcludedIdx));
+           includedStartIdx = endExcludedIdx;
         }
-        stringBuilder.append(sb);
+        stringBuilder.append(sj).append(CRLF);
         return this;
     }
 
-     */
+
+
 
 
 
