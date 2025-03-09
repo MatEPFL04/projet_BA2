@@ -1,5 +1,7 @@
 package ch.epfl.rechor.timetable.mapped;
 
+import ch.epfl.rechor.Preconditions;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -13,9 +15,8 @@ public class StructuredBuffer {
     private final Structure structure;
 
     public StructuredBuffer(Structure structure, ByteBuffer buffer) {
-        if(buffer.capacity() % structure.totalSize() != 0) {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(buffer.capacity() % structure.totalSize() == 0);
+
         this.structure = structure;
         this.buffer = buffer;
     }
@@ -30,15 +31,12 @@ public class StructuredBuffer {
     }
 
     /**
-     * Check if one of the indexes are invalid
-     * @param fieldIndex
+     * Check if the element index given surpasses the size of the buffer
+     *
      * @param elementIndex
      */
-    private void checkIndex(int fieldIndex, int elementIndex) {
-        if(fieldIndex < 0) {            //second condition here but idk
-            throw new IndexOutOfBoundsException();
-        }
-        if(elementIndex < 0 || elementIndex >= structure.totalSize()) {
+    private void checkElementIndex(int elementIndex) {
+        if(elementIndex < 0 || elementIndex >= size()) {
             throw new IndexOutOfBoundsException();
         }
     }
@@ -50,7 +48,7 @@ public class StructuredBuffer {
      * @return
      */
     public int getU8(int fieldIndex, int elementIndex) {
-        checkIndex(fieldIndex, elementIndex);
+        checkElementIndex(elementIndex);
         byte U8 = buffer.get(structure.offset(fieldIndex, elementIndex));
         return Byte.toUnsignedInt(U8);
     }
@@ -62,7 +60,7 @@ public class StructuredBuffer {
      * @return
      */
     public int getU16(int fieldIndex, int elementIndex) {
-        checkIndex(fieldIndex, elementIndex);
+        checkElementIndex(elementIndex);
         short U16 = buffer.getShort(structure.offset(fieldIndex, elementIndex));
         return Short.toUnsignedInt(U16);
     }
@@ -74,8 +72,8 @@ public class StructuredBuffer {
      * @return
      */
     public int getS32(int fieldIndex, int elementIndex) {
-        checkIndex(fieldIndex, elementIndex);
-        int S32 = buffer.getInt(structure.offset(fieldIndex, elementIndex));
-        return S32;
+        checkElementIndex(elementIndex);
+
+        return buffer.getInt(structure.offset(fieldIndex, elementIndex));
     }
 }

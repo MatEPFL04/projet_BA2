@@ -16,8 +16,8 @@ public final class BufferedStations implements Stations {
      * Constants for the different fields
      */
     private static final int NAME_ID = 0;
-    private static final int LAT = 1;
-    private static final int LON = 2;
+    private static final int LON = 1;
+    private static final int LAT = 2;
 
     private final StructuredBuffer structuredBuffer;
     private final List<String> stringTable;
@@ -30,7 +30,8 @@ public final class BufferedStations implements Stations {
      */
     public BufferedStations(List<String> stringTable, ByteBuffer buffer) {
         this.stringTable = stringTable;
-        Structure structureStation = new Structure();
+        Structure structureStation = new Structure(Structure.field(NAME_ID, Structure.FieldType.U16),
+                Structure.field(LON, Structure.FieldType.S32),Structure.field(LAT, Structure.FieldType.S32));
         this.structuredBuffer = new StructuredBuffer(structureStation, buffer);
     }
 

@@ -18,8 +18,9 @@ public final class BufferedPlatforms implements Platforms {
 
     public BufferedPlatforms(List<String> stringTable, ByteBuffer buffer) {
         this.stringTable = stringTable;
-        Structure structureStation = new Structure();
-        this.structuredBuffer = new StructuredBuffer(structureStation, buffer);
+        Structure structurePlatform = new Structure(Structure.field(NAME_ID, Structure.FieldType.U16),
+                Structure.field(STATION_ID, Structure.FieldType.U16));
+        this.structuredBuffer = new StructuredBuffer(structurePlatform, buffer);
     }
 
     @Override
