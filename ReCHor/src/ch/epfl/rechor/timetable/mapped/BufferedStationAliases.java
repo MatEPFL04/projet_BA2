@@ -12,6 +12,8 @@ public final class BufferedStationAliases implements StationAliases {
      */
     private static final int ALIAS_ID = 0;
     private static final int STATION_NAME_ID = 1;
+    private static final Structure structureStationAliases = new Structure(Structure.field(ALIAS_ID, Structure.FieldType.U16),
+            Structure.field(STATION_NAME_ID, Structure.FieldType.U16));
 
 
     private final StructuredBuffer structuredBuffer;
@@ -19,8 +21,6 @@ public final class BufferedStationAliases implements StationAliases {
 
     public BufferedStationAliases(  List<String> stringTable, ByteBuffer buffer) {
         this.stringTable = stringTable;
-        Structure structureStationAliases = new Structure(Structure.field(ALIAS_ID, Structure.FieldType.U16),
-                Structure.field(STATION_NAME_ID, Structure.FieldType.U16));
 
         this.structuredBuffer = new StructuredBuffer(structureStationAliases, buffer);
     }

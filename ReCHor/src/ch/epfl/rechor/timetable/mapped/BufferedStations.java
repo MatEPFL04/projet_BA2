@@ -21,6 +21,8 @@ public final class BufferedStations implements Stations {
 
     private final StructuredBuffer structuredBuffer;
     private final List<String> stringTable;
+    private static final Structure structureStation = new Structure(Structure.field(NAME_ID, Structure.FieldType.U16),
+            Structure.field(LON, Structure.FieldType.S32),Structure.field(LAT, Structure.FieldType.S32));
 
     /**
      *  Constructs an instance that provides access to
@@ -30,8 +32,6 @@ public final class BufferedStations implements Stations {
      */
     public BufferedStations(List<String> stringTable, ByteBuffer buffer) {
         this.stringTable = stringTable;
-        Structure structureStation = new Structure(Structure.field(NAME_ID, Structure.FieldType.U16),
-                Structure.field(LON, Structure.FieldType.S32),Structure.field(LAT, Structure.FieldType.S32));
         this.structuredBuffer = new StructuredBuffer(structureStation, buffer);
     }
 
