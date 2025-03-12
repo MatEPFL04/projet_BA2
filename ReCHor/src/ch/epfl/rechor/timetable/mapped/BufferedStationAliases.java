@@ -5,6 +5,12 @@ import ch.epfl.rechor.timetable.StationAliases;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+/**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
+ * Class allows to access alias station timetable in flattened representation.
+ */
+
 public final class BufferedStationAliases implements StationAliases {
 
     /**
@@ -25,18 +31,34 @@ public final class BufferedStationAliases implements StationAliases {
         this.structuredBuffer = new StructuredBuffer(structureStationAliases, buffer);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws IndexOutOfBoundsException
+     */
     @Override
     public String alias(int id) throws IndexOutOfBoundsException {
         int aliasIndex = structuredBuffer.getU16(ALIAS_ID, id);
         return stringTable.get(aliasIndex);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws IndexOutOfBoundsException
+     */
     @Override
     public String stationName(int id) throws IndexOutOfBoundsException {
         int stationNameIndex = structuredBuffer.getU16(STATION_NAME_ID, id);
         return stringTable.get(stationNameIndex);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int size() {
         return structuredBuffer.size();

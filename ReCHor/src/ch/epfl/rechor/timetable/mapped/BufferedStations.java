@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
+ * Class allows to access stationtime table in flattened representation.
  */
 
 public final class BufferedStations implements Stations {

@@ -70,7 +70,6 @@ public class Structure {
      */
 
     public int offset(int fieldIndex, int elementIndex) {
-
         return elementIndex * totalSize() + firstBytes[fieldIndex];
     }
 

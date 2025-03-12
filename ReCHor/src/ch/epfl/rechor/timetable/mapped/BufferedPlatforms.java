@@ -5,6 +5,12 @@ import ch.epfl.rechor.timetable.Platforms;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+/**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
+ * Class allows to access platform time table in flattened representation.
+ */
+
 public final class BufferedPlatforms implements Platforms {
 
     /**
@@ -23,17 +29,33 @@ public final class BufferedPlatforms implements Platforms {
         this.structuredBuffer = new StructuredBuffer(structurePlatform, buffer);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws IndexOutOfBoundsException
+     */
     @Override
     public String name(int id) throws IndexOutOfBoundsException {
         int nameIndex = structuredBuffer.getU16(NAME_ID, id);
         return stringTable.get(nameIndex);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws IndexOutOfBoundsException
+     */
     @Override
     public int stationId(int id) throws IndexOutOfBoundsException {
         return structuredBuffer.getU16(STATION_ID, id);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int size() {
         return structuredBuffer.size();
