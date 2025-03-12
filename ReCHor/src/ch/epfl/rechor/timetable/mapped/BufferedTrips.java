@@ -7,6 +7,10 @@ import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+/**
+ *
+ */
+
 public final class BufferedTrips implements Trips {
     private static final int ROUTE_ID = 0;
     private static final int DESTINATION_ID = 1;
