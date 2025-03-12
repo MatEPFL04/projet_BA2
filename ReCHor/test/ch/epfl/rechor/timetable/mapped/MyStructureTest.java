@@ -33,4 +33,6 @@ class MyStructureTest {
                 new Structure(Structure.field(1, Structure.FieldType.U8), Structure.field(0, Structure.FieldType.U16))
         );
     }
+
+
 }
