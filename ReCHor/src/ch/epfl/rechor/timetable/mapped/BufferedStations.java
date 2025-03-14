@@ -57,7 +57,7 @@ public final class BufferedStations implements Stations {
     @Override
     public double longitude(int id) throws IndexOutOfBoundsException {
         double longitudeIndex = structuredBuffer.getS32(LON, id);
-        return Math.scalb(longitudeIndex * 360, -32);
+        return StrictMath.scalb(longitudeIndex * 360, -32);
     }
 
     /**
@@ -69,7 +69,7 @@ public final class BufferedStations implements Stations {
     @Override
     public double latitude(int id) throws IndexOutOfBoundsException {
         double latitudeIndex = structuredBuffer.getS32(LAT, id);
-        return Math.scalb(latitudeIndex * 360, -32);
+        return StrictMath.scalb(latitudeIndex * 360, -32);
     }
 
     /**

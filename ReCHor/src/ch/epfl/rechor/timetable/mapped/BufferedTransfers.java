@@ -14,21 +14,20 @@ public final class BufferedTransfers implements Transfers {
     private final StructuredBuffer structuredBuffer;
     private static final Structure structureTransfers = new Structure(Structure.field(DEP_STATION_ID, Structure.FieldType.U16),
             Structure.field(ARR_STATION_ID, Structure.FieldType.U16),Structure.field(TRANSFER_MINUTES, Structure.FieldType.U8));
-    private int [] arrayOfPackedChanges;
+    private final int [] arrayOfPackedChanges;
 
     public BufferedTransfers (ByteBuffer buffer) {
 
         structuredBuffer = new StructuredBuffer(structureTransfers,buffer);
-        ArrayList <Integer> distinctArrStations = new ArrayList<>();
+
+        int maxStationsIdx = 0;
         for (int i = 0; i < size(); i++) {
-            int currentArrId = structuredBuffer.getU16(ARR_STATION_ID,i);
-            if (!distinctArrStations.contains(currentArrId)) {
-                distinctArrStations.add(currentArrId);
-            }
+            int currentArrId = structuredBuffer.getU16(ARR_STATION_ID, i);
+            if (currentArrId > maxStationsIdx) maxStationsIdx = currentArrId;
         }
 
         int startIdx, lastExcludedIdx = 0;
-        int [] arrStationsPackedInterval = new int[distinctArrStations.size()];
+        int [] arrStationsPackedInterval = new int[maxStationsIdx];
         startIdx = lastExcludedIdx;
         int currentPos = startIdx;
         int currentArrId = structuredBuffer.getU16(ARR_STATION_ID,startIdx);
