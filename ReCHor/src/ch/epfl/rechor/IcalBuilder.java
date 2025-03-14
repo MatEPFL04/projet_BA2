@@ -99,18 +99,6 @@ public final class IcalBuilder {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * private method used to format a date for the .ics file
      * @param date the date that needs to be instantiated

@@ -22,7 +22,6 @@ public final class BufferedRoutes implements Routes {
     @Override
     public Vehicle vehicle(int id) throws IndexOutOfBoundsException {
         int posVehicle = structuredBuffer.getU8(KIND,id);
-
         return Vehicle.ALL.get(posVehicle);
     }
 

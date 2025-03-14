@@ -3,10 +3,8 @@ package ch.epfl.rechor.timetable.mapped;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.HexFormat;
+import java.util.*;
+
 import org.junit.jupiter.api.Test;
 
 class MyBufferedStationsTest {
@@ -14,6 +12,20 @@ class MyBufferedStationsTest {
     private List<String> stringTable;
     private ByteBuffer buffer;
     private BufferedStations stations;
+
+    @Test
+    public void stationsFieldsAreAccessedCorrectly () {
+        HexFormat hexFormat = HexFormat.ofDelimiter(" ");
+        byte[] stationArray = hexFormat.parseHex("00 04 04 b6 ca 14 21 14 1f a1 00 06 04 dc cc 12 21 18 da 03");
+        List <String> stringList = new ArrayList<>(Arrays.asList("1","70","Anet","Ins","Lausanne","Losanna","Palézieux"));
+        BufferedStations bufferedStations = new BufferedStations(stringList,ByteBuffer.wrap(stationArray));
+        assertEquals("Lausanne", bufferedStations.name(0));
+        assertEquals("Palézieux", bufferedStations.name(1));
+
+    }
+
+
+
 
     @Test
     public void constructorCreatesValidObject() {

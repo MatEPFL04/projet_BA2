@@ -3,12 +3,26 @@ package ch.epfl.rechor.timetable.mapped;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MyBufferedStationAliasesTest {
+
+    @Test
+    public void bufferCorrectlyReturnsIndexValues () {
+        HexFormat hexFormat = HexFormat.ofDelimiter(" ");
+        byte[] stationAliasArray = hexFormat.parseHex("00 05 00 04 00 02 00 03");
+        List <String> stringList = new ArrayList<>(Arrays.asList("1","70","Anet","Ins","Lausanne","Losanna","Palézieux"));
+        Structure structureStationAliases = new Structure(Structure.field(0, Structure.FieldType.U16),
+                Structure.field(1, Structure.FieldType.U16));
+        StructuredBuffer buffer = new StructuredBuffer(structureStationAliases,ByteBuffer.wrap(stationAliasArray));
+        int stationNameStringIndex = buffer.getU16(1, 1);
+        assertEquals(3,stationNameStringIndex);
+    }
 
     @Test
     public void testAliasRetrieval() {

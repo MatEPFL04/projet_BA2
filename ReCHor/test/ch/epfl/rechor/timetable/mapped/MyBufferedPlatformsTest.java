@@ -3,13 +3,28 @@ package ch.epfl.rechor.timetable.mapped;
 import org.junit.jupiter.api.Test;
 import java.nio.ByteBuffer;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MyBufferedPlatformsTest {
+
+    @Test
+    public void platformFieldsAreAccessedCorrectly () {
+        HexFormat hexFormat = HexFormat.ofDelimiter(" ");
+        byte[] platformArray = hexFormat.parseHex("00 00 00 00 00 01 00 00 00 00 00 01");
+        byte[] stationArray = hexFormat.parseHex("00 04 04 b6 ca 14 21 14 1f a1 00 06 04 dc cc 12 21 18 da 03");
+
+        List <String> stringList = new ArrayList<>(Arrays.asList("1","70","Anet","Ins","Lausanne","Losanna","Palézieux"));
+        BufferedPlatforms bufferedPlatforms = new BufferedPlatforms(stringList,ByteBuffer.wrap(platformArray));
+        BufferedStations bufferedStations = new BufferedStations(stringList,ByteBuffer.wrap(stationArray));
+        assertEquals("1", bufferedPlatforms.name(0));
+        int idxParentStationInStationArray = bufferedPlatforms.stationId(2);
+        String nameOfParentStation = bufferedStations.name(idxParentStationInStationArray);
+        assertEquals("Palézieux", nameOfParentStation);
+
+
+    }
 
     @Test
     public void testPlatformRetrieval() {

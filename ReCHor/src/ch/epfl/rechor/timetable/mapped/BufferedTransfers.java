@@ -29,16 +29,14 @@ public final class BufferedTransfers implements Transfers {
 
         int startIdx, lastExcludedIdx = 0;
         int [] arrStationsPackedInterval = new int[distinctArrStations.size()];
-        for (int i = 0; i < size(); i++) {
-            startIdx = lastExcludedIdx;
-            int currentPos = startIdx;
-            int currentArrId = structuredBuffer.getU16(ARR_STATION_ID,startIdx);
-            while((currentPos + 1 < size()) && currentArrId == structuredBuffer.getU16(ARR_STATION_ID,++currentPos)) {
-                lastExcludedIdx++;
-            }
+        startIdx = lastExcludedIdx;
+        int currentPos = startIdx;
+        int currentArrId = structuredBuffer.getU16(ARR_STATION_ID,startIdx);
+        while((currentPos + 1 < size()) && currentArrId == structuredBuffer.getU16(ARR_STATION_ID,++currentPos)) {
             lastExcludedIdx++;
-            arrStationsPackedInterval[i] = PackedRange.pack(startIdx,lastExcludedIdx);
         }
+        arrStationsPackedInterval[currentArrId] = PackedRange.pack(startIdx,++lastExcludedIdx);
+
         arrayOfPackedChanges = arrStationsPackedInterval;
 
 
