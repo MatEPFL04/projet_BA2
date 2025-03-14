@@ -185,7 +185,4 @@ public final class PackedCriteria {
 
     }
 
-
-
-
 }

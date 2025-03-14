@@ -8,21 +8,42 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.StringJoiner;
 
+
 /**
+ * Builder class used to construct events in the iCalendar (.ics) format.
+ * This class provides methods to create and structure iCalendar events
+ * which can be exported as .ics files.
+ *
+ * It ensures correct formatting of event details, including summary, description,
+ * timestamps, and structure handling (BEGIN/END components).
+ *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
- * builder class, used to construct events in an Icalendar format,
- *      that can then be exported as a .ics file
  */
-
 public final class IcalBuilder {
-    private final ArrayList<Component> components = new ArrayList<>();
-    private final StringBuilder stringBuilder = new StringBuilder();
-    private final static int LINE_SIZE = 75;
-    private final static String CRLF = "\r\n";
 
     /**
-     * enum used to keep track of the opened Components
+     * List of components currently open in the iCalendar structure.
+     */
+    private final ArrayList<Component> components = new ArrayList<>();
+
+    /**
+     * StringBuilder used to construct the iCalendar content.
+     */
+    private final StringBuilder stringBuilder = new StringBuilder();
+
+    /**
+     * Maximum line length allowed in the iCalendar format before wrapping.
+     */
+    private static final int LINE_SIZE = 75;
+
+    /**
+     * Carriage return and line feed sequence required by the iCalendar format.
+     */
+    private static final String CRLF = "\r\n";
+
+    /**
+     * Enum representing the main components of an iCalendar event.
      */
     public enum Component {
         VCALENDAR,
@@ -30,8 +51,8 @@ public final class IcalBuilder {
     }
 
     /**
-     * enum used to centralize all the possible names (at least for the ReCHor project)
-     *      that can be used inside an Icalendar file
+     * Enum representing possible fields used in an iCalendar file.
+     * This centralizes all the possible names relevant for the ReCHor project.
      */
     public enum Name {
         BEGIN,
@@ -47,144 +68,103 @@ public final class IcalBuilder {
     }
 
     /**
+     * Adds a key-value pair to the iCalendar structure.
+     * Ensures proper line folding according to the iCalendar standard.
      *
-     * @param name the left String displayed before the ":" in a .ics file
-     * @param value the value associated to the name parameter in a .ics file
-     * @return the current instantiation of IcalBuilder
+     * @param name  the key name appearing before the colon (":") in the .ics file.
+     * @param value the value associated with the name parameter.
+     * @return the current instance of {@code IcalBuilder}.
      */
-
-    /*
-
-    public IcalBuilder add (Name name, String value) {
-
-
-        int currentLineSize = name.toString().length() + 1;
-        stringBuilder.append(name).append(":");
-        for (int i = 0; i < value.length(); i++) {
-            if (currentLineSize < 75) {
-                stringBuilder.append(value.charAt(i));
-                currentLineSize++;
-            } else {
-                stringBuilder.append("\r\n ");
-                stringBuilder.append(value.charAt(i));
-                currentLineSize = 2;
-            }
-        }
-        stringBuilder.append("\r\n");
-        return this;
-    }
-
-     */
-
-
-
-
-    public IcalBuilder add (Name name, String value) {
-
-        String text = name.toString().concat(":").concat(value);
+    public IcalBuilder add(Name name, String value) {
+        String text = name + ":" + value;
         StringJoiner sj = new StringJoiner(CRLF + " ");
 
-        double numberOfReturns = Math.floor((double) (text.length()) / LINE_SIZE);
+        double numberOfReturns = Math.floor((double) text.length() / LINE_SIZE);
         int includedStartIdx = 0;
         for (int i = 0; i <= numberOfReturns; i++) {
-           int length = (i == 0) ? LINE_SIZE : LINE_SIZE -1;
-           int endExcludedIdx = Math.min(includedStartIdx + length, text.length());
-           sj.add(text.substring(includedStartIdx,endExcludedIdx));
-           includedStartIdx = endExcludedIdx;
+            int length = (i == 0) ? LINE_SIZE : LINE_SIZE - 1;
+            int endExcludedIdx = Math.min(includedStartIdx + length, text.length());
+            sj.add(text.substring(includedStartIdx, endExcludedIdx));
+            includedStartIdx = endExcludedIdx;
         }
         stringBuilder.append(sj).append(CRLF);
         return this;
     }
 
-
-
-
     /**
-     * private method used to format a date for the .ics file
-     * @param date the date that needs to be instantiated
-     * @return the current instantiation of IcalBuilder
+     * Formats a given {@link LocalDateTime} into the iCalendar date-time format (YYYYMMDDTHHMMSS).
+     *
+     * @param date the date to be formatted.
+     * @return the formatted date-time string.
      */
-
-    private String icsFormatDate (LocalDateTime date) {
+    private String icsFormatDate(LocalDateTime date) {
         DateTimeFormatter fmt = new DateTimeFormatterBuilder()
                 .appendValue(ChronoField.YEAR)
-                .appendValue(ChronoField.MONTH_OF_YEAR,2)
-                .appendValue(ChronoField.DAY_OF_MONTH,2)
+                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
+                .appendValue(ChronoField.DAY_OF_MONTH, 2)
                 .appendLiteral("T")
-                .appendValue(ChronoField.HOUR_OF_DAY,2)
-                .appendValue(ChronoField.MINUTE_OF_HOUR,2)
-                .appendValue(ChronoField.SECOND_OF_MINUTE,2)
+                .appendValue(ChronoField.HOUR_OF_DAY, 2)
+                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
                 .toFormatter();
         return date.format(fmt);
-
     }
 
     /**
+     * Adds a date-time entry to the iCalendar structure.
      *
-     * @param name the name of the line added
-     * @param dateTime a date that needs to be added in the correct .ics format
-     * @return the current instantiation of IcalBuilder
+     * @param name     the name of the field being added.
+     * @param dateTime the date-time value to be formatted.
+     * @return the current instance of {@code IcalBuilder}.
      */
-
-    public IcalBuilder add (Name name, LocalDateTime dateTime) {
+    public IcalBuilder add(Name name, LocalDateTime dateTime) {
         stringBuilder.append(name)
                 .append(":")
                 .append(icsFormatDate(dateTime))
                 .append(CRLF);
-
         return this;
-
     }
 
     /**
-     * method used to create a line in a .ics file
-     *      with the name "BEGIN" and the given component
-     * @param component
-     * @return the current instantiation of IcalBuilder
+     * Starts a new component (e.g., VCALENDAR or VEVENT) in the iCalendar structure.
+     *
+     * @param component the component to start.
+     * @return the current instance of {@code IcalBuilder}.
      */
-
-    public IcalBuilder begin (Component component) {
+    public IcalBuilder begin(Component component) {
         stringBuilder.append(Name.BEGIN)
                 .append(":")
                 .append(component)
                 .append(CRLF);
-
-
         components.add(component);
         return this;
-
     }
 
     /**
-     * method used to close a component in a .ics file
-     *      using the "END" name.
-     * @return the current instantiation of IcalBuilder
+     * Ends the last started component in the iCalendar structure.
+     *
+     * @return the current instance of {@code IcalBuilder}.
+     * @throws IllegalArgumentException if there is no open component to close.
      */
-
     public IcalBuilder end() {
         Preconditions.checkArgument(!components.isEmpty());
-        Component lastComponentStarted = components.getLast();
-        components.removeLast();
+        Component lastComponentStarted = components.removeLast();
         stringBuilder.append(Name.END)
                 .append(":")
                 .append(lastComponentStarted)
                 .append(CRLF);
-
         return this;
-
     }
 
-    /**i
-     * method used to transform the object IcalBuilder
-     *      into a string, once the .ics file is finished
-     * @throws IllegalArgumentException if a component has not been ended
-     * @return the string associated to the stringbuilder IcalBuilder
+    /**
+     * Builds the final iCalendar string representation.
+     * Ensures that all opened components have been properly closed.
+     *
+     * @return the complete iCalendar event as a string.
+     * @throws IllegalArgumentException if some components remain unclosed.
      */
     public String build() {
         Preconditions.checkArgument(components.isEmpty());
         return stringBuilder.toString();
-
     }
-
-
 }

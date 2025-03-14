@@ -599,7 +599,6 @@ public class MyParetoFrontTest {
         builder.add(pack(7, 4, 0));
 
         ParetoFront front = builder.build();
-        System.out.println(builder);
         assertEquals(2, front.size(), "Le ParetoFront construit doit contenir tous les éléments.");
         //assertEquals(PackedCriteria.pack(7,4, 0), front.get(7, 4), "Les éléments doivent être correctement insérés.");
     }
@@ -613,9 +612,7 @@ public class MyParetoFrontTest {
         ParetoFront.Builder builder = new ParetoFront.Builder();
         builder.add(pack(10, 2, 0));
         builder.add(pack(15, 1, 0));
-        System.out.println(builder);
         ParetoFront front = builder.build();
-        System.out.println(builder);
         assertEquals(2, front.size(), "La taille doit correspondre au nombre d'éléments ajoutés.");
     }
 
@@ -947,7 +944,6 @@ public class MyParetoFrontTest {
         builder.add(9, 3, 1);
 
         ParetoFront paretoFront2 = builder.build();
-        System.out.println("1: " + paretoFront2);
         assertEquals(1, paretoFront2.size());
     }
 
@@ -975,7 +971,6 @@ public class MyParetoFrontTest {
         builder.add(7, 2, 1);
 
         ParetoFront paretoFront2 = builder.build();
-        System.out.println("2: " + paretoFront2);
         assertEquals(1, paretoFront2.size());
     }
 

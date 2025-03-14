@@ -6,111 +6,144 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
 /**
- * The journey Record represents a journey in public transport.
+ * The Journey record represents a journey in public transport.
+ * A journey consists of multiple legs, which can be either transport segments
+ * or walking transfers.
+ *
+ * Each journey ensures:
+ * - It is not empty.
+ * - Alternates correctly between transport and walking segments.
+ * - Has legs with consistent timing (departure must not precede the previous arrival).
+ * - The arrival stop of a leg matches the departure stop of the next leg.
+ *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
- * @param legs a list of legs (steps) that constitute the Journey
- *
  */
-
 public record Journey(List<Leg> legs) {
 
     /**
-     * checks whether the given information concerning the legs are valid,
-     * @param legs the list steps that constitute the journey
+     * Constructs a {@code Journey} and validates its structure.
+     *
+     * @param legs the list of legs that constitute the journey.
      * @throws IllegalArgumentException if:
-     *      - the given list legs is empty,
-     *      - if there is no alternance betweem steps in public transports and steps by foot,
-     *      - if one departure time precedes the arrival time of the previous leg
-     *      - if the arrival stop of a leg doesn't correspond to the departure stop of the next leg.
-
+     *      - The given list of legs is empty.
+     *      - There is no alternation between transport and walking segments.
+     *      - A departure time precedes the arrival time of the previous leg.
+     *      - The arrival stop of a leg does not correspond to the departure stop of the next leg.
      */
-    public Journey{
+    public Journey {
         legs = List.copyOf(legs);
         Preconditions.checkArgument(!legs.isEmpty());
-        boolean isItAlternating = true;
+
+        boolean isAlternating = true;
         boolean depPrecedesArr = true;
-        boolean stopConfirmity = true;
+        boolean stopContinuity = true;
+
         for (int i = 1; i < legs.size(); i++) {
-            if (legs.get(i-1) instanceof Leg.Foot && legs.get(i) instanceof Leg.Foot)
-                isItAlternating  = false;
-
-            if (legs.get(i-1) instanceof Leg.Transport && legs.get(i) instanceof Leg.Transport)
-                isItAlternating = false;
-
-            if (legs.get(i).depTime().isBefore(legs.get(i-1).arrTime()))
+            if ((legs.get(i - 1) instanceof Leg.Foot && legs.get(i) instanceof Leg.Foot) ||
+                    (legs.get(i - 1) instanceof Leg.Transport && legs.get(i) instanceof Leg.Transport)) {
+                isAlternating = false;
+            }
+            if (legs.get(i).depTime().isBefore(legs.get(i - 1).arrTime())) {
                 depPrecedesArr = false;
-
-            if (!legs.get(i).depStop().equals(legs.get(i-1).arrStop()))
-                stopConfirmity = false;
-
+            }
+            if (!legs.get(i).depStop().equals(legs.get(i - 1).arrStop())) {
+                stopContinuity = false;
+            }
         }
-        Preconditions.checkArgument(isItAlternating);
-        Preconditions.checkArgument(depPrecedesArr);
-        Preconditions.checkArgument(stopConfirmity);
 
+        Preconditions.checkArgument(isAlternating);
+        Preconditions.checkArgument(depPrecedesArr);
+        Preconditions.checkArgument(stopContinuity);
     }
 
     /**
-     * used to encapsulate the notion of step of a journey
-     * implemented only by Transport and Foot as an intermediate stop doesn't
-     * have the notion of movement
-     * abtract methods are automatically implemented by the records who implement the interface
+     * Sealed interface representing a leg (step) of a journey.
+     * Implemented by Transport and Foot, as intermediate stops do not
+     * represent movement on their own.
      */
-    public sealed interface Leg{
+    public sealed interface Leg permits Leg.Transport, Leg.Foot {
 
         Stop depStop();
         LocalDateTime depTime();
         Stop arrStop();
         LocalDateTime arrTime();
         List<IntermediateStop> intermediateStops();
-        default Duration duration(){
-            return Duration.between(depTime(),arrTime());
 
+        /**
+         * Computes the duration of the leg.
+         *
+         * @return the duration of the leg.
+         */
+        default Duration duration() {
+            return Duration.between(depTime(), arrTime());
         }
 
         /**
+         * Represents an intermediate stop within a transport leg.
          *
-         * @param stop
-         *      name of the stop
-         * @param arrTime
-         * @param depTime
+         * @param stop     the stop location.
+         * @param arrTime  the arrival time at the stop.
+         * @param depTime  the departure time from the stop.
          */
-        record IntermediateStop(Stop stop, LocalDateTime arrTime, LocalDateTime depTime){
+        record IntermediateStop(Stop stop, LocalDateTime arrTime, LocalDateTime depTime) {
             /**
-             * checks whether the stop is null, and that the arrival and departure time make sense.
-             * @param stop
-             * @param arrTime
-             * @param depTime
-             * @throws NullPointerException
-             *      if the entry stop is incorrect
-             * @throws IllegalArgumentException
-             *      if the parameters arrTime and depTime don't make sense
+             * Constructs an intermediate stop, ensuring validity.
+             *
+             * @param stop    the stop location.
+             * @param arrTime the arrival time at the stop.
+             * @param depTime the departure time from the stop.
+             * @throws NullPointerException     if stop is null.
+             * @throws IllegalArgumentException if depTime is before arrTime
              */
-            public IntermediateStop{
+            public IntermediateStop {
                 Objects.requireNonNull(stop);
                 Preconditions.checkArgument(!depTime.isBefore(arrTime));
             }
-
         }
 
         /**
-         * record used to emulate a public transport
-         * @param depStop
-         * @param depTime
-         * @param arrStop
-         * @param arrTime
-         * @param intermediateStops
-         *      a list of Intermediate stops between the departure stop and the arrival stop
-         * @param vehicle
-         * @param route
-         * @param destination
+         * Represents a transport leg of a journey.
+         *
+         * @param depStop          the departure stop.
+         * @param depTime          the departure time.
+         * @param arrStop          the arrival stop.
+         * @param arrTime          the arrival time.
+         * @param intermediateStops a list of intermediate stops between departure and arrival.
+         * @param vehicle          the type of vehicle used.
+         * @param route            the route name.
+         * @param destination      the final destination of the transport leg.
          */
+        record Transport(Stop depStop, LocalDateTime depTime, Stop arrStop, LocalDateTime arrTime,
+                         List<IntermediateStop> intermediateStops, Vehicle vehicle, String route, String destination)
+                implements Leg {
 
-        record Transport(Stop depStop,LocalDateTime depTime, Stop arrStop,LocalDateTime arrTime,
-                                List<IntermediateStop> intermediateStops,Vehicle vehicle,String route,String destination) implements Leg{
-            public Transport{
+            /**
+             * Constructs a transport leg, ensuring validity.
+             *
+             * @param depStop          the departure stop.
+             * @param depTime          the departure time.
+             * @param arrStop          the arrival stop.
+             * @param arrTime          the arrival time.
+             * @param intermediateStops the intermediate stops list.
+             * @param vehicle          the vehicle type.
+             * @param route            the route name.
+             * @param destination      the destination name.
+             * @throws NullPointerException     if any parameter is null.
+             * @throws IllegalArgumentException if the departure time is after the arrival time.
+             */
+            public Transport {
                 Objects.requireNonNull(depStop);
                 Objects.requireNonNull(depTime);
                 Objects.requireNonNull(arrStop);
@@ -120,20 +153,30 @@ public record Journey(List<Leg> legs) {
                 Objects.requireNonNull(destination);
                 Preconditions.checkArgument(!depTime.isAfter(arrTime));
                 intermediateStops = List.copyOf(intermediateStops);
-
             }
         }
 
         /**
-         * used to modelize a step of the Journey by foot
-         * @param depStop
-         * @param depTime
-         * @param arrStop
-         * @param arrTime
+         * Represents a walking leg of a journey.
+         *
+         * @param depStop the departure stop.
+         * @param depTime the departure time.
+         * @param arrStop the arrival stop.
+         * @param arrTime the arrival time.
          */
+        record Foot(Stop depStop, LocalDateTime depTime, Stop arrStop, LocalDateTime arrTime) implements Leg {
 
-        record Foot(Stop depStop,LocalDateTime depTime,Stop arrStop,LocalDateTime arrTime) implements Leg{
-            public Foot{
+            /**
+             * Constructs a walking leg, ensuring validity.
+             *
+             * @param depStop the departure stop.
+             * @param depTime the departure time.
+             * @param arrStop the arrival stop.
+             * @param arrTime the arrival time.
+             * @throws NullPointerException     if any parameter is null.
+             * @throws IllegalArgumentException if the arrival time is before the departure time.
+             */
+            public Foot {
                 Objects.requireNonNull(depStop);
                 Objects.requireNonNull(arrStop);
                 Objects.requireNonNull(depTime);
@@ -145,50 +188,60 @@ public record Journey(List<Leg> legs) {
             public List<IntermediateStop> intermediateStops() {
                 return List.of();
             }
-            public boolean isTransfer(){
+
+            /**
+             * Determines if this walking leg represents a transfer (i.e., between platforms at the same station).
+             *
+             * @return true if the walking leg is a transfer, false otherwise.
+             */
+            public boolean isTransfer() {
                 return depStop.name().equals(arrStop.name());
             }
         }
-
-
     }
 
     /**
-     * the first Stop of the journey
-     * @return the first Stop of the journey
+     * Retrieves the first stop of the journey.
+     *
+     * @return the first stop of the journey.
      */
-
-    public Stop depStop(){
+    public Stop depStop() {
         return legs.getFirst().depStop();
     }
 
-    /**the last Stop of the journey
-     * @return the last Stop of the journey
+    /**
+     * Retrieves the last stop of the journey.
+     *
+     * @return the last stop of the journey.
      */
-
-    public Stop arrStop(){
+    public Stop arrStop() {
         return legs.getLast().arrStop();
     }
 
     /**
-     * @return the departure time of the Journey
+     * Retrieves the departure time of the journey.
+     *
+     * @return the departure time of the journey.
      */
-
-    public LocalDateTime depTime(){
+    public LocalDateTime depTime() {
         return legs.getFirst().depTime();
     }
+
     /**
-     * @return the arrival time of the Journey
+     * Retrieves the arrival time of the journey.
+     *
+     * @return the arrival time of the journey.
      */
-    public LocalDateTime arrTime(){
+    public LocalDateTime arrTime() {
         return legs.getLast().arrTime();
     }
+
     /**
-     * @return the time elapsed betweeen the start and the end of the Journey
+     * Computes the total duration of the journey.
+     *
+     * @return the total journey duration.
      */
-    public Duration duration(){
-        return Duration.between(legs.getFirst().depTime(), legs.getLast().arrTime());
-
+    public Duration duration() {
+        return Duration.between(depTime(), arrTime());
     }
-
 }

@@ -17,6 +17,9 @@ public enum Vehicle {
     FERRY,
     AERIAL_LIFT,
     FUNICULAR;
-    public static final List<Vehicle> ALL =List.of(values());
+    /**
+     * an immutable list representing all the vehicules in ReCHOR.
+     */
+    public static final List<Vehicle> ALL = List.of(values());
 
 }

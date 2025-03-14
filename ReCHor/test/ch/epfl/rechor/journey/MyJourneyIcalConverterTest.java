@@ -59,13 +59,6 @@ public class MyJourneyIcalConverterTest {
         return List.of(l1, l2, l3, l4, l5);
     }
 
-    @Test
-    void print(){
-        Journey journey = new Journey(exampleLegs());
-        String value = JourneyIcalConverter.toIcalendar(journey);
-        System.out.println(value);
-
-    }
 
 
     @Test

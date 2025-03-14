@@ -12,7 +12,15 @@ import java.nio.ByteBuffer;
 
 public class StructuredBuffer {
 
+    /**
+     * the buffer that is passed to the structured buffer
+     */
+
     private final ByteBuffer buffer;
+
+    /**
+     * the structure of our structured buffer.
+     */
     private final Structure structure;
 
     /**

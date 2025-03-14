@@ -14,7 +14,14 @@ import java.util.Objects;
 
 public class Structure {
 
+    /**
+     * short array containing the first position of each field in the flattened representation
+     */
+
     private short [] firstBytes;
+    /**
+     * attribute representing the total number of bytes used to represent one object inside an array
+     */
     private short structureSize;
 
     /**
