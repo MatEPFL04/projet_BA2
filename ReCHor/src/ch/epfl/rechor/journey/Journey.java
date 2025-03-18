@@ -33,7 +33,7 @@ import java.util.Objects;
 public record Journey(List<Leg> legs) {
 
     /**
-     * Constructs a {@code Journey} and validates its structure.
+     * Constructs a Journey and validates its structure.
      *
      * @param legs the list of legs that constitute the journey.
      * @throws IllegalArgumentException if:
@@ -73,7 +73,7 @@ public record Journey(List<Leg> legs) {
      * Implemented by Transport and Foot, as intermediate stops do not
      * represent movement on their own.
      */
-    public sealed interface Leg permits Leg.Transport, Leg.Foot {
+    public sealed interface Leg {
 
         Stop depStop();
         LocalDateTime depTime();
