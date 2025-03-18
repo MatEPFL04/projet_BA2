@@ -83,7 +83,9 @@ public class MyJourneyIcalConverterTest {
 
         Journey journey = new Journey(List.of(footLeg1, transportLeg, footLeg2));
 
+
         String ical = JourneyIcalConverter.toIcalendar(journey);
+        System.out.println(ical);
         assertTrue(ical.contains("BEGIN:VCALENDAR"));
         assertTrue(ical.contains("VERSION:2.0"));
         assertTrue(ical.contains("PRODID:ReCHor"));
@@ -93,6 +95,7 @@ public class MyJourneyIcalConverterTest {
         assertTrue(ical.contains("SUMMARY:Station A → Station B"));
         assertTrue(ical.contains("END:VEVENT"));
         assertTrue(ical.contains("END:VCALENDAR"));
+
     }
 
 
