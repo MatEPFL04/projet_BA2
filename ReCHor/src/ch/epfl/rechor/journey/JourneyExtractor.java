@@ -9,62 +9,92 @@ import ch.epfl.rechor.Bits32_24_8;
 public class JourneyExtractor {
     private JourneyExtractor() {}
 
-    private static LocalDateTime ofCriteriaDateTime
-            (long criteria, boolean isArrTimeWanted, LocalDate date) {
 
-        int currentDayMins = isArrTimeWanted ?
-                PackedCriteria.arrMins(criteria) : PackedCriteria.depMins(criteria);
-        int hoursDep = currentDayMins / 60;
-        int minutesDep = currentDayMins % 60;
-        return date.atTime(hoursDep,minutesDep);
+    private static LocalDateTime dateFromMins
+            (int minutes, LocalDate date) {
+
+        LocalDateTime midnightDate = date.atStartOfDay();
+        return midnightDate.plusMinutes(minutes);
     }
 
 
     public static List<Journey> journeys(Profile profile, int depStationId) {
+
         List <Journey> journeyList = new ArrayList<>();
+
+        //Date du jour qui sera associé à chacun des tuples
+        LocalDate currentDate = profile.date();
+
+        //frontière associé au tuple courant
         ParetoFront paretoFront = profile.forStation(depStationId);
-        paretoFront.forEach((long criteria) -> {
 
-            int changesToBeMade = PackedCriteria.changes(criteria);
-            int currentConnectionId = Bits32_24_8.unpack24(PackedCriteria.payload(criteria));
+        //parcours des tuples associés à la gare de départ donnée
 
-            List <Journey.Leg> legList = new ArrayList<>();
-            int stopId = profile.connections().depStopId(currentConnectionId);
+        paretoFront.forEach((long criteriaForFirstStep) -> {
 
-            int stationId = profile.timeTable().stationId(stopId);
-            int numberOfIntermediateStops = Bits32_24_8.unpack8(PackedCriteria.payload(criteria));
+            List <Journey.Leg> currentTupleListLegs = new ArrayList<>();
 
+            //informations utiles du premier tuple (pour l'entier du voyage)
+            int journeydepMins = PackedCriteria.depMins(criteriaForFirstStep);
+            int journeyChanges = PackedCriteria.changes(criteriaForFirstStep);
+            int journeyArrMins = PackedCriteria.arrMins(criteriaForFirstStep);
 
-            profile.timeTable().stations();
+            // on regarde l'index de la station de départ de la première liaison et s'il est différent de depStationId,
+            // une étape à pied est nécessaire
 
-            LocalDateTime depTime = ofCriteriaDateTime(criteria,false, profile.date());
-            LocalDateTime arrTime = ofCriteriaDateTime(criteria,true, profile.date());
+            int currentConnectionId = Bits32_24_8.unpack24(PackedCriteria.payload(criteriaForFirstStep));
+            int currentConnectiondepStopId = profile.connections().depStopId(currentConnectionId);
+            int currentConnectionDepstationId = profile.timeTable().stationId(currentConnectiondepStopId);
 
+            // étape à pied instanciée, au tout début du voyage, si nécessaire:
+            //si l'index de gare (stop) de la liaison est différent de l'index de départ de la station
+            //
+            if (currentConnectiondepStopId != depStationId) {
 
-            if (stationId != depStationId) { // étape à pied, au tout début du voyage
-                Stop depStop = new Stop(profile.timeTable().stations().name(stationId),
-                        profile.timeTable().platformName(stopId),
-                        profile.timeTable().stations().longitude(stationId),
-                        profile.timeTable().stations().latitude(stationId));
+                //heure de départ de l'étape à pied, grâce au payload du premier critère:
+
+                LocalDateTime footDepTime = dateFromMins(journeydepMins, profile.date());
+
+                //minutes nécessaires pour passer de la première gare à la seconde et commencer le voyage
+
+                int minutesOfChange = profile.timeTable().transfers()
+                        .minutesBetween(currentConnectionDepstationId, depStationId);
+
+                //on trouve l'heure d'arrivée associée à notre première étape à pied
+
+                int arrTimeMinutes = journeydepMins + minutesOfChange;
+                LocalDateTime footArrTime = dateFromMins(arrTimeMinutes, currentDate);
+
+                Stop depStop = new Stop(profile.timeTable().stations().name(currentConnectionDepstationId),
+                        profile.timeTable().platformName(currentConnectiondepStopId),
+                        profile.timeTable().stations().longitude(currentConnectionDepstationId),
+                        profile.timeTable().stations().latitude(currentConnectionDepstationId));
 
                 Stop arrStop = new Stop(profile.timeTable().stations().name(depStationId),
                         profile.timeTable().platformName(depStationId),
                         profile.timeTable().stations().longitude(depStationId),
                         profile.timeTable().stations().latitude(depStationId));
 
-                Journey.Leg.Foot footStep = new Journey.Leg.Foot(depStop, depTime, arrStop, arrTime);
-                legList.add(footStep);
+                Journey.Leg.Foot footStep = new Journey.Leg.Foot(depStop, footDepTime, arrStop, footArrTime);
+                currentTupleListLegs.add(footStep);
             }
-            int nextStepConnectionId = profile.connections().nextConnectionId(currentConnectionId + numberOfIntermediateStops);
 
-            while (changesToBeMade > 0) {
+            //première étape finie si celle-ci était nécessaire.
+            // ajout d'étape (Foot or Leg) tant qu'il reste des changements à effectuer
 
+            while (journeyChanges > 0) {
+                int numberOfIntermediateStops = Bits32_24_8.unpack8(PackedCriteria.payload(criteriaForFirstStep));
+                int nextStepConnectionId = profile.connections().nextConnectionId(currentConnectionId + numberOfIntermediateStops);
 
-                changesToBeMade--;
-        }
+                int nextStationId = profile.connections().depStopId(nextStepConnectionId);
+                ParetoFront nextparetoFront = profile.forStation(nextStationId);
+                long nextCriteria = paretoFront.get(journeyArrMins,--journeyChanges);
 
+                    ParetoFront pareto = profile.forStation(nextStationId);
+            }
 
         });
+
         /*
         journeys.sort(Comparator
                 .comparing(Journey::depTime)
