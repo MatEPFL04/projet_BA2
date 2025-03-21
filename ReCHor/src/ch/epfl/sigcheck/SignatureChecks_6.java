@@ -4,7 +4,7 @@ package ch.epfl.sigcheck;
 // destiné à être exécuté. Son seul but est de vérifier, autant que possible,
 // que les noms et les types des différentes entités à définir pour cette
 // étape du projet sont corrects.
-
+/*
 final class SignatureChecks_6 {
     private SignatureChecks_6() {}
 
@@ -80,5 +80,7 @@ final class SignatureChecks_6 {
     ch.epfl.rechor.journey.ParetoFront.Builder v21;
     java.util.List<ch.epfl.rechor.journey.Journey> v22;
 }
+
+ */
 
 
