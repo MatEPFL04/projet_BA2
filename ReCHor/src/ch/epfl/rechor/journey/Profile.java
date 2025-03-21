@@ -11,6 +11,15 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
+ * @param timeTable
+ * @param date
+ * @param arrStationId
+ * @param stationFront
+ */
+
 public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, List<ParetoFront> stationFront) {
     public Profile {
         stationFront = List.copyOf(stationFront);

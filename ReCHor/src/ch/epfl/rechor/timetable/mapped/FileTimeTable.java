@@ -14,6 +14,18 @@ import java.util.Date;
 import java.util.List;
 import java.nio.file.Path;
 
+/**
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
+ * @param directory
+ * @param stringTable
+ * @param stations
+ * @param stationAliases
+ * @param platforms
+ * @param routes
+ * @param transfers
+ */
+
 public record FileTimeTable (Path directory,
                             List<String> stringTable, Stations stations,
                             StationAliases stationAliases, Platforms platforms,
@@ -77,9 +89,5 @@ public record FileTimeTable (Path directory,
             throw new UncheckedIOException(e);
         }
     }
-
-
-
-
-
+    
 }
