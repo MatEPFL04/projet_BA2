@@ -66,26 +66,11 @@ public final class BufferedTransfers implements Transfers {
             }
         }
 
+        int startIdx, lastExcludedIdx = 0;
         int[] arrStationsPackedInterval = new int[++maxStationsIdx];
-        int startIdx = 0;
-        int currentStationIdx = 0;
-        for (int i = 1; i < size(); i++) {
 
-            if (structuredBuffer.getU16(ARR_STATION_ID, i-1)
-                    != structuredBuffer.getU16(ARR_STATION_ID, i)) {
-                currentStationIdx = structuredBuffer.getU16(ARR_STATION_ID,startIdx);
-                arrStationsPackedInterval [currentStationIdx] = PackedRange.pack(startIdx, i);
-                startIdx = i;
 
-            }
-        }
-        currentStationIdx = structuredBuffer.getU16(ARR_STATION_ID,startIdx);
-        arrStationsPackedInterval[currentStationIdx] = PackedRange.pack(startIdx,size());
-        arrayOfPackedChanges = arrStationsPackedInterval;
 
-        /*
-
-        int startIdx = 0, lastExcludedIdx = 0;
         while (lastExcludedIdx < size()) {
             startIdx = lastExcludedIdx;
             int currentPos = startIdx;
@@ -96,9 +81,8 @@ public final class BufferedTransfers implements Transfers {
             arrStationsPackedInterval[currentArrId] = PackedRange.pack(startIdx, ++lastExcludedIdx);
         }
         arrayOfPackedChanges = arrStationsPackedInterval;
-
-         */
     }
+
 
     /**
      * Retrieves the departure station ID for a given transfer.
