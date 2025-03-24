@@ -32,14 +32,15 @@ public record FileTimeTable (Path directory,
                             Routes routes, Transfers transfers) implements TimeTable {
 
     public static TimeTable in(Path directory) throws IOException {
-        Path timetableDirectory = Path.of("timetable");
 
-        Path strings = timetableDirectory.resolve("strings.txt");
-        Path stationsPath = timetableDirectory.resolve("stations.bin");
-        Path stationsAliasesPath = timetableDirectory.resolve("station-aliases.bin");
-        Path platformsPath = timetableDirectory.resolve("platforms.bin");
-        Path routesPath = timetableDirectory.resolve("routes.bin");
-        Path transfersPath = timetableDirectory.resolve("transfers.bin");
+        //Path timetableDirectory = Path.of("timetable");
+
+        Path strings = directory.resolve("strings.txt");
+        Path stationsPath = directory.resolve("stations.bin");
+        Path stationsAliasesPath = directory.resolve("station-aliases.bin");
+        Path platformsPath = directory.resolve("platforms.bin");
+        Path routesPath = directory.resolve("routes.bin");
+        Path transfersPath = directory.resolve("transfers.bin");
         List <String> immutableStringList = List.copyOf(Files.readAllLines(strings,StandardCharsets.ISO_8859_1));
 
         ByteBuffer stationsBuffer = getBufferFromPath(stationsPath);
@@ -67,7 +68,7 @@ public record FileTimeTable (Path directory,
     @Override
     public Trips tripsFor(LocalDate date) {
         try {
-            Path timetableDirectory = Path.of(date.toString());
+            Path timetableDirectory = directory.resolve(date.toString());
             Path pathToSearchIn = timetableDirectory.resolve("trips.bin");
             return new BufferedTrips(stringTable, getBufferFromPath(pathToSearchIn));
         }
@@ -80,7 +81,7 @@ public record FileTimeTable (Path directory,
     @Override
     public Connections connectionsFor(LocalDate date) {
         try {
-            Path timetableDirectory = Path.of(date.toString());
+            Path timetableDirectory = directory.resolve(date.toString());
             Path connectionsPath = timetableDirectory.resolve("connections.bin");
             Path connections_succPath = timetableDirectory.resolve("connections-succ.bin");
             return new BufferedConnections(getBufferFromPath(connectionsPath),getBufferFromPath(connections_succPath));

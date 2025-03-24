@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import ch.epfl.rechor.timetable.*;
 import ch.epfl.rechor.journey.Journey.Leg.Transport;
@@ -42,11 +41,13 @@ public class JourneyExtractor {
                                            int startingMinutes, int startStopId, int arrStopId) {
 
         int startStationId = timetable.stationId(startStopId);
-        int minutesByFoot = timetable.transfers().minutesBetween(startStationId, arrStopId);
+        int arrStationId = timetable.stationId(arrStopId);
+
+        int minutesByFoot = timetable.transfers().minutesBetween(startStationId, arrStationId);
         LocalDateTime depTime = dateFromMins(startingMinutes, date);
         int arrTimeMinutes = startingMinutes + minutesByFoot;
         LocalDateTime arrTime = dateFromMins(arrTimeMinutes, date);
-        Stop depStop = newStop(timetable, startStationId);
+        Stop depStop = newStop(timetable, startStopId);
         Stop arrStop = newStop(timetable, arrStopId);
         return new Foot(depStop, depTime, arrStop, arrTime);
     }
@@ -66,98 +67,101 @@ public class JourneyExtractor {
         paretoFront.forEach((long criteria) -> {
 
 
-
             int journeydepMins = depMins(criteria);
             int journeyChanges = changes(criteria);
             int journeyArrMins = arrMins(criteria);
-            int journeyArrStopIdx = profile.arrStationId();
-
+            int journeyArrStationId = profile.arrStationId();
             List<Journey.Leg> currentLegs = new ArrayList<>();
 
-            int firstConnectionId = unpack24(payload(criteria));
-            int depStopId = connections.depStopId(firstConnectionId);
-            int arrStopId = connections.arrStopId(firstConnectionId);
+            int connectionID = unpack24(payload(criteria));
+            int connectionDepStopId = connections.depStopId(connectionID);
+            int connectionDepStationId = timeTable.stationId(connectionDepStopId);
+            int connectionArrStopId = connections.arrStopId(connectionID);
+            int connectionArrStationId = timeTable.stationId(connectionArrStopId);
+            int connectionDepMins = connections.depMins(connectionID);
+            int connectionArrMins = connections.arrMins(connectionID);
+            int numberOfIntermediateStops = unpack8(payload(criteria));
 
-            if (depStopId != depStationId) {
+            if (connectionDepStationId != depStationId) {
                 Leg beginningLegFoot = newFootLeg(timeTable,
-                        currentDate, journeydepMins, depStationId, depStopId);
+                        currentDate, journeydepMins, depStationId, connectionDepStationId);
                 currentLegs.add(beginningLegFoot);
             }
 
-            long currentCriteria = criteria;
-
             while (journeyChanges > 0) {
-
-                int numberOfIntermediateStops = unpack8(payload(currentCriteria));
-                firstConnectionId = unpack24(payload(currentCriteria));
-                int currentConnectionId = firstConnectionId;
 
                 List < IntermediateStop > intermediateStopList = new ArrayList<>();
                 for (int i = 0; i < numberOfIntermediateStops; i++) {
 
-                    int arrMinsConnection = connections.arrMins(currentConnectionId);
-                    LocalDateTime arrTime = dateFromMins(arrMinsConnection, currentDate);
+                    LocalDateTime arrTime = dateFromMins(connectionArrMins, currentDate);
 
-                    currentConnectionId = connections.nextConnectionId(currentConnectionId);
+                    connectionID = connections.nextConnectionId(connectionID);
 
-                    int currentConnectionstopId = connections.depStopId(currentConnectionId);
-                    Stop stop = newStop(timeTable,currentConnectionstopId);
+                    int currentConnectionDepstopId = connections.depStopId(connectionID);
+                    Stop stop = newStop(timeTable, currentConnectionDepstopId);
 
-                    int depMinsConnection = connections.depMins(currentConnectionId);
+                    int depMinsConnection = connections.depMins(connectionID);
                     LocalDateTime depTime = dateFromMins(depMinsConnection, currentDate);
 
                     intermediateStopList.add(new IntermediateStop(stop,arrTime,depTime));
                 }
 
-                int lastConnectionId = currentConnectionId;
-                arrStopId = connections.depStopId(firstConnectionId);
-                int currentLegMinsTime = connections.depMins(firstConnectionId);
-                Stop currentLegDepStop = newStop(timeTable, arrStopId);
+                Stop currentLegDepStop = newStop(timeTable, connectionDepStopId);
 
-                LocalDateTime currentLegDepTime = dateFromMins(currentLegMinsTime, currentDate);
+                LocalDateTime currentLegDepTime = dateFromMins(connectionDepMins, currentDate);
 
-                int currentLegArrStopidx = connections.arrStopId(lastConnectionId);
-                int currentLegArrMins = connections.arrMins(lastConnectionId);
-                LocalDateTime currentLegArrTime = dateFromMins(currentLegArrMins, currentDate);
-                Stop currentLegArrStop = newStop(timeTable, currentLegArrStopidx);
-                int routeId = unpack8(payload(criteria));
-                Vehicle vehicle = routes.vehicle(routeId);
-                String route = routes.name(routeId);
-                String destination = trips.destination(routeId);
+                connectionArrStopId  = connections.arrStopId(connectionID);
+                connectionArrMins = connections.arrMins(connectionID);
+
+                LocalDateTime currentLegArrTime = dateFromMins(connectionArrMins, currentDate);
+                Stop currentLegArrStop = newStop(timeTable, connectionArrStopId);
+
+                int tripId = connections.tripId(connectionID);
+                String destination = trips.destination(tripId);
+
+                Vehicle vehicle = routes.vehicle(tripId);
+                String route = routes.name(tripId);
+
+
                 Leg transportStep = new Transport(currentLegDepStop,
                        currentLegDepTime, currentLegArrStop, currentLegArrTime,
                         intermediateStopList, vehicle, route, destination);
+
                 currentLegs.add(transportStep);
 
+                connectionArrStationId = timeTable.stationId(connectionArrStopId);
 
-
-                currentCriteria = profile.forStation (timeTable.stationId(currentLegArrStopidx)).
+                criteria = profile.forStation(connectionArrStationId).
                         get(journeyArrMins, --journeyChanges);
 
+                connectionID = unpack24(payload(criteria));
+                numberOfIntermediateStops = unpack8(payload(criteria));
 
-                int startStationId = timeTable.stationId(currentLegArrStopidx);
-                int nextConnectionIdx = unpack24(payload(currentCriteria));
-                int nextConnectionDepStopId = connections.depStopId(nextConnectionIdx);
-                int nextConnectionDepStationId = timeTable.stationId(nextConnectionDepStopId);
-                int durationFootStep = transfers.minutesBetween(startStationId, nextConnectionDepStationId);
-                LocalDateTime endFootStepTime = dateFromMins(currentLegArrMins + durationFootStep, currentDate);
-                Stop nextStop = newStop(timeTable, nextConnectionDepStationId);
+                connectionDepStopId = connections.depStopId(connectionID);
+                connectionDepStationId = timeTable.stationId(connectionDepStopId);
+                int durationFootStep = transfers.minutesBetween(connectionArrStationId, connectionDepStationId);
+                LocalDateTime endFootStepTime = dateFromMins(connectionArrMins + durationFootStep, currentDate);
+                Stop nextStop = newStop(timeTable, connectionDepStopId);
 
                 Foot footStep = new Foot(currentLegArrStop,currentLegArrTime,nextStop, endFootStepTime);
                 currentLegs.add(footStep);
+
             }
 
-            if (arrStopId != journeyArrStopIdx)  {
+            if (connectionArrStationId != journeyArrStationId)  {
+
+                Leg endLegFoot = newFootLeg(timeTable,
+                        currentDate, connectionArrMins, connectionArrStopId, journeyArrStationId);
+                currentLegs.add(endLegFoot);
+
             }
             journeyList.add(new Journey(currentLegs));
 
         });
 
-
         journeyList.sort(Comparator
                 .comparing(Journey::depTime)
                 .thenComparing(Journey::arrTime));
-
 
         return journeyList;
     }

@@ -72,7 +72,9 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
                 if (Objects.isNull(stationsFront[i])) {
                     frontList.add(ParetoFront.EMPTY);
                 }
-                frontList.add(stationsFront[i].build());
+                else {
+                    frontList.add(stationsFront[i].build());
+                }
             }
             return new Profile(timeTable,date,arrStationId, frontList);
         }
