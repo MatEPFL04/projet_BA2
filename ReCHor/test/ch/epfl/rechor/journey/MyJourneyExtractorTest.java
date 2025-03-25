@@ -20,7 +20,6 @@ public class MyJourneyExtractorTest {
 
         Path path =
                 Path.of("profile_" + date + "_" + arrStationId + ".txt");
-        System.out.println(">> Trying to read from: " + path.toAbsolutePath());
         try (BufferedReader r = Files.newBufferedReader(path)) {
             Profile.Builder profileB =
                     new Profile.Builder(timeTable, date, arrStationId);
@@ -41,7 +40,6 @@ public class MyJourneyExtractorTest {
 
     @Test
     void readingProfileForAGivenStationWorks () throws IOException {
-        System.out.println(">> Working directory: " + System.getProperty("user.dir"));
         TimeTable t = FileTimeTable.in(Path.of("timetable"));
         LocalDate date = LocalDate.of(2025, Month.MARCH, 18);
         Profile p = readProfile(t, date, 11486);

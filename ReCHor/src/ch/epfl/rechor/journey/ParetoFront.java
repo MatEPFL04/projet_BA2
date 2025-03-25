@@ -47,6 +47,10 @@ public final class ParetoFront {
      */
     public long get(int arrMins, int changes) throws NoSuchElementException {
         for (int i = 0; i < size(); i++) {
+            if (PackedCriteria.arrMins(frontTuples[i]) == arrMins) {
+            }
+            if (PackedCriteria.changes(frontTuples[i]) == changes) {
+            }
             if (PackedCriteria.arrMins(frontTuples[i]) == arrMins
                     && PackedCriteria.changes(frontTuples[i]) == changes) {
                 return frontTuples[i];
