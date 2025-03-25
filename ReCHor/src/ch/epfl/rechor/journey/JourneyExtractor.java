@@ -19,9 +19,15 @@ import static ch.epfl.rechor.journey.PackedCriteria.*;
 /**
  *  @author Matteo Lazzari (397247)
  *  @author Pamphil Nedev (380400)
+ *  class used to extract journeys for a given departure station
+ *  out of a profile containing all the journeys for all the stations of the swiss timetable
  */
 
 public class JourneyExtractor {
+
+    /**
+     * private constructor as it is not instantiable
+     */
 
     private JourneyExtractor() {}
 
@@ -87,6 +93,9 @@ public class JourneyExtractor {
             int connectionArrMins = connections.arrMins(connectionID);
             int numberOfIntermediateStops = unpack8(payload(criteria));
 
+            LocalDateTime currentLegArrTime = dateFromMins(connectionArrMins, currentDate);
+            Stop currentLegArrStop = newStop(timeTable, connectionArrStopId);
+
 
             if (connectionDepStationId != depStationId) {
                 Leg beginningLegFoot = newFootLeg(timeTable,
@@ -96,6 +105,27 @@ public class JourneyExtractor {
             }
 
             while (journeyChanges >= 0) {
+
+                if (!currentLegs.isEmpty()) {
+
+                    criteria = profile.forStation(connectionArrStationId).
+                            get(journeyArrMins, journeyChanges);
+
+                    connectionID = unpack24(payload(criteria));
+                    numberOfIntermediateStops = unpack8(payload(criteria));
+
+                    connectionDepStopId = connections.depStopId(connectionID);
+                    connectionDepStationId = timeTable.stationId(connectionDepStopId);
+                    connectionDepMins = connections.depMins(connectionID);
+
+
+                    int durationFootStep = transfers.minutesBetween(connectionArrStationId, connectionDepStationId);
+                    LocalDateTime endFootStepTime = dateFromMins(connectionArrMins + durationFootStep, currentDate);
+                    Stop nextStop = newStop(timeTable, connectionDepStopId);
+
+                    Foot footStep = new Foot(currentLegArrStop, currentLegArrTime, nextStop, endFootStepTime);
+                    currentLegs.add(footStep);
+                }
 
                 //System.out.println("journeyChanges (début boucle) = " + journeyChanges);
 
@@ -125,8 +155,8 @@ public class JourneyExtractor {
                 connectionArrStopId  = connections.arrStopId(connectionID);
                 connectionArrMins = connections.arrMins(connectionID);
 
-                LocalDateTime currentLegArrTime = dateFromMins(connectionArrMins, currentDate);
-                Stop currentLegArrStop = newStop(timeTable, connectionArrStopId);
+                currentLegArrTime = dateFromMins(connectionArrMins, currentDate);
+                currentLegArrStop = newStop(timeTable, connectionArrStopId);
 
                 int tripId = connections.tripId(connectionID);
                 int routeId = trips.routeId(tripId);
@@ -145,29 +175,6 @@ public class JourneyExtractor {
                 connectionArrStationId = timeTable.stationId(connectionArrStopId);
 
                 journeyChanges--;
-
-                if (journeyChanges >= 0) {
-
-                    criteria = profile.forStation(connectionArrStationId).
-                                get(journeyArrMins, journeyChanges);
-
-                    connectionID = unpack24(payload(criteria));
-                    numberOfIntermediateStops = unpack8(payload(criteria));
-
-                    connectionDepStopId = connections.depStopId(connectionID);
-                    connectionDepStationId = timeTable.stationId(connectionDepStopId);
-                    connectionDepMins = connections.depMins(connectionID);
-
-
-                    int durationFootStep = transfers.minutesBetween(connectionArrStationId, connectionDepStationId);
-                    LocalDateTime endFootStepTime = dateFromMins(connectionArrMins + durationFootStep, currentDate);
-                    Stop nextStop = newStop(timeTable, connectionDepStopId);
-
-                    Foot footStep = new Foot(currentLegArrStop, currentLegArrTime, nextStop, endFootStepTime);
-                    currentLegs.add(footStep);
-                }
-
-
             }
 
             if (connectionArrStationId != journeyArrStationId)  {
