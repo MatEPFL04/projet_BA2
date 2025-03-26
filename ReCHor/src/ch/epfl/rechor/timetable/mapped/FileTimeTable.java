@@ -17,13 +17,13 @@ import java.nio.file.Path;
 /**
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
- * @param directory
- * @param stringTable
- * @param stations
- * @param stationAliases
- * @param platforms
- * @param routes
- * @param transfers
+ * @param directory the directory where all the flattened files are located
+ * @param stringTable a list of Strings for the ReChor project
+ * @param stations a list of stations
+ * @param stationAliases a list of stationAliases
+ * @param platforms a list of platforms
+ * @param routes a list of routes
+ * @param transfers a list of transfers
  */
 
 public record FileTimeTable (Path directory,
@@ -31,16 +31,23 @@ public record FileTimeTable (Path directory,
                             StationAliases stationAliases, Platforms platforms,
                             Routes routes, Transfers transfers) implements TimeTable {
 
+    /**
+     *
+     * @param directory the directory in which the files are located
+     * @return an instance of fileTimeTable with the buffered lists (for instance stations or platforms)
+     * @throws IOException if accessing the files in the directory cause a problem
+     */
+
     public static TimeTable in(Path directory) throws IOException {
 
-        //Path timetableDirectory = Path.of("timetable");
+        Path timetableDirectory = Path.of("timetable");
 
-        Path strings = directory.resolve("strings.txt");
-        Path stationsPath = directory.resolve("stations.bin");
-        Path stationsAliasesPath = directory.resolve("station-aliases.bin");
-        Path platformsPath = directory.resolve("platforms.bin");
-        Path routesPath = directory.resolve("routes.bin");
-        Path transfersPath = directory.resolve("transfers.bin");
+        Path strings = timetableDirectory.resolve("strings.txt");
+        Path stationsPath = timetableDirectory.resolve("stations.bin");
+        Path stationsAliasesPath = timetableDirectory.resolve("station-aliases.bin");
+        Path platformsPath = timetableDirectory.resolve("platforms.bin");
+        Path routesPath = timetableDirectory.resolve("routes.bin");
+        Path transfersPath = timetableDirectory.resolve("transfers.bin");
         List <String> immutableStringList = List.copyOf(Files.readAllLines(strings,StandardCharsets.ISO_8859_1));
 
         ByteBuffer stationsBuffer = getBufferFromPath(stationsPath);
@@ -61,9 +68,16 @@ public record FileTimeTable (Path directory,
     }
 
     private static ByteBuffer getBufferFromPath (Path path) throws IOException {
-        FileChannel channel = FileChannel.open(path);
-        return channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        try(FileChannel channel = FileChannel.open(path)) {
+            return channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        }
     }
+
+    /**
+     * method used to use binary files to get buffered trips for a given date
+     * @param date the date for which trips should be retrieved.
+     * @return buffered trips corresponding to a given date
+     */
 
     @Override
     public Trips tripsFor(LocalDate date) {
@@ -77,6 +91,12 @@ public record FileTimeTable (Path directory,
         }
 
     }
+
+    /**
+     * method used to use binary files to get buffered connections for a given date
+     * @param date the date for which connections should be retrieved.
+     * @return buffered connections corresponding to a given date
+     */
 
     @Override
     public Connections connectionsFor(LocalDate date) {

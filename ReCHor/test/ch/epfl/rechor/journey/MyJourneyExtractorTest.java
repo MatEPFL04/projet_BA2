@@ -43,8 +43,8 @@ public class MyJourneyExtractorTest {
         TimeTable t = FileTimeTable.in(Path.of("timetable"));
         LocalDate date = LocalDate.of(2025, Month.MARCH, 18);
         Profile p = readProfile(t, date, 11486);
-        List<Journey> js = JourneyExtractor.journeys(p, 7872);
-        String j = JourneyIcalConverter.toIcalendar(js.get(32));
+        List<Journey> js = JourneyExtractor.journeys(p, 7874);
+        String j = JourneyIcalConverter.toIcalendar(js.get(20));
         System.out.println(j);
     }
 }
