@@ -12,10 +12,10 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
+ * Record used to represent a profile, that can be seen as a two dimension
+ * array with a list of ParetoFront for each station.
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
- * record used to represent a profile,
- * that can be seen as a two dimension array with a list of ParetoFront for each station
  * @param timeTable
  * @param date the date that corresponds to the profile
  * @param arrStationId the index of the station of the profile
@@ -118,7 +118,6 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
          */
         public void setForStation(int stationId, ParetoFront.Builder builder) {
             stationsFront[stationId] = builder;
-
         }
 
         /**
@@ -138,7 +137,6 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
 
         public void setForTrip(int tripId, ParetoFront.Builder builder) {
             tripsFront [tripId] = builder;
-
         }
 
         /**
@@ -148,16 +146,14 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
 
         public Profile build() {
             List <ParetoFront> frontList = new ArrayList<>();
-            for (int i = 0; i < stationsFront.length; i++) {
-                if (Objects.isNull(stationsFront[i])) {
+            for (ParetoFront.Builder builder : stationsFront) {
+                if (Objects.isNull(builder)) {
                     frontList.add(ParetoFront.EMPTY);
-                }
-                else {
-                    frontList.add(stationsFront[i].build());
+                } else {
+                    frontList.add(builder.build());
                 }
             }
             return new Profile(timeTable,date,arrStationId, frontList);
         }
     }
-
 }

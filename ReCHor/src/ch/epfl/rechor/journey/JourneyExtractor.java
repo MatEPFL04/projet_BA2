@@ -23,7 +23,7 @@ import static ch.epfl.rechor.journey.PackedCriteria.*;
  *  out of a profile containing all the journeys for all the stations of the swiss timetable
  */
 
-public class JourneyExtractor {
+public final class JourneyExtractor {
 
     /**
      * private constructor as the class is not instantiable,
@@ -58,7 +58,6 @@ public class JourneyExtractor {
         Stop depStop = newStop(timetable, startStopId);
         Stop arrStop = newStop(timetable, arrStopId);
 
-
         return new Foot(depStop, depTime, arrStop, arrTime);
 
     }
@@ -90,7 +89,6 @@ public class JourneyExtractor {
 
             List<Journey.Leg> currentLegs = new ArrayList<>();
 
-
             int connectionID = unpack24(payload(criteria));
             int connectionDepStopId = connections.depStopId(connectionID);
             int connectionDepStationId = timeTable.stationId(connectionDepStopId);
@@ -103,7 +101,6 @@ public class JourneyExtractor {
             LocalDateTime currentLegArrTime = dateFromMins(connectionArrMins, currentDate);
             Stop currentLegArrStop = newStop(timeTable, connectionArrStopId);
 
-
             if (depStationId != connectionDepStationId) {
 
                 Leg beginningLegFoot = newFootLeg(timeTable,
@@ -111,7 +108,6 @@ public class JourneyExtractor {
                 currentLegs.add(beginningLegFoot);
 
             }
-
 
             boolean firstTransportAdded = false;
 

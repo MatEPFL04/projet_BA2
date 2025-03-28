@@ -15,6 +15,7 @@ import java.util.List;
 import java.nio.file.Path;
 
 /**
+ * The class represents a public transport timetable, in which we store the flattened data.
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  * @param directory the directory where all the flattened files are located
@@ -32,9 +33,11 @@ public record FileTimeTable (Path directory,
                             Routes routes, Transfers transfers) implements TimeTable {
 
     /**
-     *
+     * The method helps to create a new instance of fileTimeTable which flattened data
+     * where obtained from the files in the directory.
      * @param directory the directory in which the files are located
-     * @return an instance of fileTimeTable with the buffered lists (for instance stations or platforms)
+     * @return an instance of fileTimeTable with the buffered lists
+     * (for instance stations or platforms).
      * @throws IOException if accessing the files in the directory cause a problem
      */
 
@@ -74,9 +77,9 @@ public record FileTimeTable (Path directory,
     }
 
     /**
-     * method used to use binary files to get buffered trips for a given date
+     * The method uses binary files to instantiate buffered trips for a given date.
      * @param date the date for which trips should be retrieved.
-     * @return buffered trips corresponding to a given date
+     * @return buffered trips corresponding to a given date.
      */
 
     @Override
@@ -89,13 +92,12 @@ public record FileTimeTable (Path directory,
         catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-
     }
 
     /**
-     * method used to use binary files to get buffered connections for a given date
+     * The method uses binary files to instantiate buffered connections for a given date.
      * @param date the date for which connections should be retrieved.
-     * @return buffered connections corresponding to a given date
+     * @return buffered connections corresponding to a given date.
      */
 
     @Override
@@ -110,5 +112,4 @@ public record FileTimeTable (Path directory,
             throw new UncheckedIOException(e);
         }
     }
-    
 }
