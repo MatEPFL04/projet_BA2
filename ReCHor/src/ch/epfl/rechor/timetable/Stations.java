@@ -3,7 +3,7 @@ package ch.epfl.rechor.timetable;
 /**
  * Interface representing indexed stations.
  * This interface provides methods to retrieve station names and their geographical coordinates.
- *
+ * <p>
  * All methods throw an {@link IndexOutOfBoundsException} if the given index
  * is out of range, meaning it is less than 0 or greater than or equal to {@link #size()}.
  *

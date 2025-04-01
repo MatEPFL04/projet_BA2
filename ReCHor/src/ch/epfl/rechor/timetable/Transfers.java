@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
  * Interface representing indexed transfers.
  * This interface provides methods to retrieve transfer details between stations,
  * including departure station, arrival station, and transfer duration.
- *
+ * <p>
  * All methods throw an IndexOutOfBoundsException if the given index
  * is out of range, meaning it is less than 0 or greater than or equal to size()
  *
@@ -35,7 +35,7 @@ public interface Transfers extends Indexed {
 
     /**
      * Retrieves the packed interval representing all transfers arriving at the given station.
-     * The returned value is an encoded integer that can be decoded using PackedRange
+     * The returned value is an encoded integer that can be decoded using PackedRange.
      *
      * @param stationId the ID of the arrival station.
      * @return a packed integer representing the interval of transfers arriving at the station.

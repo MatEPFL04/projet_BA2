@@ -8,24 +8,25 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 /**
- * public class, not-instantiable,
- *      containing a unique static method used to transform a journey into a string formatted in .ics
+ * Utility class for converting a journey into a string formatted in the iCalendar (.ics) format.
+ *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  */
 
 public class JourneyIcalConverter {
+
     /**
-     * private constructor as the class is not-instantiable
+     * Private constructor as the class is not-instantiable
      */
     private JourneyIcalConverter() {}
 
     /**
+     * Converts the given journey into a string formatted in the iCalendar (.ics) format.
      *
      * @param journey the journey that needs to be converted into a string in the right format (.ics format)
      * @return a string corresponding to the journey expressed in an Icalendar format.
      */
-
     public static String toIcalendar (Journey journey) {
 
         IcalBuilder journeyCalendar = new IcalBuilder();
@@ -62,5 +63,4 @@ public class JourneyIcalConverter {
 
         return journeyCalendar.build();
     }
-
 }

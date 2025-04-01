@@ -4,7 +4,6 @@ import ch.epfl.rechor.PackedRange;
 import ch.epfl.rechor.timetable.Transfers;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 /**
@@ -69,8 +68,6 @@ public final class BufferedTransfers implements Transfers {
         int startIdx, lastExcludedIdx = 0;
         int[] arrStationsPackedInterval = new int[++maxStationsIdx];
 
-
-
         while (lastExcludedIdx < size()) {
             startIdx = lastExcludedIdx;
             int currentPos = startIdx;
@@ -82,7 +79,6 @@ public final class BufferedTransfers implements Transfers {
         }
         arrayOfPackedChanges = arrStationsPackedInterval;
     }
-
 
     /**
      * Retrieves the departure station ID for a given transfer.

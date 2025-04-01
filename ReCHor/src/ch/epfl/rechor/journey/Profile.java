@@ -5,39 +5,39 @@ import ch.epfl.rechor.timetable.TimeTable;
 import ch.epfl.rechor.timetable.Trips;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.awt.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
 /**
  * Record used to represent a profile, that can be seen as a two dimension
  * array with a list of ParetoFront for each station.
+ *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
+ *
  * @param timeTable
  * @param date the date that corresponds to the profile
  * @param arrStationId the index of the station of the profile
  * @param stationFront a list of ParetoFront for our profile (each ParetoFront corresponds to a station)
  */
-
 public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, List<ParetoFront> stationFront) {
     public Profile {
         stationFront = List.copyOf(stationFront);
     }
 
     /**
-     * the connections of the profile for the date of the profile
+     * The connections of the profile for the date of the profile.
+     *
      * @return the connections of the profile for the date of the profile
      */
-
     public Connections connections() {
         return timeTable.connectionsFor(date);
     }
 
     /**
-     * the trips of the profile for the given date
+     * The trips of the profile for the given date.
+     *
      * @return the trips of the profile for the given date
      */
 
@@ -46,6 +46,7 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
     }
 
     /**
+     *
      *
      * @param stationId the index of the station for which we get the ParetoFront
      * @return the ParetoFront of the station in parameters
@@ -57,38 +58,39 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
     }
 
     /**
-     * nested class used to instantiate a new Profile
+     * Nested class used to instantiate a new Profile.
      */
 
     public static final class Builder {
 
         /**
-         * the timetable associated to our profile we want to build
+         * The timetable associated to our profile we want to build.
          */
         TimeTable timeTable;
 
         /**
-         * the date of the profile
+         * The date of the profile.
          */
         LocalDate date;
 
         /**
-         * the arrival station index for our profile
+         * The arrival station index for our profile.
          */
         int arrStationId;
 
         /**
-         * an array containing all the ParetoFront associated to our stations
+         * An array containing all the ParetoFront associated to our stations.
          */
         ParetoFront.Builder [] stationsFront;
 
         /**
-         * an array containing all the ParetoFront (without departure minutes)
-         * for our trips
+         * An array containing all the ParetoFront (without departure minutes)
+         * for our trips.
          */
         ParetoFront.Builder [] tripsFront;
 
         /**
+         *
          *
          * @param timeTable a timetable from the swiss official schedule
          * @param date the date associated to the profile
@@ -104,6 +106,7 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
 
         /**
          *
+         *
          * @param stationId the station for which we retrieve the ParetoFront
          * @return the builder of the ParetoFront associated to our station given in parameters
          */
@@ -112,6 +115,7 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
         }
 
         /**
+         *
          *
          * @param stationId
          * @param builder the ParetoFront.Builder we want to add at the index stationId in the list stationsFront
@@ -122,6 +126,7 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
 
         /**
          *
+         *
          * @param tripId the index of the trip from which we retrieve the ParetoFront.Builder
          * @return the ParetoFront.Builder associated to the index of the trip given
          */
@@ -130,7 +135,8 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
         }
 
         /**
-         * method used to change our array tripsFront with a new ParetoFront.builder
+         * Method used to change our array tripsFront with a new ParetoFront.builder.
+         *
          * @param tripId the index of the trip
          * @param builder the builder we want to add to the list tripsFront at the given index (tripId)
          */
@@ -140,6 +146,7 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
         }
 
         /**
+         *
          * returns a profile by building each element of the list of Paretofront in construction
          * @return a new profile
          */

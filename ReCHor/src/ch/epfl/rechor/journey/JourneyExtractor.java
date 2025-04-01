@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.timetable.*;
 import ch.epfl.rechor.journey.Journey.Leg.Transport;
 import ch.epfl.rechor.journey.Journey.Leg.IntermediateStop;
@@ -17,19 +16,18 @@ import static ch.epfl.rechor.Bits32_24_8.unpack8;
 import static ch.epfl.rechor.journey.PackedCriteria.*;
 
 /**
+ * Class used to extract journeys for a given departure station
+ * out of a profile containing all the journeys for all the stations of the swiss timetable.
+ *
  *  @author Matteo Lazzari (397247)
  *  @author Pamphil Nedev (380400)
- *  class used to extract journeys for a given departure station
- *  out of a profile containing all the journeys for all the stations of the swiss timetable
  */
-
 public final class JourneyExtractor {
 
     /**
-     * private constructor as the class is not instantiable,
-     * and only used as an utility class
+     * Private constructor as the class is not instantiable,
+     * and only used as a utility class.
      */
-
     private JourneyExtractor() {}
 
     private static LocalDateTime dateFromMins
@@ -63,12 +61,12 @@ public final class JourneyExtractor {
     }
 
     /**
-     * method used to construct journeys for an entire day for a given departure station
+     * Method used to construct journeys for an entire day for a given departure station.
+     *
      * @param profile a profile for the swiss transports for a given date
      * @param depStationId the station from which we start our journey
      * @return a list of journey corresponding to the departure station for a given date
      */
-
     public static List <Journey> journeys(Profile profile, int depStationId) {
 
         LocalDate currentDate = profile.date();

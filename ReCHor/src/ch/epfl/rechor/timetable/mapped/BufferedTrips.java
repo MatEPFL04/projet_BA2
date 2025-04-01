@@ -1,13 +1,9 @@
 package ch.epfl.rechor.timetable.mapped;
 
-import ch.epfl.rechor.journey.Vehicle;
 import ch.epfl.rechor.timetable.Trips;
 
-import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
-
-
 
 /**
  * Class providing access to trips in a flattened representation.

@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
- * Class allowing access to a platform time table in a flattened representation.
+ * Class allowing access to a platform timetable in a flattened representation.
  * This class provides methods to retrieve platform names and associated station IDs efficiently.
  *
  * @author Matteo Lazzari (397247)

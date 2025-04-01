@@ -5,30 +5,30 @@ import ch.epfl.rechor.Preconditions;
 import java.nio.ByteBuffer;
 
 /**
+ * Class used to work with buffers, following a given structure.
+ *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
- * Class used to work with buffers, following a given structure.
  */
 
 public class StructuredBuffer {
 
     /**
-     * the buffer that is passed to the structured buffer
+     * The buffer that is passed to the structured buffer.
      */
-
     private final ByteBuffer buffer;
 
     /**
-     * the structure of our structured buffer.
+     * The structure of our structured buffer.
      */
     private final Structure structure;
 
     /**
-     * public constructor taking a structure and a Bytebuffer in  arguments.
+     * Public constructor taking a structure and a Bytebuffer in  arguments.
+     *
      * @param structure the given Structure
      * @param buffer the given buffer, that has to follow the constraints of the structure
      */
-
     public StructuredBuffer(Structure structure, ByteBuffer buffer) {
         Preconditions.checkArgument(buffer.capacity() % structure.totalSize() == 0);
 
@@ -39,6 +39,7 @@ public class StructuredBuffer {
     /**
      * The number of elements are the number of bytes divided by the number of bytes
      * (total size) of a certain structure.
+     *
      * @return the number of elements of the "array".
      */
     public int size() {
@@ -46,9 +47,9 @@ public class StructuredBuffer {
     }
 
     /**
-     * Checks whether the given element index surpasses the size of the buffer
+     * Checks whether the given element index surpasses the size of the buffer.
      *
-     * @param elementIndex, the index of the element in the array
+     * @param elementIndex the index of the element in the array
      */
     private void checkElementIndex(int elementIndex) {
         if(elementIndex < 0 || elementIndex >= size()) {
@@ -57,9 +58,10 @@ public class StructuredBuffer {
     }
 
     /**
+     * Reads an unsigned 8-bit value (U8) from the buffer.
      *
-     * @param fieldIndex, the index of the field (from the structure)
-     * @param elementIndex, the position of the element from which we want to evaluate a byte value
+     * @param fieldIndex the index of the field (from the structure)
+     * @param elementIndex the position of the element from which we want to evaluate a byte value
      * @return the corresponding byte value
      */
     public int getU8(int fieldIndex, int elementIndex) {
@@ -69,6 +71,7 @@ public class StructuredBuffer {
     }
 
     /**
+     * Reads an unsigned 8-bit value (U16) from the buffer.
      *
      * @param fieldIndex the index of the field (from the structure)
      * @param elementIndex the position of the element from which we want to extract a short value
@@ -82,6 +85,7 @@ public class StructuredBuffer {
     }
 
     /**
+     * Reads an unsigned 8-bit value (S32) from the buffer.
      *
      * @param fieldIndex the index of the field (from the structure)
      * @param elementIndex the position of the element from which we want to extract an int value
