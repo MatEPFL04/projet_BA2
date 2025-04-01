@@ -6,21 +6,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-
 /**
- * The Journey record represents a journey in public transport.
- * A journey consists of multiple legs, which can be either transport segments
- * or walking transfers.
- *
+ * Record representing a complete public transport journey composed of multiple consecutive legs.
+ * Legs can either be transport segments or walking transfers.
+ * <p>
  * Each journey ensures:
  * - It is not empty.
  * - Alternates correctly between transport and walking segments.
@@ -29,6 +18,8 @@ import java.util.Objects;
  *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
+ *
+ * @param legs journey's steps
  */
 public record Journey(List<Leg> legs) {
 
@@ -98,6 +89,7 @@ public record Journey(List<Leg> legs) {
          * @param depTime  the departure time from the stop.
          */
         record IntermediateStop(Stop stop, LocalDateTime arrTime, LocalDateTime depTime) {
+
             /**
              * Constructs an intermediate stop, ensuring validity.
              *

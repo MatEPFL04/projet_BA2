@@ -10,31 +10,25 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 
 /**
- * The formatter class is a utility class that
- * ensures to get every text representation in the right format
+ * The formatter class is a utility class that ensures
+ * to get every text representation in the right format.
+ *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
- * @throws NullPointerException
- *      in case the name of the stop is null
- * @throws IllegalArgumentException
- *      in the case the location, consisting of the longitude, latitude is incorrect
- *
  */
-
 public final class FormatterFr {
 
     /**
-     * Private constructor to prevent instantiation
+     * Private constructor to prevent instantiation.
      */
-
     private FormatterFr() {}
 
     /**
-     * Displays hours and minutes
-     * @param duration
+     * Formats a given duration into a string in hours and minutes.
+     *
+     * @param duration the duration to format
      * @return a string representing the formatted duration
      */
-
     public static String formatDuration(Duration duration) {
 
         long totalMinutes = duration.getSeconds()/60;
@@ -42,19 +36,19 @@ public final class FormatterFr {
         long remainingMinutes = totalMinutes % 60;
 
         if (totalMinutes < 60) {
-            return totalMinutes +" min";
+            return totalMinutes + " min";
         }
         else {
-            return totalHours + " h " + remainingMinutes +" min";
+            return totalHours + " h " + remainingMinutes + " min";
         }
     }
 
     /**
-     * Displays date time
-     * @param dateTime
+     * Formats a date time into a string in the format "HhMM".
+     *
+     * @param dateTime the date time to format
      * @return a string representing the formatted time
      */
-
     public static String formatTime(LocalDateTime dateTime) {
 
         DateTimeFormatter fmt = new DateTimeFormatterBuilder()
@@ -67,11 +61,13 @@ public final class FormatterFr {
     }
 
     /**
-     * Displays platform name
-     * @param stop
-     * @return a string representing the formatted platform name or an empty string
+     * Formats the platform name of the given stop.
+     * If the platform name starts with a digit, it is labeled as "voie";
+     * otherwise, it is labeled as "quai".
+     *
+     * @param stop the stop whose platform name is to be formatted
+     * @return a string like "voie 3" or "quai A", or an empty string if the platform is missing
      */
-
     public static String formatPlatformName(Stop stop) {
 
         String platformName = stop.platformName();
@@ -90,11 +86,13 @@ public final class FormatterFr {
     }
 
     /**
-     * Displays a walking leg of a journey or a change
-     * @param footLeg
+     * Formats a walking leg of a journey.
+     * If the departure and arrival stops are at the same station, the leg is considered a transfer
+     * and labeled as "changement". Otherwise, it is labeled as "trajet à pied".
+     *
+     * @param footLeg the walking leg to format
      * @return a string representing the formatted walking leg
      */
-
     public static String formatLeg(Journey.Leg.Foot footLeg) {
         StringBuilder sb = new StringBuilder();
 
@@ -108,11 +106,12 @@ public final class FormatterFr {
     }
 
     /**
-     * Displays a transport leg of a journey
-     * @param leg
+     * Formats a transport leg of a journey, including the departure time and stop,
+     * optional departure platform, arrival stop with optional arrival platform, and arrival time.
+     *
+     * @param leg the transport leg to format
      * @return a string representing the formatted transport leg
      */
-
     public static String formatLeg(Journey.Leg.Transport leg) {
         StringBuilder sb = new StringBuilder();
 
@@ -138,13 +137,12 @@ public final class FormatterFr {
     }
 
     /**
-     * Displays the route destination
-     * @param transportLeg
+     * Formats the route and destination of a transport leg.
+     *
+     * @param transportLeg the transport leg whose route and destination are to be formatted
      * @return a string representing the formatted route destination
      */
-
     public static String formatRouteDestination(Journey.Leg.Transport transportLeg) {
         return transportLeg.route() + " Direction " + transportLeg.destination();
-
     }
 }

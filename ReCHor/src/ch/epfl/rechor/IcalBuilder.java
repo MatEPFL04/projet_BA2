@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-
 /**
  * Builder class used to construct events in the iCalendar (.ics) format.
  * This class provides methods to create and structure iCalendar events
  * which can be exported as .ics files.
- *
+ * <p>
  * It ensures correct formatting of event details, including summary, description,
  * timestamps, and structure handling (BEGIN/END components).
  *

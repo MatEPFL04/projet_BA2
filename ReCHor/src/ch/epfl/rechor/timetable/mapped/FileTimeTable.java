@@ -43,7 +43,7 @@ public record FileTimeTable (Path directory,
 
     public static TimeTable in(Path directory) throws IOException {
 
-        Path timetableDirectory = Path.of("timetable");
+        Path timetableDirectory = Path.of(directory.toString());
 
         Path strings = timetableDirectory.resolve("strings.txt");
         Path stationsPath = timetableDirectory.resolve("stations.bin");
