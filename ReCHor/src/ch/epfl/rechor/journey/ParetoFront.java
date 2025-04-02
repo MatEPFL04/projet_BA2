@@ -23,16 +23,17 @@ public final class ParetoFront {
     public static final ParetoFront EMPTY = new ParetoFront(new long [0]);
 
     /**
-     * private constructor, so a front can only be built by the builder nested inside the ParetoFront class
+     * Private constructor, so a front can only be built by the builder nested inside the ParetoFront class.
+     *
      * @param packedCriteria, the array that is given by the builder
      */
     private ParetoFront (long [] packedCriteria) {
         this.frontTuples = packedCriteria;
-
     }
 
     /**
-     * Method returning the size of the front
+     * Method returning the size of the front.
+     *
      * @return the size of the front
      */
     public int size() {
@@ -61,9 +62,9 @@ public final class ParetoFront {
         throw new NoSuchElementException();
     }
 
-
     /**
-     * Method used to accept an action on each element in the front
+     * Method used to accept an action on each element in the front.
+     *
      * @param action the action
      */
     public void forEach(LongConsumer action) {
@@ -90,9 +91,8 @@ public final class ParetoFront {
     }
 
     /**
-     * The type Builder.
-     * with two private attributes:
-     * a long array, used to store the current front
+     * The type Builder with two private attributes:
+     * a long array, used to store the current front and
      * an int attribute, used to keep track of the effective size of the array.
      */
     public static class Builder {
@@ -110,7 +110,8 @@ public final class ParetoFront {
         }
 
         /**
-         * Instantiates a new builder using another Pareto front builder
+         * Instantiates a new builder using another Pareto front builder.
+         *
          * @param that the other builder used to instantiate a new one
          */
         public Builder (Builder that) {
@@ -120,7 +121,8 @@ public final class ParetoFront {
         }
 
         /**
-         * a method returning true if the current front in construction is empty
+         * Method returning true if the current front in construction is empty.
+         *
          * @return true if the current front is empty
          */
         public boolean isEmpty(){
@@ -129,6 +131,7 @@ public final class ParetoFront {
 
         /**
          * Clear the current front by putting the effective size as 0.
+         *
          * @return the builder
          */
         public Builder clear(){
@@ -142,14 +145,12 @@ public final class ParetoFront {
             return criteria & mask;
         }
 
-
         private void frontResize() {
             if ((effectiveSize + 1) > frontInConstruction.length) {
                 int newCapacity =  (int) (1.5 * frontInConstruction.length);
                 frontInConstruction = Arrays.copyOf(frontInConstruction,newCapacity);
             }
         }
-
 
         /**
          * Method used to add a new (long) tuple to the current front in construction, using the following steps:
@@ -196,7 +197,8 @@ public final class ParetoFront {
         }
 
         /**
-         * Add a criteria to the front with the given arrival time, changes, and payload but no departure time
+         * Add a criteria to the front with the given arrival time, changes,
+         * and payload but no departure time.
          *
          * @param arrMins the given arrival time in minutes
          * @param changes the given changes
@@ -226,10 +228,11 @@ public final class ParetoFront {
         /**
          * Method used to determine whether each tuple from the given builder
          * are dominated or equal by at least one tuple in "this".
+         *
          * @param that the builder compared to the current builder
          * @param depMins the departure time that is injected into the tuples of that before the comparisons
          * @return true, if all the tuples from that are equal
-         * or dominated by at least one tuple in the current builder, false othewise
+         * or dominated by at least one tuple in the current builder, false otherwise.
          */
         public boolean fullyDominates(Builder that, int depMins) {
             for (int i = 0; i < that.effectiveSize; i++) { //itération sur tous les tuples de that
@@ -252,6 +255,7 @@ public final class ParetoFront {
 
         /**
          * Method used to accept an action on each element in the front that is built.
+         *
          * @param action the action
          */
         public void forEach(LongConsumer action) {
@@ -261,14 +265,19 @@ public final class ParetoFront {
         }
 
         /**
-         * build method used to create an object of type ParetoFront, once the front is finished.
+         * Method used to create an object of type ParetoFront, once the front is finished.
          * The front is copied by the constructor.
+         *
          * @return the final pareto front
          */
         public ParetoFront build () {
             return new ParetoFront(Arrays.copyOf(frontInConstruction,effectiveSize));
         }
 
+        /**
+         *
+         * @return
+         */
         @Override
         public String toString () {
             StringBuilder sb = new StringBuilder();
@@ -284,14 +293,9 @@ public final class ParetoFront {
                             PackedCriteria.arrMins(frontInConstruction[i]) + "," +
                             PackedCriteria.changes(frontInConstruction[i]) + ") ");
                 }
-
             }
             sb.append(" }");
             return sb.toString();
         }
-
     }
-
-
-
 }

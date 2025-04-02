@@ -40,19 +40,17 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
      *
      * @return the trips of the profile for the given date
      */
-
     public Trips trips(){
         return timeTable.tripsFor(date);
     }
 
     /**
-     *
+     * Returns the ParetoFront for the given index station.
      *
      * @param stationId the index of the station for which we get the ParetoFront
      * @return the ParetoFront of the station in parameters
      * @throws IndexOutOfBoundsException
      */
-
     public ParetoFront forStation(int stationId) throws IndexOutOfBoundsException {
         return stationFront.get(stationId);
     }
@@ -60,7 +58,6 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
     /**
      * Nested class used to instantiate a new Profile.
      */
-
     public static final class Builder {
 
         /**
@@ -90,7 +87,8 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
         ParetoFront.Builder [] tripsFront;
 
         /**
-         *
+         * The constructor stores the given arguments and initializes two primitive arrays
+         * intended to hold the Pareto front builders for stops and trips.
          *
          * @param timeTable a timetable from the swiss official schedule
          * @param date the date associated to the profile
@@ -105,7 +103,7 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
         }
 
         /**
-         *
+         * Returns the Pareto front builder associated with the given station ID.
          *
          * @param stationId the station for which we retrieve the ParetoFront
          * @return the builder of the ParetoFront associated to our station given in parameters
@@ -115,9 +113,9 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
         }
 
         /**
+         * Method used to change our array stationsFront with a new ParetoFront.builder.
          *
-         *
-         * @param stationId
+         * @param stationId the station for which we retrieve the ParetoFront
          * @param builder the ParetoFront.Builder we want to add at the index stationId in the list stationsFront
          */
         public void setForStation(int stationId, ParetoFront.Builder builder) {
@@ -125,7 +123,7 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
         }
 
         /**
-         *
+         * Returns the Pareto front builder associated with the given trip ID.
          *
          * @param tripId the index of the trip from which we retrieve the ParetoFront.Builder
          * @return the ParetoFront.Builder associated to the index of the trip given
@@ -140,17 +138,15 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
          * @param tripId the index of the trip
          * @param builder the builder we want to add to the list tripsFront at the given index (tripId)
          */
-
         public void setForTrip(int tripId, ParetoFront.Builder builder) {
             tripsFront [tripId] = builder;
         }
 
         /**
+         * Returns a profile by building each element of the list of Pareto front in construction.
          *
-         * returns a profile by building each element of the list of Paretofront in construction
          * @return a new profile
          */
-
         public Profile build() {
             List <ParetoFront> frontList = new ArrayList<>();
             for (ParetoFront.Builder builder : stationsFront) {
