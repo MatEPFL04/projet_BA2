@@ -17,9 +17,9 @@ public final class PackedCriteria {
      */
     private static final int MASK_7_BITS       = 0x7F;
     private static final int MASK_12_BITS      = 0xFFF;
-    private static final long MASK_CLEAR_DEP   = 0x3FFFFFFFFFFFFL;
-    private static final long MASK_CLEAR_CHANGE = ~(0b1111111L << 32);
-    private static final long MASK_CLEAR_PAYLOAD = 0xFFFFFFFF00000000L;
+    private static final long MASK_CLEARING_DEPARTURE_MINS = 0x3FFFFFFFFFFFFL;
+    private static final long MASK_CLEARING_PREVIOUS_CHANGE = ~(0b1111111L << 32);
+    private static final long MASK_CLEARING_PAYLOAD = 0xFFFFFFFF00000000L;
 
     /**
      * Private constructor as the class is not instantiable.
@@ -37,9 +37,8 @@ public final class PackedCriteria {
      */
     public static long pack(int arrMins, int changes, int payload) {
         Preconditions.checkArgument(-240 <= arrMins && arrMins < 2880 && changes >= 0 && changes < 128);
-        //Preconditions. checkArgument((changes >> 7) == 0  && ((arrMins+240) >> 12) == 0);
         long payLoadAdjusted = Integer.toUnsignedLong(payload);
-        long arrMinsShifted = ((long) ((arrMins + 240))) << 39; // 39 (intervalle "bas" h.d'arr 2.2.5) - 1
+        long arrMinsShifted = ((long) ((arrMins + 240))) << 39;
         long changesShifted = ((long) changes) << 32;
 
         return arrMinsShifted | changesShifted | payLoadAdjusted;
@@ -58,13 +57,13 @@ public final class PackedCriteria {
     }
 
     /**
-     * Method returning the (complement of) departure time (in minutes).
+     * Method returning the departure time (in minutes from midnight).
      *
      * @param criteria the given criteria
      * @throws IllegalArgumentException if:
      *      - the criteria is not strictly positive
      *      - the criteria doesn't contain any information about the departure time
-     * @return the (complement of) departure time (in minutes)
+     * @return the departure time (in minutes)
      */
     public static int depMins(long criteria) {
         Preconditions.checkArgument(hasDepMins(criteria));
@@ -137,7 +136,7 @@ public final class PackedCriteria {
      * @return a (long) criteria without information about the departure time
      */
     public static long withoutDepMins(long criteria) {
-        return (criteria & MASK_CLEAR_DEP);
+        return (criteria & MASK_CLEARING_DEPARTURE_MINS);
 
     }
 
@@ -164,7 +163,7 @@ public final class PackedCriteria {
      */
     public static long withAdditionalChange(long criteria) {
         Preconditions.checkArgument(changes(criteria) < 128);
-        long clearedCriteria = criteria & MASK_CLEAR_CHANGE;
+        long clearedCriteria = criteria & MASK_CLEARING_PREVIOUS_CHANGE;
         int newChange = changes(criteria) + 1;
         return clearedCriteria | ((long) newChange << 32);
 
@@ -179,7 +178,7 @@ public final class PackedCriteria {
      */
     public static long withPayload(long criteria, int payload1) {
         long payLoadAdjusted = Integer.toUnsignedLong(payload1);
-        long criteriaWithoutPreviousPayload = criteria & MASK_CLEAR_PAYLOAD;
+        long criteriaWithoutPreviousPayload = criteria & MASK_CLEARING_PAYLOAD;
         return (criteriaWithoutPreviousPayload) | payLoadAdjusted;
     }
 }
