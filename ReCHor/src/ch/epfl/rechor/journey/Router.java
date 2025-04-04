@@ -22,13 +22,13 @@ public record Router(TimeTable timeTable) {
 
     /**
      *
-     * @param date
-     * @param arrStationId
+     *
+     * @param date the date for which the optimal journeys must be computed
+     * @param arrStationId arrival station id
      * @return optimal's journeys profiles
      */
     public Profile profile (LocalDate date, int arrStationId) {
 
-        List <ParetoFront> paretoFronts = new ArrayList<>();
         Profile.Builder profile = new Profile.Builder(timeTable, date, arrStationId);
         Stations stations = timeTable.stations();
         Connections connections = timeTable.connectionsFor(date);
@@ -49,6 +49,7 @@ public record Router(TimeTable timeTable) {
            int connectionArrStationId = timeTable.stationId(connections.arrStopId(i));
            int connectionArrMins = connections.arrMins(i);
            int tripId = (connections.tripId(i));
+           int depStationID = connections.depStopId(i);
 
             if (arrayOfTransfersDuration[connectionArrStationId] != -1){
 
@@ -59,16 +60,20 @@ public record Router(TimeTable timeTable) {
             }
 
             Builder tripBuilder = profile.forTrip(tripId);
-            frontConnection.addAll(tripBuilder);
+            if (tripBuilder != null){
+                frontConnection.addAll(tripBuilder);}
 
             Builder stationBuilder = profile.forStation(connectionArrStationId);
+            if (stationBuilder != null){
             stationBuilder.forEach((long criteria) -> {
                 if(depMins(criteria) >= connectionArrMins) {
                     long packedTuple = pack(arrMins(criteria), changes(criteria) + 1, 0);
                     frontConnection.add(packedTuple);
                 }
-            });
+            });}
+
+            profile.setForStation(depStationID, frontConnection);
         }
-        return null;
+        return profile.build();
     }
 }
