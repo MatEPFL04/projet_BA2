@@ -162,6 +162,8 @@ public final class JourneyExtractor {
                 currentLegs.add(endLegFoot);
 
             }
+
+
             journeyList.add(new Journey(currentLegs));
         });
         journeyList.sort(Comparator

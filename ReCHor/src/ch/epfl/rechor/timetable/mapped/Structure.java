@@ -42,17 +42,15 @@ public class Structure {
 
         for (int i = 0; i < fields.length; i++) {
             FieldType currentFieldType = fields[i].type;
+            firstBytes[i] = structureSize;
             switch (currentFieldType) {
                 case U8 -> {
-                    firstBytes[i] = structureSize;
                     structureSize++;
                 }
                 case U16 -> {
-                    firstBytes[i] = structureSize;
                     structureSize += 2;
                 }
                 case S32 -> {
-                    firstBytes[i] = structureSize;
                     structureSize += 4;
                 }
             }
