@@ -30,8 +30,8 @@ public class Structure {
      * Constructs a new structure from the given fields.
      * Each field must have an index equal to its position in the argument list.
      *
-     * @param fields the fields given to Structure: each field has a number of bytes used to store the field,
-     *                and a field index in the structure.
+     * @param fields the fields given to Structure: each field has a number of bytes used to
+     *               store the field, and a field index in the structure.
      */
     public Structure (Field ... fields) {
 
@@ -76,7 +76,8 @@ public class Structure {
      * @return the byte position of the first byte of a field, of a particular element (elementIndex)
      */
     public int offset(int fieldIndex, int elementIndex) {
-        return elementIndex * totalSize() + firstBytes[fieldIndex];
+        return elementIndex * totalSize() +
+                firstBytes[fieldIndex];
     }
 
     /**

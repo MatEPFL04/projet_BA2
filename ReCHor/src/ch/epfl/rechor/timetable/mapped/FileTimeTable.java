@@ -48,7 +48,8 @@ public record FileTimeTable (Path directory,
         Path platformsPath = directory.resolve("platforms.bin");
         Path routesPath = directory.resolve("routes.bin");
         Path transfersPath = directory.resolve("transfers.bin");
-        List <String> immutableStringList = List.copyOf(Files.readAllLines(strings,StandardCharsets.ISO_8859_1));
+        List <String> immutableStringList = List.copyOf(Files.readAllLines(strings,
+                StandardCharsets.ISO_8859_1));
 
         ByteBuffer stationsBuffer = getBufferFromPath(stationsPath);
         ByteBuffer stationsAliasesBuffer = getBufferFromPath(stationsAliasesPath);
@@ -57,8 +58,10 @@ public record FileTimeTable (Path directory,
         ByteBuffer transfersBuffer = getBufferFromPath(transfersPath);
 
         BufferedStations stationsBuffered = new BufferedStations(immutableStringList, stationsBuffer);
-        BufferedStationAliases stationsAliasesBuffered = new BufferedStationAliases(immutableStringList, stationsAliasesBuffer);
-        BufferedPlatforms platformsBuffered = new BufferedPlatforms(immutableStringList, platformsBuffer);
+        BufferedStationAliases stationsAliasesBuffered = new BufferedStationAliases
+                (immutableStringList, stationsAliasesBuffer);
+        BufferedPlatforms platformsBuffered = new BufferedPlatforms(immutableStringList,
+                platformsBuffer);
         BufferedRoutes routesBuffered = new BufferedRoutes(immutableStringList, routesBuffer);
         BufferedTransfers transfersBuffered = new BufferedTransfers(transfersBuffer);
 
@@ -103,7 +106,8 @@ public record FileTimeTable (Path directory,
             Path timetableDirectory = directory.resolve(date.toString());
             Path connectionsPath = timetableDirectory.resolve("connections.bin");
             Path connections_succPath = timetableDirectory.resolve("connections-succ.bin");
-            return new BufferedConnections(getBufferFromPath(connectionsPath),getBufferFromPath(connections_succPath));
+            return new BufferedConnections(getBufferFromPath(connectionsPath),
+                    getBufferFromPath(connections_succPath));
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);

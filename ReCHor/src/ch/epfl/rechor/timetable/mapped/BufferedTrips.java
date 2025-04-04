@@ -20,7 +20,8 @@ public final class BufferedTrips implements Trips {
     private static final int ROUTE_ID = 0;
 
     /**
-     * Constant representing the field index of destination IDs inside the structured trip representation.
+     * Constant representing the field index of destination IDs inside the structured
+     * trip representation.
      */
     private static final int DESTINATION_ID = 1;
 
@@ -44,7 +45,8 @@ public final class BufferedTrips implements Trips {
     /**
      * Constructs a BufferedTrips instance from a given buffer.
      *
-     * @param stringTable a list of route names and destinations associated with their respective indexes.
+     * @param stringTable a list of route names and destinations associated with their
+     *                    respective indexes.
      * @param buffer      a ByteBuffer containing structured trip data.
      */
     public BufferedTrips(List<String> stringTable, ByteBuffer buffer) {

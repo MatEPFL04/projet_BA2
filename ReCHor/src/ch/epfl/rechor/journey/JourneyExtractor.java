@@ -40,7 +40,8 @@ public final class JourneyExtractor {
         int depStationId = timeTable.stationId(stopId);
         return new Stop(timeTable.stations().name(depStationId),
                 timeTable.platformName(stopId),
-                timeTable.stations().longitude(depStationId), timeTable.stations().latitude(depStationId));
+                timeTable.stations().longitude(depStationId),
+                timeTable.stations().latitude(depStationId));
     }
 
     private static Leg newFootLeg(TimeTable timetable, LocalDate date,
@@ -115,7 +116,8 @@ public final class JourneyExtractor {
                     numberOfIntermediateStops = unpack8(payload(criteria));
                     connectionDepStopId = connections.depStopId(connectionID);
                     connectionDepMins = connections.depMins(connectionID);
-                    currentLegs.add(newFootLeg(timeTable,currentDate,connectionArrMins, connectionArrStopId, connectionDepStopId));
+                    currentLegs.add(newFootLeg(timeTable,currentDate,connectionArrMins,
+                            connectionArrStopId, connectionDepStopId));
 
                 }
 

@@ -36,7 +36,8 @@ public final class BufferedConnections implements Connections {
     private static final int ARR_MINUTES = 3;
 
     /**
-     * Constant representing the field index of TRIP_POS_ID: the current id of the course of the current connection
+     * Constant representing the field index of TRIP_POS_ID: the current id of the course of the
+     * current connection
      * as well as the position of the connection in the course (in the eight less significant bits).
      */
     private static final int TRIP_POS_ID = 4;
@@ -55,9 +56,12 @@ public final class BufferedConnections implements Connections {
     /**
      * Final attribute storing the structure.
      */
-    private static final Structure connectionStructure = new Structure(Structure.field(DEP_STOP_ID, Structure.FieldType.U16),
-            Structure.field(DEP_MINUTES, Structure.FieldType.U16), Structure.field(ARR_STOP_ID, Structure.FieldType.U16),
-            Structure.field(ARR_MINUTES, Structure.FieldType.U16), Structure.field(TRIP_POS_ID, Structure.FieldType.S32));
+    private static final Structure connectionStructure = new Structure(Structure.field(DEP_STOP_ID,
+            Structure.FieldType.U16),
+            Structure.field(DEP_MINUTES, Structure.FieldType.U16), Structure.field(ARR_STOP_ID,
+            Structure.FieldType.U16),
+            Structure.field(ARR_MINUTES, Structure.FieldType.U16), Structure.field(TRIP_POS_ID,
+            Structure.FieldType.S32));
 
     /**
      * Constructs a buffered connection object using a structured buffer and a successor buffer.
@@ -120,7 +124,8 @@ public final class BufferedConnections implements Connections {
     /**
      * Returns the trip ID of the given connection.
      *
-     * @param id the index of the connection, from which we evaluate the index of the course of the current connection
+     * @param id the index of the connection, from which we evaluate the index of the course
+     *           of the current connection
      * @return the index of the course of the current connection
      * @throws IndexOutOfBoundsException if the given index exceeds the number of connection
      */
@@ -132,7 +137,8 @@ public final class BufferedConnections implements Connections {
     /**
      * Returns the position of the connection within its trip.
      *
-     * @param id the index of the connection, from which we evaluate the position of the connection inside the course
+     * @param id the index of the connection, from which we evaluate the position
+     *           of the connection inside the course
      * @return the position of the connection inside the course it belongs to.
      * @throws IndexOutOfBoundsException if the given index exceeds the number of connection
      */

@@ -42,8 +42,10 @@ public record Journey(List<Leg> legs) {
             Leg currentLeg = legs.get(i);
 
             Preconditions.checkArgument(
-                    (previousLeg instanceof Leg.Foot && currentLeg instanceof Leg.Transport)
-                            || (previousLeg instanceof Leg.Transport && currentLeg instanceof Leg.Foot));
+                    (previousLeg instanceof Leg.Foot &&
+                            currentLeg instanceof Leg.Transport)
+                            || (previousLeg instanceof Leg.Transport &&
+                            currentLeg instanceof Leg.Foot));
 
             Preconditions.checkArgument(!previousLeg.arrTime().isAfter(currentLeg.depTime()));
 
@@ -110,7 +112,8 @@ public record Journey(List<Leg> legs) {
          * @param destination      the final destination of the transport leg.
          */
         record Transport(Stop depStop, LocalDateTime depTime, Stop arrStop, LocalDateTime arrTime,
-                         List<IntermediateStop> intermediateStops, Vehicle vehicle, String route, String destination)
+                         List<IntermediateStop> intermediateStops, Vehicle vehicle,
+                         String route, String destination)
                 implements Leg {
 
             /**
@@ -148,7 +151,8 @@ public record Journey(List<Leg> legs) {
          * @param arrStop the arrival stop.
          * @param arrTime the arrival time.
          */
-        record Foot(Stop depStop, LocalDateTime depTime, Stop arrStop, LocalDateTime arrTime) implements Leg {
+        record Foot(Stop depStop, LocalDateTime depTime, Stop arrStop, LocalDateTime arrTime)
+                implements Leg {
 
             /**
              * Constructs a walking leg, ensuring validity.
@@ -174,7 +178,8 @@ public record Journey(List<Leg> legs) {
             }
 
             /**
-             * Determines if this walking leg represents a transfer (i.e., between platforms at the same station).
+             * Determines if this walking leg represents a transfer
+             * (i.e., between platforms at the same station).
              *
              * @return true if the walking leg is a transfer, false otherwise.
              */

@@ -7,7 +7,8 @@ import java.util.function.LongConsumer;
 /**
  * Class used to represent a front,
  * composed of tuples (long values) that represent the characteristics of a journey,
- * We either have two criteria: the arrival time and the changes (in a long), or three criteria, by including the departure time.
+ * We either have two criteria: the arrival time and the changes (in a long), or three criteria,
+ * by including the departure time.
  * Instances are created by the builder class, who can instantiate a new front.
  *
  * @author Matteo Lazzari (397247)
@@ -26,7 +27,8 @@ public final class ParetoFront {
     public static final ParetoFront EMPTY = new ParetoFront(new long [0]);
 
     /**
-     * Private constructor, so a front can only be built by the builder nested inside the ParetoFront class.
+     * Private constructor, so a front can only be built by the builder nested inside
+     * the ParetoFront class.
      *
      * @param packedCriteria, the array that is given by the builder
      */
@@ -137,9 +139,8 @@ public final class ParetoFront {
             return this;
         }
 
-        private long withoutPayLoad (long criteria) {
-            long mask = (MASK_32_BIT << 32);
-            return criteria & mask;
+        private long withMaxPayload(long criteria) {
+            return criteria | MASK_32_BIT;
         }
 
         private void frontResize() {
@@ -150,12 +151,7 @@ public final class ParetoFront {
         }
 
         /**
-         * Method used to add a new (long) tuple to the current front in construction, using the following steps:
-         *      - We first find the correct insertion index,
-         *      - then we check if the new tuple is dominated,
-         *      - after that, we compact the elements that start at insertionIdx all the way to the effectivesize and
-         *      - we bring them back as a compact sequence starting at insertionIdx
-         *      - and lastly we shift the position by once to insert our new tuple
+         * Method used to add a new (long) tuple to the current front in construction.
          *
          * @param packedTuple the packed tuple
          * @return the builder
@@ -164,8 +160,12 @@ public final class ParetoFront {
 
             int insertionIdx = 0;
 
-            while((insertionIdx < effectiveSize) && withoutPayLoad(packedTuple) > withoutPayLoad(frontInConstruction[insertionIdx])) {
-                if (PackedCriteria.dominatesOrIsEqual(frontInConstruction[insertionIdx], packedTuple)) {
+            while((insertionIdx < effectiveSize) &&
+                    withMaxPayload(packedTuple) > (frontInConstruction[insertionIdx]))
+            {
+                if (PackedCriteria.dominatesOrIsEqual(frontInConstruction[insertionIdx],
+                        packedTuple))
+                {
                     return this;
                 }
                 insertionIdx++;
@@ -186,7 +186,9 @@ public final class ParetoFront {
             effectiveSize = compactFrontIdx;
             frontResize();
 
-            System.arraycopy(frontInConstruction, insertionIdx, frontInConstruction, insertionIdx + 1, effectiveSize - insertionIdx);
+            System.arraycopy(frontInConstruction, insertionIdx, frontInConstruction,
+                    insertionIdx + 1,
+                    effectiveSize - insertionIdx);
             frontInConstruction[insertionIdx] = packedTuple;
             effectiveSize++;
 
@@ -227,17 +229,20 @@ public final class ParetoFront {
          * are dominated or equal by at least one tuple in "this".
          *
          * @param that the builder compared to the current builder
-         * @param depMins the departure time that is injected into the tuples of that before the comparisons
+         * @param depMins the departure time that is injected into the tuples
+         *                of that before the comparisons
          * @return true, if all the tuples from that are equal
          * or dominated by at least one tuple in the current builder, false otherwise.
          */
         public boolean fullyDominates(Builder that, int depMins) {
             for (int i = 0; i < that.effectiveSize; i++) {
                 boolean isTupleFromThatDominatedOrEqualInThis = false;
-                long criteriaWithDepMins = PackedCriteria.withDepMins(that.frontInConstruction[i],depMins);
+                long criteriaWithDepMins =
+                        PackedCriteria.withDepMins(that.frontInConstruction[i],depMins);
 
                 for (int j = 0; j < effectiveSize; j++) {
-                    if (PackedCriteria.dominatesOrIsEqual(frontInConstruction[j],criteriaWithDepMins)){
+                    if (PackedCriteria.dominatesOrIsEqual(frontInConstruction[j],criteriaWithDepMins))
+                    {
                         isTupleFromThatDominatedOrEqualInThis = true;
                         break;
                     }

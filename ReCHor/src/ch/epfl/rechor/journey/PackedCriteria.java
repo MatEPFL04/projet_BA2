@@ -36,7 +36,8 @@ public final class PackedCriteria {
      * @return the (long) packed-value containing the information given by the method
      */
     public static long pack(int arrMins, int changes, int payload) {
-        Preconditions.checkArgument(-240 <= arrMins && arrMins < 2880 && changes >= 0 && changes < 128);
+        Preconditions.checkArgument(-240 <= arrMins && arrMins < 2880
+                && changes >= 0 && changes < 128);
         long payLoadAdjusted = Integer.toUnsignedLong(payload);
         long arrMinsShifted = ((long) ((arrMins + 240))) << 39;
         long changesShifted = ((long) changes) << 32;

@@ -58,7 +58,8 @@ public final class PackedRange {
     }
 
     /**
-     * Method used to extract the end of the interval (excluded), who was previously packed into an integer.
+     * Method used to extract the end of the interval (excluded), who was previously packed
+     * into an integer.
      *
      * @param interval integer from which we extract the end of the interval
      * @return the end of the interval

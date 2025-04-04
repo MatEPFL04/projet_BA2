@@ -19,9 +19,10 @@ import java.util.Objects;
  * @param timeTable
  * @param date the date that corresponds to the profile
  * @param arrStationId the index of the station of the profile
- * @param stationFront a list of ParetoFront for our profile (each ParetoFront corresponds to a station)
+ * @param stationFront a list of ParetoFront for our profile
  */
-public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, List<ParetoFront> stationFront) {
+public record Profile(TimeTable timeTable, LocalDate date, int arrStationId,
+                      List<ParetoFront> stationFront) {
     public Profile {
         stationFront = List.copyOf(stationFront);
     }
@@ -116,9 +117,11 @@ public record Profile(TimeTable timeTable, LocalDate date, int arrStationId, Lis
          * Method used to change our array stationsFront with a new ParetoFront.builder.
          *
          * @param stationId the station for which we retrieve the ParetoFront
-         * @param builder the ParetoFront.Builder we want to add at the index stationId in the list stationsFront
+         * @param builder the ParetoFront.Builder we want to add at
+         *                the index stationId in the list stationsFront
          */
         public void setForStation(int stationId, ParetoFront.Builder builder) {
+
             stationsFront[stationId] = builder;
         }
 

@@ -2,8 +2,8 @@ package ch.epfl.rechor.timetable;
 
 /**
  * Interface representing station aliases.
- * This interface allows retrieving alias names for stations as well as the corresponding official station names.
- * <p>
+ * This interface allows retrieving alias names for stations as well as the corresponding
+ * official station names.
  * All methods throw an {@link IndexOutOfBoundsException} if the given index
  * is out of range, meaning it is less than 0 or greater than or equal to {@link #size()}.
  *

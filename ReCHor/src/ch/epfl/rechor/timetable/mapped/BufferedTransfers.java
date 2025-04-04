@@ -26,7 +26,8 @@ public final class BufferedTransfers implements Transfers {
     private static final int ARR_STATION_ID = 1;
 
     /**
-     * Constant representing the field index of transfer durations (in minutes) inside the transfer representation.
+     * Constant representing the field index of transfer durations (in minutes) inside the
+     * transfer representation.
      */
     private static final int TRANSFER_MINUTES = 2;
 
@@ -65,17 +66,17 @@ public final class BufferedTransfers implements Transfers {
             }
         }
 
-        int startIdx, lastExcludedIdx = 0;
+        int lastExcludedIdx = 0;
         int[] arrStationsPackedInterval = new int[++maxStationsIdx];
 
         while (lastExcludedIdx < size()) {
-            startIdx = lastExcludedIdx;
-            int currentPos = startIdx;
+            int startIdx = lastExcludedIdx;
             int currentArrId = structuredBuffer.getU16(ARR_STATION_ID, startIdx);
-            while ((currentPos + 1 < size()) && currentArrId == structuredBuffer.getU16(ARR_STATION_ID, ++currentPos)) {
+            while (lastExcludedIdx < size()
+                    && structuredBuffer.getU16(ARR_STATION_ID, lastExcludedIdx) == currentArrId) {
                 lastExcludedIdx++;
             }
-            arrStationsPackedInterval[currentArrId] = PackedRange.pack(startIdx, ++lastExcludedIdx);
+            arrStationsPackedInterval[currentArrId] = PackedRange.pack(startIdx, lastExcludedIdx);
         }
         arrayOfPackedChanges = arrStationsPackedInterval;
     }
@@ -126,7 +127,8 @@ public final class BufferedTransfers implements Transfers {
      * @throws IndexOutOfBoundsException if either station ID is invalid.
      */
     @Override
-    public int minutesBetween(int depStationId, int arrStationId) throws NoSuchElementException, IndexOutOfBoundsException {
+    public int minutesBetween(int depStationId, int arrStationId) throws NoSuchElementException,
+            IndexOutOfBoundsException {
         int startIdx = arrivingAt(arrStationId);
         int startIdx_ArrStation = PackedRange.startInclusive(startIdx);
         int endIdx_ArrStation = PackedRange.endExclusive(arrivingAt(arrStationId));

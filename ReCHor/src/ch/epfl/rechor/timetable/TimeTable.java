@@ -106,7 +106,8 @@ public interface TimeTable {
 
     /**
      * Retrieves the platform name corresponding to the given stop ID.
-     * If the stop ID corresponds to a platform, the method returns its name; otherwise, it returns null.
+     * If the stop ID corresponds to a platform, the method returns its name; otherwise,
+     * it returns null.
      *
      * @param stopId the ID of the stop.
      * @return the platform name if the stop ID corresponds to a platform, null otherwise.

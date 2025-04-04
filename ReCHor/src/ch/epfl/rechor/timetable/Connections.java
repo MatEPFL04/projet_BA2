@@ -74,7 +74,8 @@ public interface Connections extends Indexed {
      * it returns the index of the first connection.
      *
      * @param id the index of the connection
-     * @return the index of the next connection in the journey, or the first connection if the given index is the last one
+     * @return the index of the next connection in the journey, or the first connection
+     *          if the given index is the last one
      * @throws IndexOutOfBoundsException if the index is out of bounds
      */
     int nextConnectionId(int id) throws IndexOutOfBoundsException;
