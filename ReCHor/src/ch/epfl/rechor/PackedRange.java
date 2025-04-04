@@ -11,7 +11,13 @@ package ch.epfl.rechor;
 public final class PackedRange {
 
     /**
-     * Private constructor, as PackedRange cannot be instantiated
+     * Masks constants.
+     */
+    final static int MASK_8_BIT = 0xFF;
+    final static int MASK_24_BIT = 0xFFFFFF;
+
+    /**
+     * Private constructor, as PackedRange cannot be instantiated.
      */
     private PackedRange () {}
 
@@ -37,18 +43,18 @@ public final class PackedRange {
      * @return  lhe length of the interval
      */
     public static int length (int interval) {
-        return interval & 0xFF;
+        return interval & MASK_8_BIT;
     }
 
     /**
-     * Method used to extract the start of the interval, who was previously packed into an integer.
+     * Method used to extract the start of the interval, which was previously packed into an integer.
      *
      * @param interval integer from which we extract the start of the interval
      * @return the start of the interval
      */
     public static int startInclusive(int interval) {
         int shiftedStart = interval >> 8;
-        return shiftedStart & 0xFFFFFF;
+        return shiftedStart & MASK_24_BIT;
     }
 
     /**

@@ -37,26 +37,18 @@ public record Journey(List<Leg> legs) {
         legs = List.copyOf(legs);
         Preconditions.checkArgument(!legs.isEmpty());
 
-        boolean isAlternating = true;
-        boolean depPrecedesArr = true;
-        boolean stopContinuity = true;
-
         for (int i = 1; i < legs.size(); i++) {
-            if ((legs.get(i - 1) instanceof Leg.Foot && legs.get(i) instanceof Leg.Foot) ||
-                    (legs.get(i - 1) instanceof Leg.Transport && legs.get(i) instanceof Leg.Transport)) {
-                isAlternating = false;
-            }
-            if (legs.get(i).depTime().isBefore(legs.get(i - 1).arrTime())) {
-                depPrecedesArr = false;
-            }
-            if (!legs.get(i).depStop().equals(legs.get(i - 1).arrStop())) {
-                stopContinuity = false;
-            }
-        }
+            Leg previousLeg = legs.get(i - 1);
+            Leg currentLeg = legs.get(i);
 
-        Preconditions.checkArgument(isAlternating);
-        Preconditions.checkArgument(depPrecedesArr);
-        Preconditions.checkArgument(stopContinuity);
+            Preconditions.checkArgument(
+                    (previousLeg instanceof Leg.Foot && currentLeg instanceof Leg.Transport)
+                            || (previousLeg instanceof Leg.Transport && currentLeg instanceof Leg.Foot));
+
+            Preconditions.checkArgument(!previousLeg.arrTime().isAfter(currentLeg.depTime()));
+
+            Preconditions.checkArgument(previousLeg.arrStop().equals(currentLeg.depStop()));
+        }
     }
 
     /**

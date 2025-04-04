@@ -10,12 +10,17 @@ package ch.epfl.rechor;
 public final class Bits32_24_8 {
 
     /**
+     * Mask constant.
+     */
+    final static int MASK_8_BIT_LSB = 0xFF;
+
+    /**
      * Private constructor, as the class is not instantiable.
      */
     private Bits32_24_8 () {}
 
     /**
-     * Method used to pack two integers values into one
+     * Method used to pack two integers values into one.
      *
      * @param bits24 the bits embedded in the range 8-31 in the new integer value
      * @param bits8 value embedded in the 8 first bits
@@ -35,7 +40,6 @@ public final class Bits32_24_8 {
      */
     public static int unpack24(int bits32) {
         return bits32 >>> 8;
-
     }
 
     /**
@@ -45,8 +49,7 @@ public final class Bits32_24_8 {
      * @return the 8 least significant bits
      */
     public static int unpack8(int bits32) {
-
-        return bits32 & 0xFF;
+        return bits32 & MASK_8_BIT_LSB;
     }
 }
 

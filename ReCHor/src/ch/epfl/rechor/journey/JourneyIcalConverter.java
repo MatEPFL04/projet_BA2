@@ -25,7 +25,7 @@ public class JourneyIcalConverter {
      * Converts the given journey into a string formatted in the iCalendar (.ics) format.
      *
      * @param journey the journey that needs to be converted into a string in the right format (.ics format)
-     * @return a string corresponding to the journey expressed in an Icalendar format.
+     * @return a string representing the event corresponding to the journey
      */
     public static String toIcalendar (Journey journey) {
 
