@@ -15,7 +15,10 @@ import java.util.function.LongConsumer;
  */
 public final class ParetoFront {
 
-    private long [] frontTuples;
+    /**
+     * Front tuples.
+     */
+    private final long [] frontTuples;
 
     /**
      * The constant EMPTY, used to represent an empty front
@@ -50,10 +53,6 @@ public final class ParetoFront {
      */
     public long get(int arrMins, int changes) throws NoSuchElementException {
         for (int i = 0; i < size(); i++) {
-            if (PackedCriteria.arrMins(frontTuples[i]) == arrMins) {
-            }
-            if (PackedCriteria.changes(frontTuples[i]) == changes) {
-            }
             if (PackedCriteria.arrMins(frontTuples[i]) == arrMins
                     && PackedCriteria.changes(frontTuples[i]) == changes) {
                 return frontTuples[i];
@@ -99,6 +98,7 @@ public final class ParetoFront {
         private long [] frontInConstruction;
         private int effectiveSize;
 
+        final static long MASK_32_BIT = 0xFFFFFFFFL;
 
         /**
          * Instantiates a new Builder, and initializes the attributes.
@@ -106,7 +106,6 @@ public final class ParetoFront {
         public Builder() {
             frontInConstruction = new long[2];
             effectiveSize = 0;
-
         }
 
         /**
@@ -117,7 +116,6 @@ public final class ParetoFront {
         public Builder (Builder that) {
             frontInConstruction = that.frontInConstruction;
             effectiveSize = that.effectiveSize;
-
         }
 
         /**
@@ -136,12 +134,11 @@ public final class ParetoFront {
          */
         public Builder clear(){
             effectiveSize = 0;
-
             return this;
         }
 
         private long withoutPayLoad (long criteria) {
-            long mask = (0xFFFFFFFFL << 32);
+            long mask = (MASK_32_BIT << 32);
             return criteria & mask;
         }
 
@@ -213,7 +210,7 @@ public final class ParetoFront {
         }
 
         /**
-         * Add all builder.
+         * Adds to the front all the tuples in construction by the given builder.
          *
          * @param that the that
          * @return the builder
@@ -235,10 +232,10 @@ public final class ParetoFront {
          * or dominated by at least one tuple in the current builder, false otherwise.
          */
         public boolean fullyDominates(Builder that, int depMins) {
-            for (int i = 0; i < that.effectiveSize; i++) { //itération sur tous les tuples de that
+            for (int i = 0; i < that.effectiveSize; i++) {
                 boolean isTupleFromThatDominatedOrEqualInThis = false;
                 long criteriaWithDepMins = PackedCriteria.withDepMins(that.frontInConstruction[i],depMins);
-                // au début, chaque tuple de that n'a pas trouvé de dominant ou égal
+
                 for (int j = 0; j < effectiveSize; j++) {
                     if (PackedCriteria.dominatesOrIsEqual(frontInConstruction[j],criteriaWithDepMins)){
                         isTupleFromThatDominatedOrEqualInThis = true;
@@ -250,7 +247,6 @@ public final class ParetoFront {
                 }
             }
             return true;
-
         }
 
         /**
@@ -274,10 +270,6 @@ public final class ParetoFront {
             return new ParetoFront(Arrays.copyOf(frontInConstruction,effectiveSize));
         }
 
-        /**
-         *
-         * @return
-         */
         @Override
         public String toString () {
             StringBuilder sb = new StringBuilder();

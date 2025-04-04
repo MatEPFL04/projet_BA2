@@ -19,7 +19,7 @@ public class Structure {
     /**
      * Short array containing the first position of each field in the flattened representation.
      */
-    private short [] firstBytes;
+    private final short [] firstBytes;
 
     /**
      * Attribute representing the total number of bytes used to represent one object inside an array.
