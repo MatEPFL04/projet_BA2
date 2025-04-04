@@ -71,7 +71,6 @@ public final class JourneyExtractor {
 
         LocalDate currentDate = profile.date();
         Connections connections = profile.connections();
-        Transfers transfers = profile.timeTable().transfers();
         TimeTable timeTable = profile.timeTable();
         Trips trips = profile.trips();
         Routes routes = profile.timeTable().routes();
@@ -96,11 +95,10 @@ public final class JourneyExtractor {
             int connectionArrMins = connections.arrMins(connectionID);
             int numberOfIntermediateStops = unpack8(payload(criteria));
 
-            LocalDateTime currentLegArrTime = dateFromMins(connectionArrMins, currentDate);
-            Stop currentLegArrStop = newStop(timeTable, connectionArrStopId);
+            LocalDateTime currentLegArrTime;
+            Stop currentLegArrStop;
 
             if (depStationId != connectionDepStationId) {
-
                 Leg beginningLegFoot = newFootLeg(timeTable,
                         currentDate, journeydepMins, depStationId, connectionDepStopId);
                 currentLegs.add(beginningLegFoot);
@@ -108,25 +106,17 @@ public final class JourneyExtractor {
             }
 
             boolean firstTransportAdded = false;
-
             while (journeyChanges >= 0) {
-
-                if (!currentLegs.isEmpty() && firstTransportAdded) {
+                if (firstTransportAdded) {
 
                     criteria = profile.forStation(connectionArrStationId).
                             get(journeyArrMins, journeyChanges);
-
                     connectionID = unpack24(payload(criteria));
                     numberOfIntermediateStops = unpack8(payload(criteria));
                     connectionDepStopId = connections.depStopId(connectionID);
-                    connectionDepStationId = timeTable.stationId(connectionDepStopId);
                     connectionDepMins = connections.depMins(connectionID);
+                    currentLegs.add(newFootLeg(timeTable,currentDate,connectionArrMins, connectionArrStopId, connectionDepStopId));
 
-                    int durationFootStep = transfers.minutesBetween(connectionArrStationId, connectionDepStationId);
-                    LocalDateTime endFootStepTime = dateFromMins(connectionArrMins + durationFootStep, currentDate);
-                    Stop nextStop = newStop(timeTable, connectionDepStopId);
-                    Foot footStep = new Foot(currentLegArrStop, currentLegArrTime, nextStop, endFootStepTime);
-                    currentLegs.add(footStep);
                 }
 
                 List < IntermediateStop > intermediateStopList = new ArrayList<>();
@@ -160,7 +150,6 @@ public final class JourneyExtractor {
 
                 currentLegs.add(transportStep);
                 connectionArrStationId = timeTable.stationId(connectionArrStopId);
-
                 firstTransportAdded = true;
 
                 journeyChanges--;
@@ -174,13 +163,10 @@ public final class JourneyExtractor {
 
             }
             journeyList.add(new Journey(currentLegs));
-
         });
-
         journeyList.sort(Comparator
                 .comparing(Journey::depTime)
                 .thenComparing(Journey::arrTime));
-
         return journeyList;
     }
 }
