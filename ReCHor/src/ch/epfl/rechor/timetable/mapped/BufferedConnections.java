@@ -45,12 +45,12 @@ public final class BufferedConnections implements Connections {
      * Attribute storing an int buffer that stores for each connection,
      * the index of the next connection in the connection array.
      */
-    private IntBuffer intBuffer;
+    private final IntBuffer intBuffer;
 
     /**
      * Attribute storing the structured buffer of connections.
      */
-    private StructuredBuffer structuredBuffer;
+    private final StructuredBuffer structuredBuffer;
 
     /**
      * Final attribute storing the structure.

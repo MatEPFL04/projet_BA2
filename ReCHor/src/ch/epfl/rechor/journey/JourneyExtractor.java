@@ -44,7 +44,7 @@ public final class JourneyExtractor {
     }
 
     private static Leg newFootLeg(TimeTable timetable, LocalDate date,
-                                           int startingMinutes, int startStopId, int arrStopId) {
+                                  int startingMinutes, int startStopId, int arrStopId) {
 
         int startStationId = timetable.stationId(startStopId);
         int arrStationId = timetable.stationId(arrStopId);
@@ -145,7 +145,7 @@ public final class JourneyExtractor {
                 String route = routes.name(routeId);
 
                 Transport transportStep = new Transport(currentLegDepStop,
-                       currentLegDepTime, currentLegArrStop, currentLegArrTime,
+                        currentLegDepTime, currentLegArrStop, currentLegArrTime,
                         intermediateStopList, vehicle, route, destination);
 
                 currentLegs.add(transportStep);
@@ -162,6 +162,8 @@ public final class JourneyExtractor {
                 currentLegs.add(endLegFoot);
 
             }
+
+
             journeyList.add(new Journey(currentLegs));
         });
         journeyList.sort(Comparator
@@ -170,6 +172,3 @@ public final class JourneyExtractor {
         return journeyList;
     }
 }
-
-
-

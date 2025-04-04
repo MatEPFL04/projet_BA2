@@ -1,9 +1,9 @@
 package ch.epfl.rechor.timetable.mapped;
+
 import ch.epfl.rechor.journey.Vehicle;
 import ch.epfl.rechor.timetable.Routes;
 
 import java.util.List;
-import java.awt.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -81,6 +81,7 @@ public final class BufferedRoutes implements Routes {
 
     /**
      * Returns the total number of routes.
+     *
      * @return the size of the route dataset.
      */
     @Override
