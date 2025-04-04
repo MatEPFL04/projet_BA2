@@ -10,8 +10,16 @@ import ch.epfl.rechor.Preconditions;
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  */
-
 public final class PackedCriteria {
+
+    /**
+     * Masks constants.
+     */
+    private static final int MASK_7_BITS       = 0x7F;
+    private static final int MASK_12_BITS      = 0xFFF;
+    private static final long MASK_CLEAR_DEP   = 0x3FFFFFFFFFFFFL;
+    private static final long MASK_CLEAR_CHANGE = ~(0b1111111L << 32);
+    private static final long MASK_CLEAR_PAYLOAD = 0xFFFFFFFF00000000L;
 
     /**
      * Private constructor as the class is not instantiable.
@@ -35,7 +43,6 @@ public final class PackedCriteria {
         long changesShifted = ((long) changes) << 32;
 
         return arrMinsShifted | changesShifted | payLoadAdjusted;
-
     }
 
     /**
@@ -62,7 +69,6 @@ public final class PackedCriteria {
     public static int depMins(long criteria) {
         Preconditions.checkArgument(hasDepMins(criteria));
         return (int)  (4095 - ((criteria >> 51) + 240));
-
     }
 
     /**
@@ -74,8 +80,7 @@ public final class PackedCriteria {
      * @return the (complement of) arrival time (in minutes)
      */
     public static int arrMins(long criteria) {
-        return (int) (((criteria >> 39) & 0xFFF)) -240;
-
+        return (int) (((criteria >> 39) & MASK_12_BITS)) -240;
     }
 
     /**
@@ -86,8 +91,7 @@ public final class PackedCriteria {
      * @return the number of changes
      */
     public static int changes(long criteria) {
-        return (int) ((criteria) >> 32) & 0x7F;
-
+        return (int) ((criteria) >> 32) & MASK_7_BITS;
     }
 
     /**
@@ -100,7 +104,6 @@ public final class PackedCriteria {
      */
     public static int payload(long criteria) {
         return (int) criteria;
-
     }
 
     /**
@@ -134,7 +137,7 @@ public final class PackedCriteria {
      * @return a (long) criteria without information about the departure time
      */
     public static long withoutDepMins(long criteria) {
-        return (criteria & 0x3FFFFFFFFFFFFL);
+        return (criteria & MASK_CLEAR_DEP);
 
     }
 
@@ -161,7 +164,7 @@ public final class PackedCriteria {
      */
     public static long withAdditionalChange(long criteria) {
         Preconditions.checkArgument(changes(criteria) < 128);
-        long clearedCriteria = criteria & ~(0b1111111L << 32);
+        long clearedCriteria = criteria & MASK_CLEAR_CHANGE;
         int newChange = changes(criteria) + 1;
         return clearedCriteria | ((long) newChange << 32);
 
@@ -176,7 +179,7 @@ public final class PackedCriteria {
      */
     public static long withPayload(long criteria, int payload1) {
         long payLoadAdjusted = Integer.toUnsignedLong(payload1);
-        long criteriaWithoutPreviousPayload = criteria & 0xFFFFFFFF00000000L;
+        long criteriaWithoutPreviousPayload = criteria & MASK_CLEAR_PAYLOAD;
         return (criteriaWithoutPreviousPayload) | payLoadAdjusted;
     }
 }
