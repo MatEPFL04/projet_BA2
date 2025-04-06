@@ -1,5 +1,6 @@
 package ch.epfl.rechor.journey;
 
+import ch.epfl.rechor.PackedRange;
 import ch.epfl.rechor.timetable.Connections;
 import ch.epfl.rechor.timetable.Stations;
 import ch.epfl.rechor.timetable.TimeTable;
@@ -7,9 +8,9 @@ import ch.epfl.rechor.timetable.Transfers;
 
 import static ch.epfl.rechor.journey.PackedCriteria.*;
 import static ch.epfl.rechor.journey.ParetoFront.Builder;
+
+import java.sql.SQLOutput;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -28,6 +29,7 @@ public record Router(TimeTable timeTable) {
      * @return optimal's journeys profiles
      */
     public Profile profile (LocalDate date, int arrStationId) {
+        System.out.println("START");
 
         Profile.Builder profile = new Profile.Builder(timeTable, date, arrStationId);
         Stations stations = timeTable.stations();
@@ -44,36 +46,90 @@ public record Router(TimeTable timeTable) {
             }
         }
 
+        Builder connectionParetoFront = new Builder();
+        Builder stationBuilder;
+        Builder tripsBuilder;
+        int count = 0;
+
         for (int i = 0; i < connections.size(); i++) {
-           Builder frontConnection = new Builder();
+
+           int connectionDepStationId = timeTable.stationId(connections.depStopId(i));
            int connectionArrStationId = timeTable.stationId(connections.arrStopId(i));
+           int connectionDepMins = connections.depMins(i);
            int connectionArrMins = connections.arrMins(i);
-           int tripId = (connections.tripId(i));
-           int depStationID = connections.depStopId(i);
+           int tripId = connections.tripId(i);
+
+
+           //option 1
 
             if (arrayOfTransfersDuration[connectionArrStationId] != -1){
+
+                System.out.println("option 1");
 
                 long tuple = PackedCriteria.pack(connectionArrMins +
                         arrayOfTransfersDuration[connectionArrStationId], 0, 0);
 
-                frontConnection.add(tuple);
+                connectionParetoFront.add(tuple);
             }
 
-            Builder tripBuilder = profile.forTrip(tripId);
-            if (tripBuilder != null){
-                frontConnection.addAll(tripBuilder);}
+            //option 2
+            tripsBuilder = profile.forTrip(tripId);
+            if (tripsBuilder != null) {
 
-            Builder stationBuilder = profile.forStation(connectionArrStationId);
+                connectionParetoFront.addAll(tripsBuilder);
+            }
+
+            //option 3
+
+            stationBuilder = profile.forStation(connectionArrStationId);
             if (stationBuilder != null){
-            stationBuilder.forEach((long criteria) -> {
-                if(depMins(criteria) >= connectionArrMins) {
+                System.out.println("option 3");
+                stationBuilder.forEach((long criteria) -> {
+
+                if((depMins(criteria) >= connectionArrMins)) {
                     long packedTuple = pack(arrMins(criteria), changes(criteria) + 1, 0);
-                    frontConnection.add(packedTuple);
+                    connectionParetoFront.add(packedTuple);
+
                 }
             });}
 
-            profile.setForStation(depStationID, frontConnection);
+            //mise à jour de la frontière de la liaison
+
+            if (tripsBuilder != null) {
+                System.out.println("mise à jour de la frontière de la liaison");
+                tripsBuilder.addAll(connectionParetoFront);
+            }
+
+
+            //mise à jour des frontières des gares
+
+            int firstChangeToDepStation = PackedRange.startInclusive
+                    (transfers.arrivingAt(connectionDepStationId));
+            int lastChangeToDepStation = PackedRange.endExclusive(
+                    transfers.arrivingAt(connectionDepStationId)) - 1;
+
+            for (int j = firstChangeToDepStation; j <= lastChangeToDepStation; j++) {
+
+                int transferId = j;
+                int d = connectionDepMins - transfers.minutes(j);
+
+                connectionParetoFront.forEach( (long criteria) -> {
+
+                    //on y entre
+
+                    long tupleWithoutDepMins = PackedCriteria.pack(arrMins(criteria),changes(criteria),0);
+                    long addedTuple = PackedCriteria.withDepMins(tupleWithoutDepMins, d);
+                    if (profile.forStation(transfers.depStationId(transferId)) != null) {
+                        System.out.println("added for: " + transfers.depStationId(transferId));
+                        (profile.forStation(transfers.depStationId(transferId))).add(addedTuple);
+                    }
+
+                });
+            }
+
+            connectionParetoFront.clear();
         }
+        System.out.println("DONE");
         return profile.build();
     }
 }
