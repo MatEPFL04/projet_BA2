@@ -32,11 +32,12 @@ public record Router(TimeTable timeTable) {
 
         Profile.Builder profile = new Profile.Builder(timeTable, date, arrStationId);
         Stations stations = timeTable.stations();
+
         Connections connections = timeTable.connectionsFor(date);
+
         Transfers transfers = timeTable.transfers();
 
         int[] arrayOfTransfersDuration = new int[stations.size()];
-        System.out.println(stations.size());
 
         for (int i = 0; i < stations.size(); i++) {
             try {
@@ -57,7 +58,7 @@ public record Router(TimeTable timeTable) {
            int connectionDepMins = connections.depMins(i);
            int connectionArrMins = connections.arrMins(i);
            int tripId = connections.tripId(i);
-           int currentConnectionPosInTrip = connections.tripPos(i);
+           int currentConnectionTripPos = connections.tripPos(i);
 
            tripsBuilder = profile.forTrip(tripId) != null ?
                     profile.forTrip(tripId) : new Builder();
@@ -125,7 +126,7 @@ public record Router(TimeTable timeTable) {
                     front.forEach( (long criteria) -> {
 
                         int numberOfIntermediateStops = connections.tripPos((int) criteria)
-                                - currentConnectionPosInTrip;
+                                - currentConnectionTripPos;
                         int payl = Bits32_24_8.pack(connectionId,numberOfIntermediateStops);
 
 
