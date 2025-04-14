@@ -158,6 +158,7 @@ public final class ParetoFront {
          */
         public Builder add(long packedTuple) {
 
+
             int insertionIdx = 0;
 
             while((insertionIdx < effectiveSize) &&

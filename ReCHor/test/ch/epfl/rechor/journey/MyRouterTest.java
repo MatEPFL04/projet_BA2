@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Month;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MyRouterTest {
@@ -25,9 +26,12 @@ public class MyRouterTest {
         Profile profile = router.profile(tuesday, arrStationID);
 
         ParetoFront front = profile.forStation(depStationID);
-        System.out.println("taille: " + front.size());
 
-        boolean foundExpectedTuple = front.toString().contains("(695,1)");
-        assertTrue(foundExpectedTuple, "message");
+        //tuple qui arrive à 17h57 avec 4 changements à Gruyères, devrait avoir été crée...
+        long tupleNeededToBeInFront = PackedCriteria.pack(17*60 + 57, 3, 0);
+        System.out.println(front);
+        assertEquals(tupleNeededToBeInFront, front.get(17*60 + 57, 3));
+
+
     }
 }
