@@ -53,30 +53,29 @@ public record Router(TimeTable timeTable) {
 
         for (int i = 0; i < connections.size(); i++) {
 
-           int connectionDepStationId = timeTable.stationId(connections.depStopId(i));
-           int connectionArrStationId = timeTable.stationId(connections.arrStopId(i));
-           int connectionDepMins = connections.depMins(i);
-           int connectionArrMins = connections.arrMins(i);
-           int tripId = connections.tripId(i);
-           int currentConnectionTripPos = connections.tripPos(i);
+            int connectionDepStationId = timeTable.stationId(connections.depStopId(i));
+            int connectionArrStationId = timeTable.stationId(connections.arrStopId(i));
+            int connectionDepMins = connections.depMins(i);
+            int connectionArrMins = connections.arrMins(i);
+            int tripId = connections.tripId(i);
+            int currentConnectionTripPos = connections.tripPos(i);
 
-           tripsBuilder = profile.forTrip(tripId) != null ?
+            tripsBuilder = profile.forTrip(tripId) != null ?
                     profile.forTrip(tripId) : new Builder();
 
-           arrStationBuilder = profile.forStation(connectionArrStationId) != null ?
+            arrStationBuilder = profile.forStation(connectionArrStationId) != null ?
                     profile.forStation(connectionArrStationId) : new Builder();
 
-           Builder depStationFront = profile.forStation(connectionDepStationId) != null ?
+            Builder depStationFront = profile.forStation(connectionDepStationId) != null ?
                     profile.forStation(connectionDepStationId) : new Builder();
 
+            int associatedPayload = i;
 
-           //option 1
+            //option 1
             if (arrayOfTransfersDuration[connectionArrStationId] != -1){
 
-                int payload = i;
-
                 long tuple = PackedCriteria.pack(connectionArrMins +
-                        arrayOfTransfersDuration[connectionArrStationId], 0, payload);
+                        arrayOfTransfersDuration[connectionArrStationId], 0, associatedPayload);
                 front.add(tuple);
             }
 
@@ -84,15 +83,15 @@ public record Router(TimeTable timeTable) {
             front.addAll(tripsBuilder);
 
 
-            int payload = i;
+
 
             //option 3
             arrStationBuilder.forEach((long criteria) -> {
 
                 if((depMins(criteria) >= connectionArrMins)) {
-                        long packedTuple = pack(arrMins(criteria), changes(criteria) + 1, payload);
+                    long packedTuple = pack(arrMins(criteria), changes(criteria) + 1, associatedPayload);
 
-                        front.add(packedTuple);
+                    front.add(packedTuple);
 
                 }
             });
@@ -124,8 +123,8 @@ public record Router(TimeTable timeTable) {
 
                     int connectionId = i;
                     front.forEach( (long criteria) -> {
-
-                        int numberOfIntermediateStops = connections.tripPos((int) criteria)
+                        int connectionID = PackedCriteria.payload(criteria);
+                        int numberOfIntermediateStops = connections.tripPos(connectionID)
                                 - currentConnectionTripPos;
                         int payl = Bits32_24_8.pack(connectionId,numberOfIntermediateStops);
 
@@ -149,3 +148,4 @@ public record Router(TimeTable timeTable) {
         return profile.build();
     }
 }
+
