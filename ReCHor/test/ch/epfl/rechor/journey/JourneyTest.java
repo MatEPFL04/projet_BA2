@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -54,6 +53,7 @@ class JourneyTest {
                 Vehicle.TRAIN,
                 "IR15",
                 "Luzern");
+
 
         return List.of(l1, l2, l3, l4, l5);
     }

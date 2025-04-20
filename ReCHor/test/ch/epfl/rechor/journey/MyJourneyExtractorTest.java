@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class MyJourneyExtractorTest {
 
@@ -40,11 +41,13 @@ public class MyJourneyExtractorTest {
 
     @Test
     void readingProfileForAGivenStationWorks () throws IOException {
+
         TimeTable t = FileTimeTable.in(Path.of("timetable"));
         LocalDate date = LocalDate.of(2025, Month.MARCH, 18);
         Profile p = readProfile(t, date, 11486);
         List<Journey> js = JourneyExtractor.journeys(p, 7872);
         String j = JourneyIcalConverter.toIcalendar(js.get(20));
+
         System.out.println(j);
     }
 }

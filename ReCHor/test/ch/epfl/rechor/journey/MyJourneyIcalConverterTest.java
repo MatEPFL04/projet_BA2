@@ -1,7 +1,6 @@
 package ch.epfl.rechor.journey;
 
-import ch.epfl.rechor.FormatterFr;
-import ch.epfl.rechor.IcalBuilder;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

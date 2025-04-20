@@ -1,8 +1,8 @@
 package ch.epfl.rechor;
 
-import ch.epfl.rechor.timetable.StationAliases;
 import ch.epfl.rechor.timetable.Stations;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -15,11 +15,25 @@ import java.util.regex.Pattern;
  */
 public class StopIndex {
 
-    private StopIndex(List<String> stopNameIndex, Map<String, String> map){}
+    private StopIndex(List<String> stopName, Map<String, String> map){
 
-    public List<Stations> stopsMatching(String request, int maxNumberOfStops) {
+        // call stopsMatching() pr associer query a un stop
+    }
 
-        Pattern vowels = Pattern.compile("[aeiou]");
+    public List<Stations> stopsMatching(String query, int maxNumberOfStops) {
+
+        List<Stations> stopsQuery = new ArrayList<>();
+
+        if(stopsQuery.size() > maxNumberOfStops) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        Pattern e = Pattern.compile("[eéèêë]");
+        Pattern c = Pattern.compile("[cç]");
+        Pattern a = Pattern.compile("[aàâäá]");
+        Pattern i = Pattern.compile("[iîïìí]");
+        Pattern o = Pattern.compile("[oôöòó]");
+        Pattern u = Pattern.compile("[uûùü]");
 
         return null;
     }

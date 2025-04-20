@@ -10,7 +10,7 @@ import java.util.Set;
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  */
-public sealed interface Json permits Json.JArray, Json.JObject, Json.JString, Json.JNumber {
+public sealed interface Json {
 
     /**
      * Represents a JSON array.
@@ -21,7 +21,11 @@ public sealed interface Json permits Json.JArray, Json.JObject, Json.JString, Js
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder("[");
-            jsonArray.forEach(sb::append);
+            for (Json json : jsonArray) {
+                sb.append(sb.length() != 1 ? "," : "");
+                sb.append(json);
+            }
+
             sb.append("]");
             return sb.toString();
         }
@@ -32,18 +36,18 @@ public sealed interface Json permits Json.JArray, Json.JObject, Json.JString, Js
      *
      * @param jsonObject map which associates Json values to java strings.
      */
-    record JObject (Map <Json,String> jsonObject) implements Json {
+    record JObject (Map <JString, Json> jsonObject) implements Json {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder("{");
-            Set<Map.Entry <Json,String>> pairs = jsonObject.entrySet();
+            Set<Map.Entry <JString, Json>> pairs = jsonObject.entrySet();
             pairs.forEach(pair -> {
                 if (!(sb.length() == 1)) {
                     sb.append(",");
                 }
-                Json object = pair.getKey();
-                String str = pair.getValue();
-                sb.append(object).append(":").append(str);
+                JString key = pair.getKey();
+                Json value = pair.getValue();
+                sb.append(key).append(":").append(value);
             });
             return sb.append("}").toString();
         }
