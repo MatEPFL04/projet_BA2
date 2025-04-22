@@ -1,14 +1,19 @@
 package ch.epfl.rechor.gui;
 
+import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TitledPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
@@ -62,57 +67,59 @@ public record DetailUI(Node rootNode) {
 
          */
 
-        // 2. Étapes du voyage (étape à pied, étape en transport)
+        // 2. Étapes du voyage
 
         GridPane gridPane = new GridPane();
-
-        gridPane.add(new Label("Heures D/D+A + icône    "), 0, 0);
-        gridPane.add(new Label("Cercles    "),                1, 0);
-        gridPane.add(new Label("Nom des gares   "),          2, 0);
-        gridPane.add(new Label("Voies/Quais"),            3, 0);
-
         List <Journey.Leg> listOfLegs = observableValue.getValue().legs();
 
-
-        listOfLegs.forEach(leg -> {
-
+        int rowIndex = 0;
+        for (Journey.Leg leg : listOfLegs) {
             switch  (leg) {
                 case Journey.Leg.Foot foot -> {
-                    int row = 1;
-                    gridPane.add(new Label("07:00 → 07:10 🥾"),      0, row);
-                    gridPane.add(new Label("●        ●"),            1, row);
-                    gridPane.add(new Label("EPFL → Lausanne"),       2, row);
-                    gridPane.add(new Label("—        —"),            3, row);
+                    gridPane.add(new Label(FormatterFr.formatLeg(foot)), 2,rowIndex, 2, 1);
+                    rowIndex++;
                 }
                 case Journey.Leg.Transport transport -> {
-                    if(transport.intermediateStops().isEmpty()){
-                        int row = 3;
-                        gridPane.add(new Label("07:00 → 07:10 "),      0, 1);
-                        gridPane.add(new Label("●        "),            1, 1);
-                        gridPane.add(new Label("EPFL "),       2, 1);
-                        gridPane.add(new Label("dgdgdg        —"),            3, 1);
 
-                        gridPane.add(new Label("07:00 → 07:10 "),      0, 2);
-                        gridPane.add(new Label("●        "),            1, 3);
-                        gridPane.add(new Label("EPFL "),       2, 2);
-                        gridPane.add(new Label("dgdgdg        —"),            3, 2);
+                    gridPane.addRow(rowIndex, new Label(FormatterFr.formatTime(transport.depTime())),
+                            new Circle(3),
+                            new Label(transport.depStop().name()),
+                            new Label(FormatterFr.formatPlatformName(transport.depStop())));
+                    rowIndex++;
 
-                        gridPane.add(new Label("07:00 → 07:10 "),      0, row);
-                        gridPane.add(new Label("●        "),            1, row);
-                        gridPane.add(new Label("EPFL "),       2, row);
-                        gridPane.add(new Label("dgdgdg        —"),            3, row);
+                    gridPane.add(new ImageView((VehicleIcons.iconFor(transport.vehicle()))),
+                            2, rowIndex, 2, 1);
+                    rowIndex++;
+
+                    if(!(transport.intermediateStops().isEmpty())){
+                        String titleOfMenuDeroulant = transport.intermediateStops().size()
+                                + " arrêts,  " + FormatterFr.formatDuration(transport.duration());
+                        StringBuilder intermediateStopsString = new StringBuilder();
+                        transport.intermediateStops().forEach(intermediateStop  -> {
+                            intermediateStopsString.append(FormatterFr.formatTime(intermediateStop.arrTime()))
+                                    .append(" ")
+                                    .append(FormatterFr.formatTime(intermediateStop.depTime()))
+                                    .append(" ")
+                                    .append(intermediateStop.stop().name())
+                                    .append("\n");
+                        });
+                        TitledPane pane = new TitledPane();
+                        pane.setText(titleOfMenuDeroulant);
+                        pane.setContent(new Label(intermediateStopsString.toString()));
+
+                        gridPane.add(new Accordion(pane), 2, rowIndex, 2, 1);
+                        rowIndex++;
                     }
-                    else {
-                        int row = 4;
-                        gridPane.add(new Label("07:00 → 07:10 🥾"),      0, row);
-                        gridPane.add(new Label("●        ●"),            1, row);
-                        gridPane.add(new Label("EPFL → Lausanne"),       2, row);
-                        gridPane.add(new Label("— sdgdsg       —"),            3, row);
-                    }
 
+                    gridPane.addRow(rowIndex, new Label(FormatterFr.formatTime(transport.arrTime())),
+                            new Circle(3),
+                            new Label(transport.arrStop().name()),
+                            new Label(FormatterFr.formatPlatformName(transport.arrStop())));
+                    rowIndex++;
                 }
             }
-        });
+        };
+
 
         StackPane stackPane2 = new StackPane(gridPane);
         VBox box = new VBox(stackPane2);
@@ -120,6 +127,5 @@ public record DetailUI(Node rootNode) {
         ScrollPane scrollPane = new ScrollPane(stackPane);
 
         return new DetailUI(scrollPane);
-
     }
 }

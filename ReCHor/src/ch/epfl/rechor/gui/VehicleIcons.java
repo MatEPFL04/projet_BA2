@@ -23,7 +23,7 @@ public final class VehicleIcons {
      * @param vehicle the vehicle for which we want to load the corresponding icon.
      * @return the icon corresponding to the vehicle.
      */
-    public Image iconFor(Vehicle vehicle) {
+    public static Image iconFor(Vehicle vehicle) {
         return cachedIcons.computeIfAbsent(vehicle, v-> new Image(v.name() + ".png"));
     }
 }
