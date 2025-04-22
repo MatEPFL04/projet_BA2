@@ -39,9 +39,10 @@ public final class MyTestDetailUI extends Application {
         TimeTable timeTable = new CachedTimeTable(
                 FileTimeTable.in(Path.of("timetable")));
         Stations stations = timeTable.stations();
-        LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
+        LocalDate date = LocalDate.of(2025, Month.MARCH, 23);
         int depStationId = stationId(stations, "Ecublens VD, EPFL");
-        int arrStationId = stationId(stations, "Gruyères");
+        int arrStationId = stationId(stations, "Ecublens VD, Bassenges");
+        System.out.println(arrStationId);
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
         Journey journey = JourneyExtractor
@@ -58,5 +59,9 @@ public final class MyTestDetailUI extends Application {
         primaryStage.setMinWidth(400);
         primaryStage.setMinHeight(600);
         primaryStage.show();
+
+
+        System.out.println(journeyO.getValue());
+
     }
 }
