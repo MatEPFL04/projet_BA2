@@ -18,10 +18,10 @@ public final class VehicleIcons {
     private static final Map<Vehicle, Image> cachedIcons = new EnumMap<>(Vehicle.class);
 
     /**
+     * The method returns the icon corresponding to the vehicle given in argument.
      *
-     *
-     * @param vehicle
-     * @return
+     * @param vehicle the vehicle for which we want to load the corresponding icon.
+     * @return the icon corresponding to the vehicle.
      */
     public Image iconFor(Vehicle vehicle) {
         return cachedIcons.computeIfAbsent(vehicle, v-> new Image(v.name() + ".png"));

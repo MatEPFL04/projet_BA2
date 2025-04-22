@@ -142,7 +142,6 @@ public record Router(TimeTable timeTable) {
             }
 
             front.clear();
-
         }
 
         return profile.build();

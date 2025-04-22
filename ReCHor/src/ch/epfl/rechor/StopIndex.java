@@ -32,7 +32,7 @@ public final class StopIndex {
      *
      * @param query user's query when searching for an arrival station
      * @param maxNumberOfStops the maximum number of stations suggested for a query
-     * @return list of the stops corresponding to the query
+     * @return list of the stop's names corresponding to the query
      */
     public List<String> stopsMatching(String query, int maxNumberOfStops) {
 

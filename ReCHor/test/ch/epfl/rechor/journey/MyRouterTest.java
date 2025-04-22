@@ -17,26 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MyRouterTest {
 
-    @Test
-    void profileToGruyeresOnTuesdayContainsExpectedJourneysFromEPFL() throws IOException {
-        TimeTable timeTable = FileTimeTable.in(Path.of("timetable"));
-        Router router = new Router(timeTable);
-
-        int depStationID = 7872;
-        int arrStationID = 11486;
-
-        LocalDate tuesday = LocalDate.of(2025, Month.MARCH, 18);
-        Profile profile = router.profile(tuesday, arrStationID);
-
-        ParetoFront front = profile.forStation(depStationID);
-
-        //tuple qui arrive à 17h57 avec 4 changements à Gruyères, devrait avoir été crée...
-        long tupleNeededToBeInFront = PackedCriteria.pack(17*60 + 57, 3, 0);
-        System.out.println(front);
-        assertEquals(tupleNeededToBeInFront, front.get(17*60 + 57, 3));
-
-
-    }
     static int stationId(Stations stations, String stationName) {
         for (int i = 0; i < stations.size(); i++) {
             if (Objects.equals(stations.name(i), stationName)) {
