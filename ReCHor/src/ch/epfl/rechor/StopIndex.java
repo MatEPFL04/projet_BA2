@@ -12,17 +12,28 @@ import java.util.regex.Pattern;
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  */
-
 public final class StopIndex {
      private final List <String> indexedStopNames;
-     private final Map <String, String> alternativeNamesMap; // the second string value represents the main stop names
+     private final Map <String, String> alternativeNamesMap;
+     // the second string value represents the main stop names
 
+    /**
+     *
+     * @param stopName list of the stop's names to index
+     * @param map map associating the alternative stop's names to their main one's
+     */
     public StopIndex(List<String> stopName, Map<String, String> map){
         indexedStopNames = stopName;
         alternativeNamesMap = map;
-
     }
 
+    /**
+     * Method used to concert a query into a list of corresponding stops.
+     *
+     * @param query user's query when searching for an arrival station
+     * @param maxNumberOfStops the maximum number of stations suggested for a query
+     * @return list of the stops corresponding to the query
+     */
     public List<String> stopsMatching(String query, int maxNumberOfStops) {
 
         String[] subQueries = query.split(" ");
@@ -56,7 +67,8 @@ public final class StopIndex {
                 if (matcher.start() == 0 || !Character.isLetter(stopName.charAt(matcher.start() - 1))) {
                     currentSubQueryScore *= 4;
                 }
-                if (matcher.end() == stopName.length() || !Character.isLetter(stopName.charAt(matcher.end()))) {
+                if (matcher.end() == stopName.length() ||
+                        !Character.isLetter(stopName.charAt(matcher.end()))) {
                     currentSubQueryScore *= 2;
                 }
                 totalScore += currentSubQueryScore;
@@ -83,7 +95,8 @@ public final class StopIndex {
             }
         }
         return caseSensitive ? Pattern.compile(sb.toString())
-                : Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+                : Pattern.compile(sb.toString(),
+                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     }
 }
 

@@ -1,8 +1,5 @@
 package ch.epfl.rechor.timetable;
 
-import ch.epfl.rechor.journey.Journey;
-
-import java.sql.Time;
 import java.time.LocalDate;
 import java.util.Objects;
 
