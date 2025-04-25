@@ -10,7 +10,9 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
@@ -41,7 +43,7 @@ public record DetailUI(Node rootNode) {
         GridPane gridPane = new GridPane();
         gridPane.setId("legs");
         List <Journey.Leg> listOfLegs = observableValue.getValue().legs();
-        List <Bounds> circlesBounds = new ArrayList<>();
+        List <Circle> circles = new ArrayList<>();
 
         int rowIndex = 0;
         for (Journey.Leg leg : listOfLegs) {
@@ -60,7 +62,7 @@ public record DetailUI(Node rootNode) {
 
                     Circle circle = new Circle(3);
                     GridPane.setHalignment(circle, HPos.LEFT);
-                    circlesBounds.add(circle.getBoundsInParent());
+                    circles.add(circle);
 
                     Label depStopNameLabel = new Label(transport.depStop().name());
                     GridPane.setHalignment(depStopNameLabel, HPos.LEFT);
@@ -122,16 +124,30 @@ public record DetailUI(Node rootNode) {
                             secondCircle,
                             arrStopNameLabel,
                             arrPlatformNameLabel);
-                    circlesBounds.add(secondCircle.getBoundsInParent());
+                    circles.add(secondCircle);
                     rowIndex++;
                 }
             }
         };
 
-
-        SubGridPane pane = new SubGridPane(circlesBounds);
+        List <Line> lineList = new ArrayList<>();
+        GridPane pane = new GridPane () {
+            @Override
+            protected void layoutChildren() {
+                super.layoutChildren();
+                for (int i = 1; i < circles.size(); i++) {
+                    Bounds firstCircleBound = circles.get(i-1).getBoundsInParent();
+                    Bounds secondCircleBound = circles.get(i).getBoundsInParent();
+                    Line line = new Line(firstCircleBound.getCenterX(), firstCircleBound.getCenterY(),
+                            secondCircleBound.getCenterX(), secondCircleBound.getCenterY());
+                    line.setStrokeWidth(2);
+                    line.setStroke(Color.RED);
+                    lineList.add(line);
+                }
+            }
+        };
         pane.setId("annotations");
-
+        pane.getChildren().addAll(lineList);
 
 
         StackPane journeyStackPane = new StackPane(gridPane);
