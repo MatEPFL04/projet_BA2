@@ -37,22 +37,21 @@ public final class MyTestDetailUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         TimeTable timeTable = new CachedTimeTable(
-                FileTimeTable.in(Path.of("timetable_april")));
+                FileTimeTable.in(Path.of("timetable")));
         Stations stations = timeTable.stations();
         LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
-        int depStationId = stationId(stations, "Lausanne");
-        int arrStationId = stationId(stations, "Gruyères");
-        System.out.println(arrStationId);
+        int depStationId = stationId(stations, "Zürich Flughafen, Bahnhof");
+        int arrStationId = stationId(stations, "Vevey");
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
         Journey journey = JourneyExtractor
                 .journeys(profile, depStationId)
-                .get(36);
+                .get(4);
+
 
         ObservableValue<Journey> journeyO =
                 new SimpleObjectProperty<>(journey);
-        DetailUI detailUI = DetailUI.create(journeyO);
-        System.out.println(detailUI.rootNode());
+        DetailUI detailUI = DetailUI.create(journeyO);;
         Pane root = new BorderPane(detailUI.rootNode());
 
         primaryStage.setScene(new Scene(root));
@@ -60,8 +59,6 @@ public final class MyTestDetailUI extends Application {
         primaryStage.setMinHeight(600);
         primaryStage.show();
 
-
-        System.out.println(journeyO.getValue());
 
     }
 }
