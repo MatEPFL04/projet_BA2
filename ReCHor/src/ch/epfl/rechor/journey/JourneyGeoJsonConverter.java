@@ -35,11 +35,10 @@ public class JourneyGeoJsonConverter {
 
         List<Json> listOfCoordinates = allStops.stream()
                 .map(stop -> new Json.JArray(List.of(
-                        new Json.JNumber(new BigDecimal(stop.longitude()).setScale(5, RoundingMode.HALF_UP).doubleValue())
-                                ,
-                        new Json.JNumber(new BigDecimal(stop.latitude()).setScale(5, RoundingMode.HALF_UP).doubleValue())
+                        new Json.JNumber((int) (stop.longitude() * Math.pow(10, 5)) / Math.pow(10, 5)),
+                        new Json.JNumber((int) (stop.latitude() * Math.pow(10, 5)) / Math.pow(10, 5))
                 )))
-                .map(pairOfCoordinates -> (Json) pairOfCoordinates)
+                .map(array -> (Json) array)
                 .toList();
 
         Json.JArray arrayOfPairOfCoordinates = new Json.JArray(listOfCoordinates);

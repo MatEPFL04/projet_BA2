@@ -37,16 +37,16 @@ public final class MyTestDetailUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         TimeTable timeTable = new CachedTimeTable(
-                FileTimeTable.in(Path.of("timetable_april")));
+                FileTimeTable.in(Path.of("timetable_17")));
         Stations stations = timeTable.stations();
-        LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
-        int depStationId = stationId(stations, "Ecublens VD, EPFL");
-        int arrStationId = stationId(stations, "Gruyères");
+        LocalDate date = LocalDate.of(2025, Month.APRIL, 24);
+        int depStationId = stationId(stations, "Zermatt");
+        int arrStationId = stationId(stations, "Trogen, Landsgemeindeplatz");
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
         Journey journey = JourneyExtractor
                 .journeys(profile, depStationId)
-                .get(37);
+                .get(11);
 
 
         ObservableValue<Journey> journeyO =
