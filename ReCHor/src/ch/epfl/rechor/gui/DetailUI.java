@@ -2,6 +2,7 @@ package ch.epfl.rechor.gui;
 
 import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
+import ch.epfl.rechor.journey.ParetoFront;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
@@ -130,27 +131,26 @@ public record DetailUI(Node rootNode) {
             }
         };
 
-        List <Line> lineList = new ArrayList<>();
         GridPane pane = new GridPane () {
             @Override
             protected void layoutChildren() {
                 super.layoutChildren();
-                for (int i = 1; i < circles.size(); i++) {
+                getChildren().removeIf(n -> n instanceof Line);
+                for (int i = 1; i < circles.size(); i+=2) {
+
                     Bounds firstCircleBound = circles.get(i-1).getBoundsInParent();
                     Bounds secondCircleBound = circles.get(i).getBoundsInParent();
                     Line line = new Line(firstCircleBound.getCenterX(), firstCircleBound.getCenterY(),
                             secondCircleBound.getCenterX(), secondCircleBound.getCenterY());
                     line.setStrokeWidth(2);
                     line.setStroke(Color.RED);
-                    lineList.add(line);
+                    getChildren().add(line);
                 }
             }
         };
         pane.setId("annotations");
-        pane.getChildren().addAll(lineList);
 
-
-        StackPane journeyStackPane = new StackPane(gridPane);
+        StackPane journeyStackPane = new StackPane(pane,gridPane);
         Button calendar = new Button("Calendrier");
         Button map = new Button("Carte");
         HBox hBox = new HBox(calendar,map);

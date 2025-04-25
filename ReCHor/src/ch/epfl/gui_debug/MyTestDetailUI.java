@@ -40,8 +40,8 @@ public final class MyTestDetailUI extends Application {
                 FileTimeTable.in(Path.of("timetable")));
         Stations stations = timeTable.stations();
         LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
-        int depStationId = stationId(stations, "Zürich Flughafen, Bahnhof");
-        int arrStationId = stationId(stations, "Vevey");
+        int depStationId = stationId(stations, "Lausanne");
+        int arrStationId = stationId(stations, "Bern");
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
         Journey journey = JourneyExtractor
