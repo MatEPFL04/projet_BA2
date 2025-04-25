@@ -2,20 +2,31 @@ package ch.epfl.rechor.gui;
 
 import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
-import ch.epfl.rechor.journey.ParetoFront;
+import ch.epfl.rechor.journey.JourneyGeoJsonConverter;
+import ch.epfl.rechor.journey.JourneyIcalConverter;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,11 +39,12 @@ import java.util.List;
 public record DetailUI(Node rootNode) {
 
     /**
+     *
+     *
      * @param observableValue
      * @return
      */
     public static DetailUI create(ObservableValue<Journey> observableValue) {
-
 
         // 1. Aucun voyage
         Text text = new Text("Aucun voyage");
@@ -44,7 +56,8 @@ public record DetailUI(Node rootNode) {
         GridPane gridPane = new GridPane();
         gridPane.setId("legs");
         List <Journey.Leg> listOfLegs = observableValue.getValue().legs();
-        List <Circle> circles = new ArrayList<>();
+        LocalDate localDate = LocalDate.from(listOfLegs.getFirst().depTime());
+        List<Circles> pairsOfCircle = new ArrayList<>();
 
         int rowIndex = 0;
         for (Journey.Leg leg : listOfLegs) {
@@ -63,7 +76,6 @@ public record DetailUI(Node rootNode) {
 
                     Circle circle = new Circle(3);
                     GridPane.setHalignment(circle, HPos.LEFT);
-                    circles.add(circle);
 
                     Label depStopNameLabel = new Label(transport.depStop().name());
                     GridPane.setHalignment(depStopNameLabel, HPos.LEFT);
@@ -125,8 +137,10 @@ public record DetailUI(Node rootNode) {
                             secondCircle,
                             arrStopNameLabel,
                             arrPlatformNameLabel);
-                    circles.add(secondCircle);
                     rowIndex++;
+
+                    Circles pair = new Circles(circle, secondCircle);
+                    pairsOfCircle.add(pair);
                 }
             }
         };
@@ -135,26 +149,47 @@ public record DetailUI(Node rootNode) {
             @Override
             protected void layoutChildren() {
                 super.layoutChildren();
-                getChildren().removeIf(n -> n instanceof Line);
-                for (int i = 1; i < circles.size(); i+=2) {
-
-                    Bounds firstCircleBound = circles.get(i-1).getBoundsInParent();
-                    Bounds secondCircleBound = circles.get(i).getBoundsInParent();
-                    Line line = new Line(firstCircleBound.getCenterX(), firstCircleBound.getCenterY(),
-                            secondCircleBound.getCenterX(), secondCircleBound.getCenterY());
-                    line.setStrokeWidth(2);
-                    line.setStroke(Color.RED);
-                    getChildren().add(line);
+                List<Line> listOfLines = new ArrayList<>();
+                for (int i = 0; i < pairsOfCircle.size(); i++) {
+                    Line line = getLineFromCircle(pairsOfCircle.get(i));
+                    listOfLines.add(line);
                 }
+                getChildren().setAll(listOfLines);
             }
         };
+
         pane.setId("annotations");
 
-        StackPane journeyStackPane = new StackPane(pane,gridPane);
+        StackPane journeyStackPane = new StackPane(pane, gridPane);
+
         Button calendar = new Button("Calendrier");
         Button map = new Button("Carte");
         HBox hBox = new HBox(calendar,map);
         hBox.setId("buttons");
+
+        calendar.setOnAction(calendarEvent -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialFileName("voyage_" + localDate + ".ics");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("iCalendar files", "*.ics"));
+
+            File selectedFile = fileChooser.showSaveDialog(null);
+            try {
+                Files.writeString(selectedFile.toPath(), JourneyIcalConverter.toIcalendar(new Journey(listOfLegs)));
+            } catch (IOException e) {
+                throw new Error(e);
+            }
+        });
+
+        map.setOnAction(mapEvent -> {
+            try {
+                URI url = new URI("https", "umap.osm.ch", "/fr/map",
+                        "data=" + JourneyGeoJsonConverter.toGeoJson(new Journey(listOfLegs)), null);
+                Desktop.getDesktop().browse(url);
+            } catch (Exception e) {
+                throw new Error(e);
+            }
+        });
 
         VBox journeyVBox = new VBox(journeyStackPane, hBox);
         noJourneyVBox.setVisible(false);
@@ -163,8 +198,16 @@ public record DetailUI(Node rootNode) {
         scrollPane.setId("detail");
         scrollPane.getStylesheets().add("detail.css");
 
-
         return new DetailUI(scrollPane);
+    }
 
+    private static Line getLineFromCircle(Circles circles) {
+        Bounds firstCircleBound = circles.depCircle().getBoundsInParent();
+        Bounds secondCircleBound = circles.arrCircle().getBoundsInParent();
+        Line line = new Line(firstCircleBound.getCenterX(), firstCircleBound.getCenterY(),
+                secondCircleBound.getCenterX(), secondCircleBound.getCenterY());
+        line.setStrokeWidth(2);
+        line.setStroke(Color.RED);
+        return line;
     }
 }
