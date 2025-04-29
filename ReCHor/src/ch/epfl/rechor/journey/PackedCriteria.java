@@ -54,7 +54,7 @@ public final class PackedCriteria {
      *      false otherwise
      */
     public static boolean hasDepMins(long criteria) {
-        return ((criteria >> 50) != 0);
+        return ((criteria >> 51) != 0);
     }
 
     /**

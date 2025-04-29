@@ -35,9 +35,9 @@ public class MyRouterTest {
 
         Stations stations = timeTable.stations();
 
-        LocalDate date = LocalDate.of(2025, Month.MARCH, 18);
+        LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
         int depStationId = stationId(stations, "Ecublens VD, EPFL");
-        int arrStationId = stationId(stations, "Gruyères");
+        int arrStationId = stationId(stations, "Pully-Nord");
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
 

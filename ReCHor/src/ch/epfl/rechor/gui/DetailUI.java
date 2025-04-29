@@ -4,6 +4,7 @@ import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
 import ch.epfl.rechor.journey.JourneyGeoJsonConverter;
 import ch.epfl.rechor.journey.JourneyIcalConverter;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
@@ -29,6 +30,8 @@ import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Stack;
 
 /**
  * Record representing the detail of a journey.
@@ -42,25 +45,37 @@ public record DetailUI(Node rootNode) {
      *
      *
      * @param observableValue
-     * @return
+     * @return a detailUI associated to an observable value
+     *
      */
     public static DetailUI create(ObservableValue<Journey> observableValue) {
 
-        // 1. Aucun voyage
+
         Text text = new Text("Aucun voyage");
         VBox noJourneyVBox = new VBox(text);
         noJourneyVBox.setId("no-journey");
 
-        // 2. Étapes du voyage
+
+        VBox journeyVBox = getJourneyVBox(observableValue.getValue());
+
+        StackPane mainStackPane = new StackPane(noJourneyVBox, journeyVBox);
+
+        ScrollPane scrollPane = new ScrollPane(mainStackPane);
+        scrollPane.setId("detail");
+        scrollPane.getStylesheets().add("detail.css");
+
+        return new DetailUI(scrollPane);
+    }
+
+
+    private static StackPane getJourneyStackPane(Journey journey) {
 
         GridPane gridPane = new GridPane();
         gridPane.setId("legs");
-        List <Journey.Leg> listOfLegs = observableValue.getValue().legs();
-        LocalDate localDate = LocalDate.from(listOfLegs.getFirst().depTime());
         List<Circles> pairsOfCircle = new ArrayList<>();
 
         int rowIndex = 0;
-        for (Journey.Leg leg : listOfLegs) {
+        for (Journey.Leg leg : journey.legs()) {
             switch  (leg) {
                 case Journey.Leg.Foot foot -> {
                     Label changeLabel = new Label(FormatterFr.formatLeg(foot));
@@ -160,45 +175,52 @@ public record DetailUI(Node rootNode) {
 
         pane.setId("annotations");
 
-        StackPane journeyStackPane = new StackPane(pane, gridPane);
+        return new StackPane(pane, gridPane);
 
-        Button calendar = new Button("Calendrier");
+    }
+
+    private static VBox getJourneyVBox(Journey journey) {
+
         Button map = new Button("Carte");
+        Button calendar = new Button("Calendrier");
         HBox hBox = new HBox(calendar,map);
         hBox.setId("buttons");
+        addMapAction(map, journey );
+        addICalendarFile(calendar, journey);
 
-        calendar.setOnAction(calendarEvent -> {
+        StackPane journeyStackPane = getJourneyStackPane(journey);
+        return new VBox(journeyStackPane, hBox);
+    }
+
+    private static void addICalendarFile(Button button, Journey journey) {
+        LocalDate date = LocalDate.from(journey.legs().getFirst().depTime());
+        button.setOnAction(calendarEvent -> {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialFileName("voyage_" + localDate + ".ics");
+            fileChooser.setInitialFileName("voyage_" + date + ".ics");
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("iCalendar files", "*.ics"));
 
             File selectedFile = fileChooser.showSaveDialog(null);
             try {
-                Files.writeString(selectedFile.toPath(), JourneyIcalConverter.toIcalendar(new Journey(listOfLegs)));
+                Files.writeString(selectedFile.toPath(), JourneyIcalConverter.toIcalendar(journey));
             } catch (IOException e) {
                 throw new Error(e);
             }
         });
 
-        map.setOnAction(mapEvent -> {
+    }
+
+    private static void addMapAction(Button button, Journey journey) {
+        button.setOnAction(mapEvent -> {
             try {
                 URI url = new URI("https", "umap.osm.ch", "/fr/map",
-                        "data=" + JourneyGeoJsonConverter.toGeoJson(new Journey(listOfLegs)), null);
+                        "data=" + JourneyGeoJsonConverter.toGeoJson(journey), null);
                 Desktop.getDesktop().browse(url);
             } catch (Exception e) {
                 throw new Error(e);
             }
         });
 
-        VBox journeyVBox = new VBox(journeyStackPane, hBox);
-        noJourneyVBox.setVisible(false);
-        StackPane mainStackPane = new StackPane(noJourneyVBox, journeyVBox);
-        ScrollPane scrollPane = new ScrollPane(mainStackPane);
-        scrollPane.setId("detail");
-        scrollPane.getStylesheets().add("detail.css");
-
-        return new DetailUI(scrollPane);
     }
 
     private static Line getLineFromCircle(Circles circles) {

@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MyStopIndexTest {
     @Test
     public void scoringIsCorrect() {
-        String query = "mez vil";
         String stopName1 = "Mézières FR, village";
         String stopName2 = "Mézières VD, village";
         String stopName3 = "Mézery-près-Donneloye, village";

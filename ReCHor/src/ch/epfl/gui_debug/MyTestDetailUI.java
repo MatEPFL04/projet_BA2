@@ -1,11 +1,10 @@
 package ch.epfl.gui_debug;
 
+import ch.epfl.rechor.PackedRange;
 import ch.epfl.rechor.gui.DetailUI;
-import ch.epfl.rechor.journey.Journey;
-import ch.epfl.rechor.journey.JourneyExtractor;
-import ch.epfl.rechor.journey.Profile;
-import ch.epfl.rechor.journey.Router;
+import ch.epfl.rechor.journey.*;
 import ch.epfl.rechor.timetable.CachedTimeTable;
+import ch.epfl.rechor.timetable.Connections;
 import ch.epfl.rechor.timetable.Stations;
 import ch.epfl.rechor.timetable.TimeTable;
 import ch.epfl.rechor.timetable.mapped.FileTimeTable;
@@ -26,32 +25,36 @@ public final class MyTestDetailUI extends Application {
     public static void main(String[] args) { launch(args); }
 
     static int stationId(Stations stations, String stationName) {
+
         for (int i = 0; i < stations.size(); i++) {
             if (Objects.equals(stations.name(i), stationName)) {
                 return i;
             }
         }
+
         return -1;
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         TimeTable timeTable = new CachedTimeTable(
-                FileTimeTable.in(Path.of("timetable_17")));
+                FileTimeTable.in(Path.of("timetable")));
         Stations stations = timeTable.stations();
-        LocalDate date = LocalDate.of(2025, Month.APRIL, 24);
-        int depStationId = stationId(stations, "Zermatt");
-        int arrStationId = stationId(stations, "Trogen, Landsgemeindeplatz");
+        LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
+        int depStationId = stationId(stations, "Ecublens VD, EPFL");
+        int arrStationId = stationId(stations, "Bern");
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
+
         Journey journey = JourneyExtractor
                 .journeys(profile, depStationId)
-                .get(11);
+                .get(32);
 
-
-        ObservableValue<Journey> journeyO =
+        ObservableValue<Journey> journey0 =
+                new SimpleObjectProperty<>();
+        ObservableValue<Journey> journey1 =
                 new SimpleObjectProperty<>(journey);
-        DetailUI detailUI = DetailUI.create(journeyO);;
+        DetailUI detailUI = DetailUI.create(journey1);;
         Pane root = new BorderPane(detailUI.rootNode());
 
         primaryStage.setScene(new Scene(root));
@@ -59,5 +62,8 @@ public final class MyTestDetailUI extends Application {
         primaryStage.setMinHeight(600);
         primaryStage.show();
 
+
+
     }
+
 }

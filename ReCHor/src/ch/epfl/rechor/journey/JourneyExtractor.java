@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.timetable.*;
 import ch.epfl.rechor.journey.Journey.Leg.Transport;
 import ch.epfl.rechor.journey.Journey.Leg.IntermediateStop;
@@ -160,13 +161,13 @@ public final class JourneyExtractor {
             if (connectionArrStationId != journeyArrStationId)  {
 
                 Leg endLegFoot = newFootLeg(timeTable,
-                        currentDate, connectionArrMins, connectionArrStationId, journeyArrStationId);
+                        currentDate, connectionArrMins, connectionArrStopId, journeyArrStationId);
                 currentLegs.add(endLegFoot);
 
             }
 
-
             journeyList.add(new Journey(currentLegs));
+
         });
         journeyList.sort(Comparator
                 .comparing(Journey::depTime)
