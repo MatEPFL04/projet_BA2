@@ -25,9 +25,11 @@ public class MyStopIndexTest {
 
     @Test
     public void stopIndexWorksWithAliases() {
-        StopIndex stopIndex = new StopIndex(List.of("Losanna"),
+        StopIndex stopIndex = new StopIndex(List.of("Losanna", "Lausanne"),
                 Map.of("Losanna", "Lausanne"));
         assertEquals("[Lausanne]",(stopIndex.stopsMatching("sann",6)).toString());
+        assertEquals(37, StopIndex.stopScore(List.of(StopIndex.pattern("san")), "Lausanne" ));
+        assertEquals(42, StopIndex.stopScore(List.of(StopIndex.pattern("san")), "Losanna" ));
     }
 
     @Test
