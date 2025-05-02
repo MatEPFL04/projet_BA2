@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * This class represents an index of stop names in which it's possible to do researches.
@@ -16,6 +17,17 @@ public final class StopIndex {
      private final List <String> indexedStopNames;
      private final Map <String, String> alternativeNamesMap;
      // the second string value represents the main stop names
+    /*
+     public static void main(String[] args) {
+         String tab = "ceci est un test de hachage";
+         String [] test = tab.split(" ");
+         for (String s : test) {
+             System.out.println(s);
+         }
+         String [] test2 = tab.splitWithDelimiters()
+     }
+
+     */
 
     /**
      *
@@ -42,19 +54,21 @@ public final class StopIndex {
             subQueriesPatterns.add(pattern(subQuery));
         }
 
-        List<String> streamOfStops =
-                indexedStopNames.stream()
+        Stream <String> streamOfStops = indexedStopNames.stream();
+        Stream <String> streamAliaseNames = alternativeNamesMap.keySet().stream();
+        List <String> concatenedListOfStops =
+                Stream.concat(streamOfStops, streamAliaseNames)
                         .filter(stop -> stopScore(subQueriesPatterns, stop) != -1)
                         .sorted((stopName1, stopName2) -> {
                             return Integer.compare(stopScore(subQueriesPatterns, stopName2),
                                     stopScore(subQueriesPatterns, stopName1));
                         })
-                        .distinct()
                         .map(stopName -> alternativeNamesMap.getOrDefault(stopName,stopName))
+                        .distinct()
                         .limit(maxNumberOfStops)
                         .toList();
 
-        return streamOfStops;
+        return concatenedListOfStops;
     }
 
     public static int stopScore (List <Pattern> patternList, String stopName) {

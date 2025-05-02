@@ -41,14 +41,14 @@ public final class MyTestDetailUI extends Application {
                 FileTimeTable.in(Path.of("timetable_april")));
         Stations stations = timeTable.stations();
         LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
-        int depStationId = stationId(stations, "Ecublens VD, EPFL");
-        int arrStationId = stationId(stations, "Bern");
+        int depStationId = stationId(stations, "Pully-Nord");
+        int arrStationId = stationId(stations, "Renens VD");
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
 
         Journey journey = JourneyExtractor
                 .journeys(profile, depStationId)
-                .get(32);
+                .getLast();
 
         ObservableValue<Journey> journey0 =
                 new SimpleObjectProperty<>();
