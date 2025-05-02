@@ -63,7 +63,6 @@ public record DetailUI(Node rootNode) {
         ScrollPane scrollPane = new ScrollPane(mainStackPane);
         scrollPane.setId("detail");
         scrollPane.getStylesheets().add("detail.css");
-
         return new DetailUI(scrollPane);
     }
 

@@ -38,7 +38,7 @@ public final class MyTestDetailUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         TimeTable timeTable = new CachedTimeTable(
-                FileTimeTable.in(Path.of("timetable")));
+                FileTimeTable.in(Path.of("timetable_april")));
         Stations stations = timeTable.stations();
         LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
         int depStationId = stationId(stations, "Ecublens VD, EPFL");
@@ -62,8 +62,5 @@ public final class MyTestDetailUI extends Application {
         primaryStage.setMinHeight(600);
         primaryStage.show();
 
-
-
     }
-
 }
