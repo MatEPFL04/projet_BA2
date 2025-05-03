@@ -159,8 +159,10 @@ public record DetailUI(Node rootNode) {
                     rowIndex++;
 
                     if(!(transport.intermediateStops().isEmpty())){
-                        String titleOfMenuDeroulant = transport.intermediateStops().size()
-                                + " arrêts,  " + FormatterFr.formatDuration(transport.duration());
+                        String stopRepresentation = transport.intermediateStops().size() != 1 ?
+                                " arrêts, " : " arrêt, ";
+                        String titleOfMenuDeroulant = transport.intermediateStops().size() + stopRepresentation
+                                 + FormatterFr.formatDuration(transport.duration());
                         int row = 0;
                         GridPane intermediateStopGrid = new GridPane();
                         for (Journey.Leg.IntermediateStop intermediateStop : transport.intermediateStops()) {

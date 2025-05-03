@@ -35,8 +35,8 @@ public final class StopIndex {
      * @return list of the stop's names corresponding to the query
      */
     public List<String> stopsMatching(String query, int maxNumberOfStops) {
-
-        String[] subQueries = query.split(" ");
+        Pattern space = Pattern.compile(" ");
+        String[] subQueries = space.split(query);
         List<Pattern> subQueriesPatterns = new ArrayList<>();
         for (String subQuery : subQueries) {
             subQueriesPatterns.add(pattern(subQuery));
@@ -82,23 +82,31 @@ public final class StopIndex {
         return totalScore;
     }
 
-    public static Pattern pattern(String query) {
-        boolean caseSensitive = !query.equals(query.toLowerCase());
+    public static Pattern pattern(String subquery) {
+        boolean caseSensitive = !subquery.equals(subquery.toLowerCase());
+        Pattern pattern  =  Pattern.compile("[aeiouc]");
+        String [] chunksOfSubRequest = pattern.splitWithDelimiters(subquery,0);
+
         StringBuilder sb = new StringBuilder();
-        for (char c: query.toCharArray()) {
-            switch (c) {
-                case 'a' -> sb.append("[aàâäá]");
-                case 'e' -> sb.append("[eéèêë]");
-                case 'i' -> sb.append("[iîïìí]");
-                case 'o' -> sb.append("[oôöòó]");
-                case 'u' -> sb.append("[uûùü]");
-                case 'c' -> sb.append("[cç]");
-                default -> sb.append(Pattern.quote(Character.toString(c)));
+
+        for (String chunk : chunksOfSubRequest) {
+            switch (chunk) {
+                case "a" -> sb.append("[aàâäá]");
+                case "e" -> sb.append("[eéèêë]");
+                case "i" -> sb.append("[iîïìí]");
+                case "o" -> sb.append("[oôöòó]");
+                case "u" -> sb.append("[uûùü]");
+                case "c" -> sb.append("[cç]");
+                default -> sb.append(Pattern.quote(chunk));
             }
         }
-        return caseSensitive ? Pattern.compile(sb.toString())
-                : Pattern.compile(sb.toString(),
-                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+
+        return caseSensitive ? Pattern.compile(sb.toString()) :
+                Pattern.compile(sb.toString(),
+                        Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     }
+
+
+
 }
 
