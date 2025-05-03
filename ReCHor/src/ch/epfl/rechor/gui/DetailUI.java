@@ -43,6 +43,8 @@ import java.util.Stack;
  */
 public record DetailUI(Node rootNode) {
 
+    private record Circles(Circle depCircle, Circle arrCircle) { }
+
     /**
      *
      *
@@ -55,7 +57,6 @@ public record DetailUI(Node rootNode) {
         Text text = new Text("Aucun voyage");
         VBox noJourneyVBox = new VBox(text);
         noJourneyVBox.setId("no-journey");
-
         Button map = new Button("Carte");
         Button calendar = new Button("Calendrier");
         HBox hBox = new HBox(calendar,map);
@@ -64,24 +65,27 @@ public record DetailUI(Node rootNode) {
         legsGridPane.setId("legs");
         StackPane journeyStackPane = new StackPane();
         VBox journeyVBox = new VBox(journeyStackPane, hBox);
-
         StackPane mainStackPane = new StackPane(noJourneyVBox, journeyVBox);
         ScrollPane scrollPane = new ScrollPane(mainStackPane);
         scrollPane.setId("detail");
         scrollPane.getStylesheets().add("detail.css");
 
-        List <Circles> listCercles = new ArrayList<>();
 
         observableValue.subscribe(journey -> {
             if (journey != null) {
                 noJourneyVBox.setVisible(false);
                 journeyStackPane.getChildren().clear();
+
+                List <Circles> listCercles = new ArrayList<>();
+
                 addLegsToGridPane(legsGridPane, journey ,listCercles);
                 Pane paneDrawingLines = getPaneDrawingLines(listCercles);
+
                 journeyStackPane.getChildren().add(paneDrawingLines);
                 journeyStackPane.getChildren().add(legsGridPane);
-                addMapAction(map, journey);
-                addICalendarFile(calendar,journey);
+
+                mapEvent(map, journey);
+                icalendarEvent(calendar,journey);
             }
             else {
                 journeyVBox.setVisible(false);
@@ -92,9 +96,6 @@ public record DetailUI(Node rootNode) {
     }
 
     private static Pane getPaneDrawingLines(List<Circles> listCircles) {
-
-        GridPane gridPane = new GridPane();
-        gridPane.setId("legs");
 
         GridPane pane = new GridPane () {
             @Override
@@ -109,7 +110,6 @@ public record DetailUI(Node rootNode) {
             }
         };
         pane.setId("annotations");
-
         return pane;
     }
 
@@ -204,7 +204,7 @@ public record DetailUI(Node rootNode) {
         };
     }
 
-    private static void addICalendarFile(Button button, Journey journey) {
+    private static void icalendarEvent(Button button, Journey journey) {
         LocalDate date = LocalDate.from(journey.legs().getFirst().depTime());
         button.setOnAction(calendarEvent -> {
             FileChooser fileChooser = new FileChooser();
@@ -221,7 +221,7 @@ public record DetailUI(Node rootNode) {
         });
     }
 
-    private static void addMapAction(Button button, Journey journey) {
+    private static void mapEvent(Button button, Journey journey) {
         button.setOnAction(mapEvent -> {
             try {
                 URI url = new URI("https", "umap.osm.ch", "/fr/map",
@@ -236,10 +236,13 @@ public record DetailUI(Node rootNode) {
     private static Line getLineFromCircle(Circles circles) {
         Bounds firstCircleBound = circles.depCircle().getBoundsInParent();
         Bounds secondCircleBound = circles.arrCircle().getBoundsInParent();
+
         Line line = new Line(firstCircleBound.getCenterX(), firstCircleBound.getCenterY(),
                 secondCircleBound.getCenterX(), secondCircleBound.getCenterY());
         line.setStrokeWidth(2);
         line.setStroke(Color.RED);
+
         return line;
     }
+
 }
