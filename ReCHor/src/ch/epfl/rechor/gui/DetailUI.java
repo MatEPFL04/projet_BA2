@@ -4,6 +4,8 @@ import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
 import ch.epfl.rechor.journey.JourneyGeoJsonConverter;
 import ch.epfl.rechor.journey.JourneyIcalConverter;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
@@ -50,28 +52,68 @@ public record DetailUI(Node rootNode) {
      */
     public static DetailUI create(ObservableValue<Journey> observableValue) {
 
-
         Text text = new Text("Aucun voyage");
         VBox noJourneyVBox = new VBox(text);
         noJourneyVBox.setId("no-journey");
 
-
-        VBox journeyVBox = getJourneyVBox(observableValue.getValue());
+        Button map = new Button("Carte");
+        Button calendar = new Button("Calendrier");
+        HBox hBox = new HBox(calendar,map);
+        hBox.setId("buttons");
+        GridPane legsGridPane = new GridPane();
+        legsGridPane.setId("legs");
+        StackPane journeyStackPane = new StackPane();
+        VBox journeyVBox = new VBox(journeyStackPane, hBox);
 
         StackPane mainStackPane = new StackPane(noJourneyVBox, journeyVBox);
-
         ScrollPane scrollPane = new ScrollPane(mainStackPane);
         scrollPane.setId("detail");
         scrollPane.getStylesheets().add("detail.css");
+
+        List <Circles> listCercles = new ArrayList<>();
+
+        observableValue.subscribe(journey -> {
+            if (journey != null) {
+                noJourneyVBox.setVisible(false);
+                journeyStackPane.getChildren().clear();
+                addLegsToGridPane(legsGridPane, journey ,listCercles);
+                Pane paneDrawingLines = getPaneDrawingLines(listCercles);
+                journeyStackPane.getChildren().add(paneDrawingLines);
+                journeyStackPane.getChildren().add(legsGridPane);
+                addMapAction(map, journey);
+                addICalendarFile(calendar,journey);
+            }
+            else {
+                journeyVBox.setVisible(false);
+            }
+        });
+
         return new DetailUI(scrollPane);
     }
 
-
-    private static StackPane getJourneyStackPane(Journey journey) {
+    private static Pane getPaneDrawingLines(List<Circles> listCircles) {
 
         GridPane gridPane = new GridPane();
         gridPane.setId("legs");
-        List<Circles> pairsOfCircle = new ArrayList<>();
+
+        GridPane pane = new GridPane () {
+            @Override
+            protected void layoutChildren() {
+                super.layoutChildren();
+                List<Line> listOfLines = new ArrayList<>();
+                for (int i = 0; i < listCircles.size(); i++) {
+                    Line line = getLineFromCircle(listCircles.get(i));
+                    listOfLines.add(line);
+                }
+                getChildren().setAll(listOfLines);
+            }
+        };
+        pane.setId("annotations");
+
+        return pane;
+    }
+
+    private static void addLegsToGridPane(GridPane gridPane, Journey journey, List<Circles> pairsOfCircles) {
 
         int rowIndex = 0;
         for (Journey.Leg leg : journey.legs()) {
@@ -154,41 +196,10 @@ public record DetailUI(Node rootNode) {
                     rowIndex++;
 
                     Circles pair = new Circles(circle, secondCircle);
-                    pairsOfCircle.add(pair);
+                    pairsOfCircles.add(pair);
                 }
             }
         };
-
-        GridPane pane = new GridPane () {
-            @Override
-            protected void layoutChildren() {
-                super.layoutChildren();
-                List<Line> listOfLines = new ArrayList<>();
-                for (int i = 0; i < pairsOfCircle.size(); i++) {
-                    Line line = getLineFromCircle(pairsOfCircle.get(i));
-                    listOfLines.add(line);
-                }
-                getChildren().setAll(listOfLines);
-            }
-        };
-
-        pane.setId("annotations");
-
-        return new StackPane(pane, gridPane);
-
-    }
-
-    private static VBox getJourneyVBox(Journey journey) {
-
-        Button map = new Button("Carte");
-        Button calendar = new Button("Calendrier");
-        HBox hBox = new HBox(calendar,map);
-        hBox.setId("buttons");
-        addMapAction(map, journey );
-        addICalendarFile(calendar, journey);
-
-        StackPane journeyStackPane = getJourneyStackPane(journey);
-        return new VBox(journeyStackPane, hBox);
     }
 
     private static void addICalendarFile(Button button, Journey journey) {
@@ -206,7 +217,6 @@ public record DetailUI(Node rootNode) {
                 throw new Error(e);
             }
         });
-
     }
 
     private static void addMapAction(Button button, Journey journey) {
@@ -219,7 +229,6 @@ public record DetailUI(Node rootNode) {
                 throw new Error(e);
             }
         });
-
     }
 
     private static Line getLineFromCircle(Circles circles) {

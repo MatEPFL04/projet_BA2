@@ -1,6 +1,5 @@
 package ch.epfl.gui_debug;
 
-import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.gui.SummaryUI;
 import ch.epfl.rechor.journey.Journey;
 import ch.epfl.rechor.journey.JourneyExtractor;
@@ -47,8 +46,8 @@ public final class TestSummaryUI extends Application {
                 FileTimeTable.in(Path.of("timetable_april")));
         Stations stations = timeTable.stations();
         LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
-        int depStationId = stationId(stations, "Ecublens VD, EPFL");
-        int arrStationId = stationId(stations, "Bern");
+        int depStationId = stationId(stations, "Pully-Nord");
+        int arrStationId = stationId(stations, "Pully");
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
 
@@ -68,5 +67,4 @@ public final class TestSummaryUI extends Application {
         primaryStage.setMinHeight(600);
         primaryStage.show();
     }
-
 }

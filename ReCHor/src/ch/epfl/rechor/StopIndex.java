@@ -16,18 +16,6 @@ import java.util.stream.Stream;
 public final class StopIndex {
      private final List <String> indexedStopNames;
      private final Map <String, String> alternativeNamesMap;
-     // the second string value represents the main stop names
-    /*
-     public static void main(String[] args) {
-         String tab = "ceci est un test de hachage";
-         String [] test = tab.split(" ");
-         for (String s : test) {
-             System.out.println(s);
-         }
-         String [] test2 = tab.splitWithDelimiters()
-     }
-
-     */
 
     /**
      *
