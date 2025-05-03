@@ -75,9 +75,9 @@ public record DetailUI(Node rootNode) {
             if (journey != null) {
                 noJourneyVBox.setVisible(false);
                 journeyStackPane.getChildren().clear();
+                legsGridPane.getChildren().clear();
 
                 List <Circles> listCercles = new ArrayList<>();
-
                 addLegsToGridPane(legsGridPane, journey ,listCercles);
                 Pane paneDrawingLines = getPaneDrawingLines(listCercles);
 
