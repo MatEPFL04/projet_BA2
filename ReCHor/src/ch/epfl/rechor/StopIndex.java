@@ -1,10 +1,9 @@
 package ch.epfl.rechor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -16,6 +15,18 @@ import java.util.stream.Stream;
 public final class StopIndex {
      private final List <String> indexedStopNames;
      private final Map <String, String> alternativeNamesMap;
+
+     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
+     private static final Pattern SPLITTING_PATTERN = Pattern.compile("[aeiouc]");
+
+     private static final Map <String, String> CHAR_REPLACEMENT =
+             new HashMap<>(Map.of("a", "[aàâäá]", "e",
+                     "[eéèêë]", "i", "[iîïìí]", "o", "[oôöòó]",
+                     "u", "[uûùü]", "c","[cç]" ));
+
+
+
+     private record StopScores (String stopName, int score) { }
 
     /**
      *
@@ -35,31 +46,52 @@ public final class StopIndex {
      * @return list of the stop's names corresponding to the query
      */
     public List<String> stopsMatching(String query, int maxNumberOfStops) {
-        Pattern space = Pattern.compile(" ");
-        String[] subQueries = space.split(query);
+
+        /*
+
+        String[] subQueries = SPACE_PATTERN.split(query);
         List<Pattern> subQueriesPatterns = new ArrayList<>();
         for (String subQuery : subQueries) {
             subQueriesPatterns.add(pattern(subQuery));
         }
 
-        Stream <String> streamOfStops = indexedStopNames.stream();
-        Stream <String> streamAliaseNames = alternativeNamesMap.keySet().stream();
-        List <String> concatenedListOfStops =
-                Stream.concat(streamOfStops, streamAliaseNames)
-                        .filter(stop -> stopScore(subQueriesPatterns, stop) != -1)
-                        .sorted((stopName1, stopName2) -> {
-                            return Integer.compare(stopScore(subQueriesPatterns, stopName2),
-                                    stopScore(subQueriesPatterns, stopName1));
-                        })
-                        .map(stopName -> alternativeNamesMap.getOrDefault(stopName,stopName))
-                        .distinct()
-                        .limit(maxNumberOfStops)
-                        .toList();
+        Stream <String> originalStopsStream = indexedStopNames.stream();
+        Stream <String> aliaseNamesStream = alternativeNamesMap.keySet().stream();
+        Stream <StopScores> namesToTakeIntoAccount = Stream.concat(originalStopsStream, aliaseNamesStream)
+                .map(stopName -> stopScore(subQueriesPatterns, stopName))
+                .filter(Objects::nonNull)
+                .sorted((firstPair, secondPair))
 
-        return concatenedListOfStops;
+
+
+
+                new ArrayList<>();
+        indexedStopNames.forEach(nameStop -> {
+            associatedScores.add(stopScore(subQueriesPatterns, nameStop));
+        });
+        alternativeNamesMap.keySet().forEach(aliasStopName -> {
+            associatedScores.add(stopScore(subQueriesPatterns,aliasStopName));
+        });
+
+        Stream <String> stopScoresStream = associatedScores.stream()
+                        .filter(Objects::nonNull)
+                        .sorted((scorePair1, scorePair2) -> {
+                            return Integer.compare(scorePair2.score(), scorePair1.score());
+                        })
+                        .map(StopScores::stopName)
+                        .map(scorePair -> alternativeNamesMap.getOrDefault(scorePair, scorePair))
+                        .distinct()
+                        .limit(maxNumberOfStops);
+
+        return stopScoresStream.toList();
+
+         */
+
+        return null;
+
     }
 
-    public static int stopScore (List <Pattern> patternList, String stopName) {
+    public static StopScores stopScore (List <Pattern> patternList, String stopName) {
         int totalScore = 0;
         for (Pattern pattern : patternList) {
             Matcher matcher = pattern.matcher(stopName);
@@ -76,33 +108,25 @@ public final class StopIndex {
                 totalScore += currentSubQueryScore;
             }
             else {
-                return -1;
+                return null;
             }
         }
-        return totalScore;
+        return new StopScores(stopName, totalScore);
     }
 
     public static Pattern pattern(String subquery) {
         boolean caseSensitive = !subquery.equals(subquery.toLowerCase());
-        Pattern pattern  =  Pattern.compile("[aeiouc]");
-        String [] chunksOfSubRequest = pattern.splitWithDelimiters(subquery,0);
+        String toBeCompiled =
+                Arrays.stream(SPLITTING_PATTERN.splitWithDelimiters(subquery,0))
+                        .map(chunkOfLetters -> {
+                            return CHAR_REPLACEMENT.getOrDefault
+                                    (chunkOfLetters, Pattern.quote(chunkOfLetters));
+                        })
+                        .collect(Collectors.joining());
 
-        StringBuilder sb = new StringBuilder();
 
-        for (String chunk : chunksOfSubRequest) {
-            switch (chunk) {
-                case "a" -> sb.append("[aàâäá]");
-                case "e" -> sb.append("[eéèêë]");
-                case "i" -> sb.append("[iîïìí]");
-                case "o" -> sb.append("[oôöòó]");
-                case "u" -> sb.append("[uûùü]");
-                case "c" -> sb.append("[cç]");
-                default -> sb.append(Pattern.quote(chunk));
-            }
-        }
-
-        return caseSensitive ? Pattern.compile(sb.toString()) :
-                Pattern.compile(sb.toString(),
+        return caseSensitive ? Pattern.compile(toBeCompiled) :
+                Pattern.compile(toBeCompiled,
                         Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     }
 

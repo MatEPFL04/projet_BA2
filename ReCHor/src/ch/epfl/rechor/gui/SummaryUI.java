@@ -53,9 +53,10 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                     listView.getSelectionModel().select(j);
                     break;
                 }
+                Journey lastJourney = listView.getItems().getLast();
+                listView.getSelectionModel().select(lastJourney);
             }
         });
-
 
         listView.getStylesheets().add("summary.css");
 
@@ -80,6 +81,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
 
         private JourneyListCell(){
+
             this.textDirection = new Text();
             this.imageView = new ImageView();
             imageView.setFitHeight(20);
@@ -87,11 +89,11 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
             this.routeHBox = new HBox(imageView, textDirection);
             routeHBox.getStyleClass().add("route");
 
-
             this.line = new Line();
+            this.group = new Group();
 
             line.setStroke(Color.GRAY);
-            this.group = new Group();
+
 
             this.centerPane  = new Pane(line, group) {
 
@@ -99,15 +101,15 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 protected void layoutChildren() {
                     super.layoutChildren();
                     line.setStartX(MARGIN);
-                    line.setStartY(10);
-                    line.setEndX(centerPane.getWidth());
-                    line.setEndY(10);
+                    line.setStartY(getHeight()/2.0);
+                    line.setEndX(getWidth() - MARGIN);
+                    line.setEndY(getHeight()/2.0);
                     for (Node child : group.getChildren()) {
                         if (child instanceof Circle) {
                             double ratio = ((Number) child.getUserData()).doubleValue();
                             Circle circle = (Circle) child;
-                            double circlePos = MARGIN  + ratio * (getWidth());
-                            circle.setCenterY(10);
+                            double circlePos = MARGIN + ratio * (getWidth() - 2 * MARGIN);
+                            circle.setCenterY(getHeight()/2.0);
                             circle.setCenterX(circlePos);
                         }
 
@@ -154,11 +156,13 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 group.getChildren().clear();
 
                 Circle depCircle = new Circle(3);
-                depCircle.getStyleClass().add("dep-arr");
-                depCircle.setUserData(0);
                 Circle arrCircle = new Circle(3);
+
+                depCircle.getStyleClass().add("dep-arr");
                 arrCircle.getStyleClass().add("dep-arr");
-                arrCircle.setUserData(0.97);
+
+                depCircle.setUserData(0);
+                arrCircle.setUserData(1);
 
                 group.getChildren().add(depCircle);
                 group.getChildren().add(arrCircle);
@@ -166,20 +170,12 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 for (Journey.Leg leg : journey.legs()) {
                     if (leg instanceof Journey.Leg.Foot) {
                         LocalDateTime currentTime = leg.depTime();
-
                         double minutesElapsed = Duration.between(journeyDepTime, currentTime).toMinutes();
-                        System.out.println("minutesElapsed = " + minutesElapsed);
-                        System.out.println("/journeyduration " + journeyDuration);
-
                         Circle transferCircle = new Circle(3);
                         transferCircle.getStyleClass().add("transfer");
                         double ratioToAssign = minutesElapsed / journeyDuration;
-                        System.out.println("ratioToAssign = " + ratioToAssign);
-                        System.out.println("for :" + JourneyIcalConverter.toIcalendar(journey));
-
                         transferCircle.setUserData(ratioToAssign);
                         group.getChildren().add(transferCircle);
-
                     }
                 }
 

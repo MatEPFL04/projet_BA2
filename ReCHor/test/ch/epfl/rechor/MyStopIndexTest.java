@@ -17,7 +17,7 @@ public class MyStopIndexTest {
         String stopName4 = "Charleville-Mézières";
 
         List <Pattern> listPatterns = List.of(StopIndex.pattern("mez"), StopIndex.pattern("vil"));
-        assertEquals(120, StopIndex.stopScore(listPatterns, stopName1));
+        assertEquals(120, (StopIndex.stopScore(listPatterns, stopName1)));
         assertEquals(120, StopIndex.stopScore(listPatterns, stopName2));
         assertEquals(80, StopIndex.stopScore(listPatterns, stopName3));
         assertEquals(75, StopIndex.stopScore(listPatterns, stopName4));

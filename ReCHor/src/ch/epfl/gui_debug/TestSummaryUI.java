@@ -43,11 +43,11 @@ public final class TestSummaryUI extends Application {
     public void start( Stage primaryStage) throws Exception {
 
         TimeTable timeTable = new CachedTimeTable(
-                FileTimeTable.in(Path.of("timetable_april")));
+                FileTimeTable.in(Path.of("timetable")));
         Stations stations = timeTable.stations();
         LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
-        int depStationId = stationId(stations, "Pully-Nord");
-        int arrStationId = stationId(stations, "Pully");
+        int depStationId = stationId(stations, "Ecublens VD, EPFL");
+        int arrStationId = stationId(stations, "Gruyères");
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
 
@@ -57,7 +57,7 @@ public final class TestSummaryUI extends Application {
         ObservableValue<List<Journey>> journeysO =
                 new SimpleObjectProperty<>(journeys);
         ObservableValue<LocalTime> depTimeO =
-                new SimpleObjectProperty<>(LocalTime.of(16, 00));
+                new SimpleObjectProperty<>(LocalTime.of(22, 00));
 
         SummaryUI summaryUI = SummaryUI.create(journeysO, depTimeO);
         Pane root = new BorderPane(summaryUI.rootNode());

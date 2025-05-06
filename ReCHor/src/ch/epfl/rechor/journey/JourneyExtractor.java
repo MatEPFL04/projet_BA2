@@ -81,6 +81,7 @@ public final class JourneyExtractor {
 
         paretoFront.forEach((long criteria) -> {
 
+
             int journeydepMins = depMins(criteria);
             int journeyChanges = changes(criteria);
             int journeyArrMins = arrMins(criteria);
@@ -165,6 +166,7 @@ public final class JourneyExtractor {
                 currentLegs.add(endLegFoot);
 
             }
+
 
             journeyList.add(new Journey(currentLegs));
 
