@@ -13,27 +13,29 @@ import java.util.stream.Stream;
  * @author Pamphil Nedev (380400)
  */
 public final class StopIndex {
-     private final List <String> indexedStopNames;
-     private final Map <String, String> alternativeNamesMap;
+    private final List<String> indexedStopNames;
+    private final Map<String, String> alternativeNamesMap;
 
-     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
-     private static final Pattern SPLITTING_PATTERN = Pattern.compile("[aeiouc]");
-
-     private static final Map <String, String> CHAR_REPLACEMENT =
-             new HashMap<>(Map.of("a", "[aàâäá]", "e",
-                     "[eéèêë]", "i", "[iîïìí]", "o", "[oôöòó]",
-                     "u", "[uûùü]", "c","[cç]" ));
+    private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
+    private static final Pattern SPLITTING_PATTERN = Pattern.compile("[aeiouc]");
 
 
+    private static final Map<String, String> CHAR_REPLACEMENT =
+            new HashMap<>(Map.of("a", "[aàâäá]", "e",
+                    "[eéèêë]", "i", "[iîïìí]", "o", "[oôöòó]",
+                    "u", "[uûùü]", "c", "[cç]"));
 
-     private record StopScores (String stopName, int score) { }
+
+    private record StopScores(String stopName, int score) {
+    }
 
     /**
-     *
      * @param stopName list of the stop's names to index
-     * @param map map associating the alternative stop's names to their main one's
+     * @param map      map associating the alternative stop's names to their main one's
      */
-    public StopIndex(List<String> stopName, Map<String, String> map){
+    public StopIndex(List<String> stopName, Map<String, String> map) {
+        Preconditions.checkArgument(stopName.containsAll(map.values()));
+
         indexedStopNames = stopName;
         alternativeNamesMap = map;
     }
@@ -41,13 +43,11 @@ public final class StopIndex {
     /**
      * Method used to concert a query into a list of corresponding stops.
      *
-     * @param query user's query when searching for an arrival station
+     * @param query            user's query when searching for an arrival station
      * @param maxNumberOfStops the maximum number of stations suggested for a query
      * @return list of the stop's names corresponding to the query
      */
     public List<String> stopsMatching(String query, int maxNumberOfStops) {
-
-        /*
 
         String[] subQueries = SPACE_PATTERN.split(query);
         List<Pattern> subQueriesPatterns = new ArrayList<>();
@@ -57,37 +57,18 @@ public final class StopIndex {
 
         Stream <String> originalStopsStream = indexedStopNames.stream();
         Stream <String> aliaseNamesStream = alternativeNamesMap.keySet().stream();
-        Stream <StopScores> namesToTakeIntoAccount = Stream.concat(originalStopsStream, aliaseNamesStream)
+        List <String> matchingStops = Stream.concat(originalStopsStream, aliaseNamesStream)
                 .map(stopName -> stopScore(subQueriesPatterns, stopName))
                 .filter(Objects::nonNull)
-                .sorted((firstPair, secondPair))
+                .sorted((firstPair, secondPair) -> Integer.compare(secondPair.score(), firstPair.score()))
+                .map((scorePair) -> scorePair.stopName)
+                .map((stopName) -> alternativeNamesMap.getOrDefault(stopName, stopName))
+                .distinct()
+                .limit(maxNumberOfStops)
+                .collect(Collectors.toList());
 
+        return matchingStops;
 
-
-
-                new ArrayList<>();
-        indexedStopNames.forEach(nameStop -> {
-            associatedScores.add(stopScore(subQueriesPatterns, nameStop));
-        });
-        alternativeNamesMap.keySet().forEach(aliasStopName -> {
-            associatedScores.add(stopScore(subQueriesPatterns,aliasStopName));
-        });
-
-        Stream <String> stopScoresStream = associatedScores.stream()
-                        .filter(Objects::nonNull)
-                        .sorted((scorePair1, scorePair2) -> {
-                            return Integer.compare(scorePair2.score(), scorePair1.score());
-                        })
-                        .map(StopScores::stopName)
-                        .map(scorePair -> alternativeNamesMap.getOrDefault(scorePair, scorePair))
-                        .distinct()
-                        .limit(maxNumberOfStops);
-
-        return stopScoresStream.toList();
-
-         */
-
-        return null;
 
     }
 
@@ -116,6 +97,7 @@ public final class StopIndex {
 
     public static Pattern pattern(String subquery) {
         boolean caseSensitive = !subquery.equals(subquery.toLowerCase());
+
         String toBeCompiled =
                 Arrays.stream(SPLITTING_PATTERN.splitWithDelimiters(subquery,0))
                         .map(chunkOfLetters -> {
@@ -129,7 +111,6 @@ public final class StopIndex {
                 Pattern.compile(toBeCompiled,
                         Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     }
-
 
 
 }
