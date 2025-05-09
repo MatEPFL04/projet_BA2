@@ -92,6 +92,8 @@ public record DetailUI(Node rootNode) {
             }
         });
 
+
+
         return new DetailUI(scrollPane);
     }
 

@@ -34,7 +34,7 @@ public final class StopIndex {
      * @param map      map associating the alternative stop's names to their main one's
      */
     public StopIndex(List<String> stopName, Map<String, String> map) {
-        Preconditions.checkArgument(stopName.containsAll(map.values()));
+        //Preconditions.checkArgument(stopName.containsAll(map.values()));
 
         indexedStopNames = stopName;
         alternativeNamesMap = map;
@@ -58,7 +58,10 @@ public final class StopIndex {
         Stream <String> originalStopsStream = indexedStopNames.stream();
         Stream <String> aliaseNamesStream = alternativeNamesMap.keySet().stream();
         List <String> matchingStops = Stream.concat(originalStopsStream, aliaseNamesStream)
-                .map(stopName -> stopScore(subQueriesPatterns, stopName))
+                .map(stopName -> {
+                    return stopScore(subQueriesPatterns, stopName);
+
+                })
                 .filter(Objects::nonNull)
                 .sorted((firstPair, secondPair) -> Integer.compare(secondPair.score(), firstPair.score()))
                 .map((scorePair) -> scorePair.stopName)
@@ -67,6 +70,7 @@ public final class StopIndex {
                 .limit(maxNumberOfStops)
                 .collect(Collectors.toList());
 
+
         return matchingStops;
 
 
@@ -74,6 +78,7 @@ public final class StopIndex {
 
     public static StopScores stopScore (List <Pattern> patternList, String stopName) {
         int totalScore = 0;
+
         for (Pattern pattern : patternList) {
             Matcher matcher = pattern.matcher(stopName);
             if (matcher.find()) {
@@ -92,7 +97,7 @@ public final class StopIndex {
                 return null;
             }
         }
-        return new StopScores(stopName, totalScore);
+        return patternList.isEmpty() ? null : new StopScores(stopName, totalScore);
     }
 
     public static Pattern pattern(String subquery) {

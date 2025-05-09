@@ -1,8 +1,6 @@
 package ch.epfl.rechor.gui;
 
 import ch.epfl.rechor.StopIndex;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
@@ -15,49 +13,51 @@ import javafx.util.Subscription;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Flow;
-
 
 public record StopField(TextField textField, ObservableValue<String> stop0) {
 
     private final static int NUMBER_OF_PRESENTED_RESULTS = 30;
 
-
     public static StopField create(StopIndex stopIndex) {
-
 
         ObjectProperty<String> observableStop = new SimpleObjectProperty<>();
 
         TextField textField = new TextField();
 
         Popup popup = new Popup();
-
+        popup.hide();
+        popup.setAnchorX(0);
+        popup.setAnchorY(0);
         ListView <String> queryResults = new ListView<>();
         queryResults.setFocusTraversable(false);
         queryResults.setMaxHeight(240);
+        queryResults.getSelectionModel().selectFirst();
 
         popup.getContent().add(queryResults);
         popup.setHideOnEscape(false);
 
         ArrayList <Subscription>  subscriptions = new ArrayList<>();
 
-
         textField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+
             if (event.getCode() == KeyCode.UP ) {
                 queryResults.getSelectionModel().selectPrevious();
                 event.consume();
             }
-            else if (event.getCode() == KeyCode.DOWN) {
+
+            if (event.getCode() == KeyCode.DOWN) {
                 queryResults.getSelectionModel().selectNext();
                 event.consume();
             }
 
         });
 
+
         textField.focusedProperty().subscribe( focusProperty -> {
 
             if (focusProperty) {
-                popup.show(queryResults, popup.getAnchorX(), popup.getAnchorY());
+
+                popup.show(textField, popup.getAnchorX(), popup.getAnchorY());
 
                 subscriptions.add( textField.textProperty().subscribe( ((oldText, newText) -> {
                     List<String> foundResults = stopIndex.stopsMatching(newText, NUMBER_OF_PRESENTED_RESULTS);
@@ -70,10 +70,10 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                     // nouvelle bound calculée en fonction du système de coordonnées de l'écran et ancrer le popup
                     Bounds newBound = textField.localToScreen(newBounds);
                     popup.setAnchorX(newBound.getMinX());
-                    popup.setAnchorX(newBound.getMaxY());
-
+                    popup.setAnchorY(newBound.getMaxY());
 
                 })));
+
 
 
             }
@@ -93,16 +93,13 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                 // le nom de l'arrêt actuellement sélectionné est copié dans le champ textuel et dans la propriété stop
                 else {
                     String selectedStopInListView = queryResults.getSelectionModel().getSelectedItem();
-                    //setTo(selectedStopInListView);
+                    textField.textProperty().set(selectedStopInListView);
+                    observableStop.set(selectedStopInListView);
                 }
             }
         });
 
         return new StopField(textField, observableStop);
-
-
-
-
 
     }
 
@@ -112,8 +109,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
             textField.textProperty().set(stopName);
             stop0.set(stopName);
         }
-
-
     }
 }
 
