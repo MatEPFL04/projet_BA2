@@ -29,7 +29,6 @@ public class Main extends Application {
     private static int STAGE_MIN_HEIGHT = 600;
     private ObservableValue <List<Journey>> observableJourneys;
 
-
     public static void main(String[] args) {
         launch(args);
     }
@@ -46,14 +45,14 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
+        Path pathToTimetable = Path.of("timetable_april");
 
-        Path pathToTimetable = Path.of("timetable");
-        // Chargement des données horaires
+        // Load timetable
         TimeTable  timetable = FileTimeTable.in(pathToTimetable);
         Stations stations = timetable.stations();
         StationAliases stationAliases = timetable.stationAliases();
 
-
+        // Observable Journeys
         List<String> stopNames = new LinkedList<>();
 
         for (int i = 0; i < stations.size() ; i++) {
@@ -74,20 +73,20 @@ public class Main extends Application {
         ObservableValue<LocalDate> dateObserved = queryUI.date0();
         ObservableValue<LocalTime> timeObserved = queryUI.time0();
 
+        CachedTimeTable cachedTimeTable = new CachedTimeTable(timetable);
+        Router router = new Router(cachedTimeTable);
+
         observableJourneys = Bindings.createObjectBinding( () -> {
-                    CachedTimeTable cachedTimeTable = new CachedTimeTable(timetable);
-                    Router router = new Router(cachedTimeTable);
-                    Profile profile = router.profile(dateObserved.getValue(), stationId(stations, arrStopObserved.getValue()));
+                    Profile profile = router.profile(dateObserved.getValue(),
+                            stationId(stations, arrStopObserved.getValue()));
                     int depStationId = stationId(stations, depStopObserved.getValue());
 
                     return JourneyExtractor.journeys(profile, depStationId);
                 },
-
             arrStopObserved, depStopObserved, dateObserved
         );
 
-        // parties principales de l'interface
-
+        // Main Window
 
         SummaryUI summaryUI = SummaryUI.create(observableJourneys, timeObserved);
         DetailUI detailUI = DetailUI.create(summaryUI.selectedJourneyO());

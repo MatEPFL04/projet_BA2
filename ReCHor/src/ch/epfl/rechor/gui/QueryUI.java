@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 import javafx.util.converter.LocalTimeStringConverter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -24,29 +23,27 @@ public record QueryUI(Node rootNode, ObservableValue<String> depStopO,
                       ObservableValue<String> arrStopO, ObservableValue<LocalDate> date0,
                       ObservableValue<LocalTime> time0) {
 
+    private static DateTimeFormatter STRING_TO_HOUR_MINUTES_USER = DateTimeFormatter.ofPattern("H:mm");
+    private static DateTimeFormatter STRING_TO_HOUR_MINUTES = DateTimeFormatter.ofPattern("HH:mm");
 
-    private static DateTimeFormatter HOUR_MINUTES_TO_STRING_CONVERETR = new DateTimeFormatterBuilder()
-            .appendValue(ChronoField.HOUR_OF_DAY, 2)
-            .appendLiteral(':')
-            .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-            .toFormatter();
-
-    private static DateTimeFormatter STRING_TO_HOUR_MINUTES = DateTimeFormatter.ofPattern("hh:mm");
-
+    /**
+     *
+     * @param stopIndex
+     * @return
+     */
     public static QueryUI create(StopIndex stopIndex) {
 
         StopField departureStopField = StopField.create(stopIndex);
         StopField arrivalStopField = StopField.create(stopIndex);
 
         // First Box :
+
         // Departure
         Label labelDeparture = new Label();
         labelDeparture.setText("Départ\u202f:");
         TextField depStopField = departureStopField.textField();
-
         depStopField.setPromptText("Nom de l'arrêt de départ");
         depStopField.setId("depStop");
-
 
         // Arrival
         Label labelArrival = new Label();
@@ -56,17 +53,18 @@ public record QueryUI(Node rootNode, ObservableValue<String> depStopO,
 
         // Exchange
         Button button = new Button();
+        button.setText("\u2194");
         button.setOnAction(e -> {
             String departure = depStopField.getText();
             String arrival = arrStopField.getText();
-            depStopField.setText(arrival);
-            arrStopField.setText(departure);
+            departureStopField.setTo(arrival);
+            arrivalStopField.setTo(departure);
         });
-
 
         HBox box1 = new HBox(labelDeparture, depStopField,button, labelArrival, arrStopField);
 
         // Second Box :
+
         // Date
         Label labelDate = new Label();
         labelDate.setText("Date\u202f:");
@@ -74,42 +72,26 @@ public record QueryUI(Node rootNode, ObservableValue<String> depStopO,
         datePicker.setValue(LocalDate.now());
         datePicker.setId("date");
 
-
-
         // Time
         Label labelTime = new Label();
         labelTime.setText("Heure\u202f:");
         TextField textFieldTime = new TextField();
-        textFieldTime.setText(HOUR_MINUTES_TO_STRING_CONVERETR.format(LocalTime.now()));
         textFieldTime.setId("time");
 
-
-        ObjectProperty<LocalTime> time0 = new SimpleObjectProperty<>();
-
-
         LocalTimeStringConverter converter =
-                new LocalTimeStringConverter(HOUR_MINUTES_TO_STRING_CONVERETR, STRING_TO_HOUR_MINUTES);
+                new LocalTimeStringConverter(STRING_TO_HOUR_MINUTES, STRING_TO_HOUR_MINUTES_USER);
 
         TextFormatter<LocalTime> textFormatter = new TextFormatter<>(converter);
+        textFormatter.setValue(LocalTime.now());
         textFieldTime.setTextFormatter(textFormatter);
-
-        textFieldTime.textProperty().subscribe((oldStringTime, newStringTime) -> {
-
-                });
-
-
 
         HBox box2 = new HBox(labelDate, datePicker, labelTime, textFieldTime);
 
         // VBox
-
         VBox vBox = new VBox(box1, box2);
         vBox.getStylesheets().add("query.css");
 
         return new QueryUI(vBox, departureStopField.stop0(), arrivalStopField.stop0()
-                , datePicker.valueProperty(), time0);
+                , datePicker.valueProperty(), textFormatter.valueProperty());
     }
 }
-
-
-

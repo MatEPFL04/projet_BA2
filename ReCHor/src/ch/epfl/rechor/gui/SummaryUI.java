@@ -48,14 +48,23 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
         }));
 
         journeyTime.subscribe( newTime -> {
+            boolean defaultSelection = true;
             for (Journey j : listView.getItems() ) {
                 if (!newTime.isAfter(j.depTime().toLocalTime())) {
                     listView.getSelectionModel().select(j);
+                    listView.scrollTo(j);
+                    defaultSelection = false;
                     break;
                 }
-                Journey lastJourney = listView.getItems().getLast();
-                listView.getSelectionModel().select(lastJourney);
             }
+
+            if (defaultSelection && (listOfJourneys.getValue() != null)) {
+                //Journey lastJourney = listView.getItems().getLast();
+                listView.getSelectionModel().select(listOfJourneys.getValue().getLast());
+                listView.scrollTo(listOfJourneys.getValue().getLast());
+            }
+
+
         });
 
         listView.getStylesheets().add("summary.css");
@@ -93,7 +102,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
             this.group = new Group();
 
             line.setStroke(Color.GRAY);
-
 
             this.centerPane  = new Pane(line, group) {
 
@@ -168,7 +176,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 group.getChildren().add(arrCircle);
 
                 for (Journey.Leg leg : journey.legs()) {
-                    if (leg instanceof Journey.Leg.Foot) {
+                    if (leg instanceof Journey.Leg.Foot && ((Journey.Leg.Foot) leg).isTransfer()) {
                         LocalDateTime currentTime = leg.depTime();
                         double minutesElapsed = Duration.between(journeyDepTime, currentTime).toMinutes();
                         Circle transferCircle = new Circle(3);

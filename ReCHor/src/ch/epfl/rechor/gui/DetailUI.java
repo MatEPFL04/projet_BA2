@@ -70,10 +70,13 @@ public record DetailUI(Node rootNode) {
         scrollPane.setId("detail");
         scrollPane.getStylesheets().add("detail.css");
 
+        //BooleanBinding visibilityBinding = BooleanBindings.c
+
 
         observableValue.subscribe(journey -> {
             if (journey != null) {
                 noJourneyVBox.setVisible(false);
+                journeyVBox.setVisible(true);
                 journeyStackPane.getChildren().clear();
                 legsGridPane.getChildren().clear();
 

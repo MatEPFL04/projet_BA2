@@ -18,26 +18,38 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
 
     private final static int NUMBER_OF_PRESENTED_RESULTS = 30;
 
+    /**
+     * Method creates the text field and the popup window.
+     *
+     * @param stopIndex the index of the stop
+     * @return an instance of StopField
+     */
     public static StopField create(StopIndex stopIndex) {
 
         ObjectProperty<String> observableStop = new SimpleObjectProperty<>();
 
         TextField textField = new TextField();
 
+        List <String> emptyQuery = stopIndex.stopsMatching("" ,NUMBER_OF_PRESENTED_RESULTS);
+
+        // Window containing the results :
+
         Popup popup = new Popup();
         popup.hide();
         popup.setAnchorX(0);
         popup.setAnchorY(0);
+
         ListView <String> queryResults = new ListView<>();
         queryResults.setFocusTraversable(false);
         queryResults.setMaxHeight(240);
-        queryResults.getSelectionModel().selectFirst();
+        queryResults.getItems().setAll(emptyQuery);
 
         popup.getContent().add(queryResults);
         popup.setHideOnEscape(false);
 
-        ArrayList <Subscription>  subscriptions = new ArrayList<>();
+        // Text field :
 
+        // Keyboard Controls
         textField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 
             if (event.getCode() == KeyCode.UP ) {
@@ -49,9 +61,10 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                 queryResults.getSelectionModel().selectNext();
                 event.consume();
             }
-
         });
 
+        // Active-Inactive Field
+        ArrayList <Subscription>  subscriptions = new ArrayList<>();
 
         textField.focusedProperty().subscribe( focusProperty -> {
 
@@ -59,38 +72,35 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
 
                 popup.show(textField, popup.getAnchorX(), popup.getAnchorY());
 
-                subscriptions.add( textField.textProperty().subscribe( ((oldText, newText) -> {
-                    List<String> foundResults = stopIndex.stopsMatching(newText, NUMBER_OF_PRESENTED_RESULTS);
+                subscriptions.add(textField.textProperty().subscribe(
+                        ((oldText, newText) -> {
+                    List<String> foundResults = stopIndex.stopsMatching(newText,
+                            NUMBER_OF_PRESENTED_RESULTS);
                     queryResults.getItems().setAll(foundResults);
-
+                    queryResults.getSelectionModel().selectFirst();
                 })));
 
-                subscriptions.add(textField.boundsInLocalProperty().subscribe( ((oldBounds, newBounds) -> {
-
-                    // nouvelle bound calculée en fonction du système de coordonnées de l'écran et ancrer le popup
+                subscriptions.add(textField.boundsInLocalProperty().subscribe(
+                        ((oldBounds, newBounds) ->
+                {
                     Bounds newBound = textField.localToScreen(newBounds);
                     popup.setAnchorX(newBound.getMinX());
                     popup.setAnchorY(newBound.getMaxY());
 
                 })));
-
-
-
             }
+
             else {
-                // propriétés ne sont plus observées
                 subscriptions.forEach(Subscription::unsubscribe);
                 subscriptions.clear();
-
-                //fenêtre des résultats cachés
                 popup.hide();
 
+                // Observable value containing the name of the stop
                 if (queryResults.getItems().isEmpty()) {
                     observableStop.set("");
                     textField.clear();
                 }
 
-                // le nom de l'arrêt actuellement sélectionné est copié dans le champ textuel et dans la propriété stop
                 else {
                     String selectedStopInListView = queryResults.getSelectionModel().getSelectedItem();
                     textField.textProperty().set(selectedStopInListView);
@@ -98,11 +108,14 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                 }
             }
         });
-
         return new StopField(textField, observableStop);
-
     }
 
+    /**
+     * Assigns the name of the stop to the field.
+     *
+     * @param stopName name of the stop
+     */
     public void setTo(String stopName) {
 
         if (stop0 instanceof ObjectProperty stop0) {
