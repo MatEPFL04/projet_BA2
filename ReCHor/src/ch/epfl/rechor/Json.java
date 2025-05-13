@@ -3,6 +3,7 @@ package ch.epfl.rechor;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * The interface represents a JSON document.
@@ -20,14 +21,11 @@ public sealed interface Json {
     record JArray (List<Json> jsonArray) implements Json {
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder("[");
+            StringJoiner sj = new StringJoiner(",","[","]");
             for (Json json : jsonArray) {
-                sb.append(sb.length() != 1 ? "," : "");
-                sb.append(json);
+                sj.add(json.toString());
             }
-
-            sb.append("]");
-            return sb.toString();
+            return sj.toString();
         }
     }
 

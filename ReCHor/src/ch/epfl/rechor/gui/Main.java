@@ -45,7 +45,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        Path pathToTimetable = Path.of("timetable_april");
+        Path pathToTimetable = Path.of("timetable");
 
         // Load timetable
         TimeTable  timetable = FileTimeTable.in(pathToTimetable);

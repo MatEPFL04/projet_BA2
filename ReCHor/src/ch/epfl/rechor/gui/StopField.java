@@ -30,8 +30,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
 
         TextField textField = new TextField();
 
-        List <String> emptyQuery = stopIndex.stopsMatching("" ,NUMBER_OF_PRESENTED_RESULTS);
-
         // Window containing the results :
 
         Popup popup = new Popup();
@@ -42,7 +40,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
         ListView <String> queryResults = new ListView<>();
         queryResults.setFocusTraversable(false);
         queryResults.setMaxHeight(240);
-        queryResults.getItems().setAll(emptyQuery);
 
         popup.getContent().add(queryResults);
         popup.setHideOnEscape(false);
@@ -73,7 +70,7 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                 popup.show(textField, popup.getAnchorX(), popup.getAnchorY());
 
                 subscriptions.add(textField.textProperty().subscribe(
-                        ((oldText, newText) -> {
+                        ((newText) -> {
                     List<String> foundResults = stopIndex.stopsMatching(newText,
                             NUMBER_OF_PRESENTED_RESULTS);
                     queryResults.getItems().setAll(foundResults);
@@ -81,20 +78,19 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                 })));
 
                 subscriptions.add(textField.boundsInLocalProperty().subscribe(
-                        ((oldBounds, newBounds) ->
+                        (newBounds) ->
                 {
                     Bounds newBound = textField.localToScreen(newBounds);
                     popup.setAnchorX(newBound.getMinX());
                     popup.setAnchorY(newBound.getMaxY());
 
-                })));
+                }));
             }
 
             else {
                 subscriptions.forEach(Subscription::unsubscribe);
                 subscriptions.clear();
                 popup.hide();
-
                 // Observable value containing the name of the stop
                 if (queryResults.getItems().isEmpty()) {
                     observableStop.set("");
