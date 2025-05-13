@@ -25,7 +25,9 @@ public class JourneyGeoJsonConverter {
 
         List<Stop> allStops = new ArrayList<>();
         List < Journey.Leg> listLegs = journey.legs();
+
         for (Journey.Leg leg : listLegs) {
+
             allStops.add(leg.depStop());
             for (Journey.Leg.IntermediateStop intermediateStops : leg.intermediateStops()) {
                 allStops.add(intermediateStops.stop());

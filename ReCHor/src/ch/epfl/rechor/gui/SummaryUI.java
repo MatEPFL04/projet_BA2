@@ -176,7 +176,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 group.getChildren().add(arrCircle);
 
                 for (Journey.Leg leg : journey.legs()) {
-                    if (leg instanceof Journey.Leg.Foot && ((Journey.Leg.Foot) leg).isTransfer()) {
+                    if (leg instanceof Journey.Leg.Foot && (journey.legs().getFirst() != leg)) {
                         LocalDateTime currentTime = leg.depTime();
                         double minutesElapsed = Duration.between(journeyDepTime, currentTime).toMinutes();
                         Circle transferCircle = new Circle(3);

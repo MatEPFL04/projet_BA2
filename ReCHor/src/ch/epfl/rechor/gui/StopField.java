@@ -40,7 +40,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
         ListView <String> queryResults = new ListView<>();
         queryResults.setFocusTraversable(false);
         queryResults.setMaxHeight(240);
-
         popup.getContent().add(queryResults);
         popup.setHideOnEscape(false);
 
