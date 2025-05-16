@@ -10,8 +10,11 @@ import ch.epfl.rechor.timetable.mapped.FileTimeTable;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -31,6 +34,10 @@ public class Main extends Application {
 
     private final static int STAGE_MIN_WIDTH = 800;
     private final static int STAGE_MIN_HEIGHT = 600;
+    private ObjectBinding<List<Journey>> observableJourneys;
+    private Profile profile;
+    private String currentArrStation;
+    private LocalDate currentLocalDate;
 
     /**
      * Launches the JavFX application.
@@ -53,6 +60,7 @@ public class Main extends Application {
         for (int i = 0; i < stations.size(); i++) {
             if (Objects.equals(stations.name(i), stationName)) {
                 return i;
+
             }
         }
         return -1;
@@ -69,7 +77,7 @@ public class Main extends Application {
 
         Path pathToTimetable = Path.of("timetable");
 
-        TimeTable  timetable = FileTimeTable.in(pathToTimetable);
+        TimeTable timetable = FileTimeTable.in(pathToTimetable);
         Stations stations = timetable.stations();
         StationAliases stationAliases = timetable.stationAliases();
 
@@ -96,18 +104,29 @@ public class Main extends Application {
         CachedTimeTable cachedTimeTable = new CachedTimeTable(timetable);
         Router router = new Router(cachedTimeTable);
 
-        ObservableValue<List<Journey>> observableJourneys = Bindings.createObjectBinding(() -> {
 
-                    if (!arrStopObserved.getValue().isEmpty()) {
-                        Profile profile = router.profile(queryUI.date0().getValue(),
-                                stationId(stations, arrStopObserved.getValue()));
+        observableJourneys = Bindings.createObjectBinding(() -> {
+
+                    boolean isArrStopValid = stationId(stations, arrStopObserved.getValue()) != -1;
+                    boolean isDepStopValid = stationId(stations, depStopObserved.getValue()) != -1;
+
+                    if (isArrStopValid && (!Objects.equals(currentLocalDate,dateObserved.getValue()) ||
+                            !Objects.equals(currentArrStation, arrStopObserved.getValue()))){
+                        System.out.println("new profile calculated (arr stop field different " +
+                                        "from previous one OR new date and a valid arr stop field"  );
+
+                        profile = router.profile(dateObserved.getValue(),
+                                stationId(stations,arrStopObserved.getValue()));
+                        currentArrStation = arrStopObserved.getValue();
+                        currentLocalDate = dateObserved.getValue();
+                    }
+
+                    if (isDepStopValid && profile != null) {
 
                         int depStationId = stationId(stations, depStopObserved.getValue());
-
                         return JourneyExtractor.journeys(profile, depStationId);
                     }
                     return null;
-
                 },
                 arrStopObserved, depStopObserved, dateObserved
         );

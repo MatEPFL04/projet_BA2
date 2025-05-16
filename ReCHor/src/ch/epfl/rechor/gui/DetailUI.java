@@ -65,7 +65,7 @@ public record DetailUI(Node rootNode) {
         legsGridPane.setId("legs");
         StackPane journeyStackPane = new StackPane();
         VBox journeyVBox = new VBox(journeyStackPane, hBox);
-        StackPane mainStackPane = new StackPane(noJourneyVBox, journeyVBox);
+        StackPane mainStackPane = new StackPane(journeyVBox, noJourneyVBox);
         ScrollPane scrollPane = new ScrollPane(mainStackPane);
         scrollPane.setId("detail");
         scrollPane.getStylesheets().add("detail.css");
@@ -77,7 +77,6 @@ public record DetailUI(Node rootNode) {
                 );
 
         noJourneyVBox.visibleProperty().bind(noJourneyTextVisibility);
-        journeyVBox.visibleProperty().bind(noJourneyTextVisibility.not());
 
         observableValue.subscribe(journey -> {
 

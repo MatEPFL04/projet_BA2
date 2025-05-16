@@ -1,5 +1,6 @@
 package ch.epfl.rechor.timetable;
 
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -52,21 +53,26 @@ public class CachedTimeTable implements TimeTable {
 
     @Override
     public Trips tripsFor(LocalDate date) {
-        if (!Objects.equals(currentDate,date) || trips == null) {
-            trips = timeTable.tripsFor(date);
-            currentDate = date;
+        if (!Objects.equals(date, currentDate)) {
+            updateFieds(date);
             return trips;
         }
+
         return trips;
     }
 
     @Override
     public Connections connectionsFor(LocalDate date) {
-        if (!Objects.equals(currentDate,date) || connections == null) {
-            connections = timeTable.connectionsFor(date);
-            currentDate = date;
+        if (!Objects.equals(currentDate,date)) {
+            updateFieds(date);
             return connections;
         }
         return connections;
+    }
+
+    public void updateFieds(LocalDate date) {
+        connections = timeTable.connectionsFor(date);
+        trips = timeTable.tripsFor(date);
+        currentDate = date;
     }
 }

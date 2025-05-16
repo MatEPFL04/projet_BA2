@@ -19,6 +19,7 @@ import javafx.scene.text.Text;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
     /**
      * Creates a SummaryUI bound to the supplied observables.
      *
-     * @param listOfJourneys an observable list of journeys to show (may be {@code null})
+     * @param listOfJourneys an observable list of journeys to show
      * @param journeyTime    a reference time used to auto-select the first journey
      *                       that departs on or after it
      * @return the new SummaryUI
@@ -44,34 +45,42 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
         listView.setCellFactory(view -> new JourneyListCell());
 
         listOfJourneys.subscribe((journeyList -> {
+
             if (journeyList == null){
                 listView.getItems().setAll(List.of());
+
             }
             else {
                 listView.getItems().setAll(journeyList);
             }
+            selectJourneyInListView(journeyTime.getValue(), listView);
+
         }));
 
         journeyTime.subscribe( newTime -> {
-            boolean defaultSelection = true;
-            for (Journey j : listView.getItems() ) {
-                if (!newTime.isAfter(j.depTime().toLocalTime())) {
-                    listView.getSelectionModel().select(j);
-                    listView.scrollTo(j);
-                    defaultSelection = false;
-                    break;
-                }
-            }
-
-            if (defaultSelection && (listOfJourneys.getValue() != null)) {
-                listView.getSelectionModel().select(listOfJourneys.getValue().getLast());
-                listView.scrollTo(listOfJourneys.getValue().getLast());
-            }
+            selectJourneyInListView(newTime,listView);
         });
 
         listView.getStylesheets().add("summary.css");
 
         return new SummaryUI(listView, listView.getSelectionModel().selectedItemProperty());
+    }
+
+    private static void selectJourneyInListView(LocalTime localTime, ListView<Journey> listView){
+        boolean defaultSelection = true;
+        for (Journey j : listView.getItems() ) {
+            if (!localTime.isAfter(j.depTime().toLocalTime())) {
+                listView.getSelectionModel().select(j);
+                listView.scrollTo(j);
+                defaultSelection = false;
+                break;
+            }
+        }
+        if (listView.getItems().isEmpty()) return;
+        else if (defaultSelection) {
+            listView.getSelectionModel().select(listView.getItems().getLast());
+            listView.scrollTo(listView.getSelectionModel().getSelectedItem());
+        }
     }
 
     private static class JourneyListCell extends ListCell<Journey> {
@@ -168,20 +177,27 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 depCircle.setUserData(0);
                 arrCircle.setUserData(1);
 
-                group.getChildren().add(depCircle);
-                group.getChildren().add(arrCircle);
+                List<Circle> whiteCircles = new ArrayList<>();
+                whiteCircles.add(depCircle);
+                whiteCircles.add(arrCircle);
+
+                //group.getChildren().add(depCircle);
+                //group.getChildren().add(arrCircle);
 
                 for (Journey.Leg leg : journey.legs()) {
-                    if (leg instanceof Journey.Leg.Foot && (journey.legs().getFirst() != leg)) {
+                    if (leg instanceof Journey.Leg.Foot && (journey.legs().getFirst() != leg)
+                            && journey.legs().getLast() != leg) {
                         LocalDateTime currentTime = leg.depTime();
                         double minutesElapsed = Duration.between(journeyDepTime, currentTime).toMinutes();
                         Circle transferCircle = new Circle(3);
                         transferCircle.getStyleClass().add("transfer");
                         double ratioToAssign = minutesElapsed / journeyDuration;
                         transferCircle.setUserData(ratioToAssign);
-                        group.getChildren().add(transferCircle);
+                        whiteCircles.add(transferCircle);
+                        //group.getChildren().add(transferCircle);
                     }
                 }
+                group.getChildren().setAll(whiteCircles);
             }
             setGraphic(borderPane);
         }

@@ -30,6 +30,7 @@ public record Router(TimeTable timeTable) {
      */
     public Profile profile (LocalDate date, int arrStationId) {
 
+
         Profile.Builder profile = new Profile.Builder(timeTable, date, arrStationId);
         Stations stations = timeTable.stations();
 
@@ -51,6 +52,7 @@ public record Router(TimeTable timeTable) {
         Builder arrStationBuilder;
         Builder tripsBuilder;
 
+
         for (int i = 0; i < connections.size(); i++) {
 
             int connectionDepStationId = timeTable.stationId(connections.depStopId(i));
@@ -58,7 +60,9 @@ public record Router(TimeTable timeTable) {
             int connectionDepMins = connections.depMins(i);
             int connectionArrMins = connections.arrMins(i);
             int tripId = connections.tripId(i);
+
             int currentConnectionTripPos = connections.tripPos(i);
+
 
             tripsBuilder = profile.forTrip(tripId) != null ?
                     profile.forTrip(tripId) : new Builder();
