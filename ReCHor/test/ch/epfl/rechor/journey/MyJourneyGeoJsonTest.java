@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MyJourneyGeoJsonTest {
 
     private static List<Journey.Leg> exampleLegs() {
-        var lausanne = new Stop("Lausanne", "1", 6.62909, 46.51679);
+        var lausanne = new Stop("Lausanne", "1", 6.62909, 46.516797);
         var palezieux = new Stop("Palezieux", "1", 6.83787, 46.54276);
         var romont = new Stop("Romont", "1", 6.91181, 46.69351);
         var fribourg = new Stop("Fribourg", "1", 7.15105, 46.80315);
@@ -63,6 +63,9 @@ public class MyJourneyGeoJsonTest {
                   ]
                 }
                 """;
+        System.out.println("expected: " +  expected.trim());
+
+        System.out.println("actual: " +  toGeoJson);
 
         assertEquals(expected.trim(), toGeoJson.toString().trim());
     }

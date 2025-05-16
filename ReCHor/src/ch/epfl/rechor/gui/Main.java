@@ -67,7 +67,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        Path pathToTimetable = Path.of("timetable_april");
+        Path pathToTimetable = Path.of("timetable");
 
         TimeTable  timetable = FileTimeTable.in(pathToTimetable);
         Stations stations = timetable.stations();
@@ -97,11 +97,17 @@ public class Main extends Application {
         Router router = new Router(cachedTimeTable);
 
         ObservableValue<List<Journey>> observableJourneys = Bindings.createObjectBinding(() -> {
-                    Profile profile = router.profile(dateObserved.getValue(),
-                            stationId(stations, arrStopObserved.getValue()));
-                    int depStationId = stationId(stations, depStopObserved.getValue());
 
-                    return JourneyExtractor.journeys(profile, depStationId);
+                    if (!arrStopObserved.getValue().isEmpty()) {
+                        Profile profile = router.profile(queryUI.date0().getValue(),
+                                stationId(stations, arrStopObserved.getValue()));
+
+                        int depStationId = stationId(stations, depStopObserved.getValue());
+
+                        return JourneyExtractor.journeys(profile, depStationId);
+                    }
+                    return null;
+
                 },
                 arrStopObserved, depStopObserved, dateObserved
         );

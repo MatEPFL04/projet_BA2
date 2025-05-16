@@ -33,14 +33,7 @@ public class JourneyGeoJsonConverter {
         allStops.add(journey.arrStop());
 
         List<Json> listOfCoordinates = allStops.stream()
-                .map(stop -> {
-                    double longitude = Math.round(stop.longitude() * 1e5) / 1e5; // 5 d.p.
-                    double latitude = Math.round(stop.latitude()  * 1e5) / 1e5;
-                    return (Json) new Json.JArray(List.of(
-                            new Json.JNumber(longitude),
-                            new Json.JNumber(latitude)
-                    ));
-                })
+                .map(JourneyGeoJsonConverter::getStopArrayForCoordinates)
                 .toList();
 
         Json.JArray arrayOfPairOfCoordinates = new Json.JArray(listOfCoordinates);
@@ -50,5 +43,14 @@ public class JourneyGeoJsonConverter {
         polyline.put(new Json.JString("coordinates"), arrayOfPairOfCoordinates);
 
         return new Json.JObject(polyline);
+    }
+
+    private static Json getStopArrayForCoordinates (Stop stop) {
+        double longitude = Math.round(stop.longitude() * 1e5) / 1e5;
+        double latitude = Math.round(stop.latitude()  * 1e5) / 1e5;
+
+        return new Json.JArray(List.of(
+                new Json.JNumber(longitude),
+                new Json.JNumber(latitude)));
     }
 }

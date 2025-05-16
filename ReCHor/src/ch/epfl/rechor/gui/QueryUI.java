@@ -60,8 +60,7 @@ public record QueryUI(Node rootNode, ObservableValue<String> depStopO,
 
         Label labelDate = new Label();
         labelDate.setText("Date\u202f:");
-        DatePicker datePicker = new DatePicker();
-        datePicker.setValue(LocalDate.now());
+        DatePicker datePicker = new DatePicker(LocalDate.now());
         datePicker.setId("date");
 
         Label labelTime = new Label();
