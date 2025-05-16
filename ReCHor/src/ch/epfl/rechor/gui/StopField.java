@@ -14,6 +14,15 @@ import javafx.util.Subscription;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A UI component that combines a text field with an auto-completion popup listing stop names.
+ *
+ * @param textField the editable text field visible to the user
+ * @param stop0     an observable that always holds the currently selected stop
+ *
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
+ */
 public record StopField(TextField textField, ObservableValue<String> stop0) {
 
     private final static int NUMBER_OF_PRESENTED_RESULTS = 30;
@@ -30,8 +39,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
 
         TextField textField = new TextField();
 
-        // Window containing the results :
-
         Popup popup = new Popup();
         popup.hide();
         popup.setAnchorX(0);
@@ -43,9 +50,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
         popup.getContent().add(queryResults);
         popup.setHideOnEscape(false);
 
-        // Text field :
-
-        // Keyboard Controls
         textField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 
             if (event.getCode() == KeyCode.UP ) {
@@ -59,7 +63,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
             }
         });
 
-        // Active-Inactive Field
         ArrayList <Subscription>  subscriptions = new ArrayList<>();
 
         textField.focusedProperty().subscribe( focusProperty -> {
@@ -82,7 +85,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                     Bounds newBound = textField.localToScreen(newBounds);
                     popup.setAnchorX(newBound.getMinX());
                     popup.setAnchorY(newBound.getMaxY());
-
                 }));
             }
 
@@ -119,5 +121,3 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
         }
     }
 }
-
-

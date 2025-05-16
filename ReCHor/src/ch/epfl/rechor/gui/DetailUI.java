@@ -6,7 +6,6 @@ import ch.epfl.rechor.journey.JourneyGeoJsonConverter;
 import ch.epfl.rechor.journey.JourneyIcalConverter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
@@ -33,24 +32,25 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Stack;
 
 /**
  * Record representing the detail of a journey.
+ *
+ * @param rootNode the root node of the UI
  *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  */
 public record DetailUI(Node rootNode) {
 
-    private record Circles(Circle depCircle, Circle arrCircle) { }
+    private record Circles(Circle depCircle, Circle arrCircle) {}
 
     /**
+     * Creates a DetailUI whose content continually mirrors the value
+     * of the supplied observable.
      *
-     *
-     * @param observableValue
-     * @return a detailUI associated to an observable value
-     *
+     * @param observableValue an observable value  holding the journey to display
+     * @return a detailUI bound to an observable value
      */
     public static DetailUI create(ObservableValue<Journey> observableValue) {
 
@@ -69,8 +69,6 @@ public record DetailUI(Node rootNode) {
         ScrollPane scrollPane = new ScrollPane(mainStackPane);
         scrollPane.setId("detail");
         scrollPane.getStylesheets().add("detail.css");
-
-        //visibility of the text for the journey
 
         BooleanBinding noJourneyTextVisibility =
                 Bindings.createBooleanBinding(
@@ -98,10 +96,7 @@ public record DetailUI(Node rootNode) {
                 mapEvent(map, journey);
                 icalendarEvent(calendar,journey);
             }
-
-
         });
-
         return new DetailUI(scrollPane);
     }
 
@@ -112,8 +107,8 @@ public record DetailUI(Node rootNode) {
             protected void layoutChildren() {
                 super.layoutChildren();
                 List<Line> listOfLines = new ArrayList<>();
-                for (int i = 0; i < listCircles.size(); i++) {
-                    Line line = getLineFromCircle(listCircles.get(i));
+                for (Circles listCircle : listCircles) {
+                    Line line = getLineFromCircle(listCircle);
                     listOfLines.add(line);
                 }
                 getChildren().setAll(listOfLines);
@@ -123,7 +118,8 @@ public record DetailUI(Node rootNode) {
         return pane;
     }
 
-    private static void addLegsToGridPane(GridPane gridPane, Journey journey, List<Circles> pairsOfCircles) {
+    private static void addLegsToGridPane(GridPane gridPane, Journey journey,
+                                          List<Circles> pairsOfCircles) {
 
         int rowIndex = 0;
         for (Journey.Leg leg : journey.legs()) {
@@ -136,7 +132,8 @@ public record DetailUI(Node rootNode) {
                 }
                 case Journey.Leg.Transport transport -> {
 
-                    Label transportdepTimeLabel = new Label(FormatterFr.formatTime(transport.depTime()));
+                    Label transportdepTimeLabel =
+                            new Label(FormatterFr.formatTime(transport.depTime()));
                     transportdepTimeLabel.getStyleClass().add("departure");
                     GridPane.setHalignment(transportdepTimeLabel, HPos.RIGHT);
 
@@ -146,7 +143,8 @@ public record DetailUI(Node rootNode) {
                     Label depStopNameLabel = new Label(transport.depStop().name());
                     GridPane.setHalignment(depStopNameLabel, HPos.LEFT);
 
-                    Label depPlatformNameLabel = new Label(FormatterFr.formatPlatformName(transport.depStop()));
+                    Label depPlatformNameLabel =
+                            new Label(FormatterFr.formatPlatformName(transport.depStop()));
                     depPlatformNameLabel.getStyleClass().add("departure");
                     GridPane.setHalignment(depPlatformNameLabel, HPos.LEFT);
 
@@ -171,14 +169,19 @@ public record DetailUI(Node rootNode) {
                     if(!(transport.intermediateStops().isEmpty())){
                         String stopRepresentation = transport.intermediateStops().size() != 1 ?
                                 " arrêts, " : " arrêt, ";
-                        String titleOfMenuDeroulant = transport.intermediateStops().size() + stopRepresentation
+                        String titleOfMenuDeroulant = transport.intermediateStops().size()
+                                 + stopRepresentation
                                  + FormatterFr.formatDuration(transport.duration());
                         int row = 0;
                         GridPane intermediateStopGrid = new GridPane();
-                        for (Journey.Leg.IntermediateStop intermediateStop : transport.intermediateStops()) {
-                            Label arrTimeLabel = new Label(FormatterFr.formatTime(intermediateStop.arrTime()));
-                            Label stopLabel = new Label(intermediateStop.stop().name());
-                            Label depTimeLabel = new Label(FormatterFr.formatTime(intermediateStop.depTime()));
+                        for (Journey.Leg.IntermediateStop intermediateStop :
+                                transport.intermediateStops()) {
+                            Label arrTimeLabel =
+                                    new Label(FormatterFr.formatTime(intermediateStop.arrTime()));
+                            Label stopLabel =
+                                    new Label(intermediateStop.stop().name());
+                            Label depTimeLabel =
+                                    new Label(FormatterFr.formatTime(intermediateStop.depTime()));
                             intermediateStopGrid.addRow(row, arrTimeLabel, depTimeLabel, stopLabel);
                             row++;
                         }
@@ -193,13 +196,15 @@ public record DetailUI(Node rootNode) {
                         rowIndex++;
                     }
 
-                    Label transportArrTimeLabel = new Label(FormatterFr.formatTime(transport.arrTime()));
+                    Label transportArrTimeLabel =
+                            new Label(FormatterFr.formatTime(transport.arrTime()));
                     GridPane.setHalignment(transportArrTimeLabel, HPos.RIGHT);
                     Circle secondCircle = new Circle(3);
                     GridPane.setHalignment(secondCircle, HPos.LEFT);
                     Label arrStopNameLabel = new Label(transport.arrStop().name());
                     GridPane.setHalignment(arrStopNameLabel, HPos.LEFT);
-                    Label arrPlatformNameLabel = new Label(FormatterFr.formatPlatformName(transport.arrStop()));
+                    Label arrPlatformNameLabel =
+                            new Label(FormatterFr.formatPlatformName(transport.arrStop()));
                     GridPane.setHalignment(arrPlatformNameLabel, HPos.LEFT);
                     gridPane.addRow(rowIndex, transportArrTimeLabel,
                             secondCircle,
@@ -211,7 +216,7 @@ public record DetailUI(Node rootNode) {
                     pairsOfCircles.add(pair);
                 }
             }
-        };
+        }
     }
 
     private static void icalendarEvent(Button button, Journey journey) {
@@ -254,5 +259,4 @@ public record DetailUI(Node rootNode) {
 
         return line;
     }
-
 }

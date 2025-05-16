@@ -19,23 +19,20 @@ public final class StopIndex {
     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
     private static final Pattern SPLITTING_PATTERN = Pattern.compile("[aeiouc]");
 
-
     private static final Map<String, String> CHAR_REPLACEMENT =
             new HashMap<>(Map.of("a", "[aàâäá]", "e",
                     "[eéèêë]", "i", "[iîïìí]", "o", "[oôöòó]",
                     "u", "[uûùü]", "c", "[cç]"));
 
-
-    private record StopScores(String stopName, int score) {
-    }
+    private record StopScores(String stopName, int score) {}
 
     /**
+     * Builds an index ready for auto-completion.
+     *
      * @param stopName list of the stop's names to index
      * @param map      map associating the alternative stop's names to their main one's
      */
     public StopIndex(List<String> stopName, Map<String, String> map) {
-        //Preconditions.checkArgument(stopName.containsAll(map.values()));
-
         indexedStopNames = stopName;
         alternativeNamesMap = map;
     }
@@ -70,12 +67,16 @@ public final class StopIndex {
                 .limit(maxNumberOfStops)
                 .collect(Collectors.toList());
 
-
         return matchingStops;
-
-
     }
 
+    /**
+     * Computes a relevance score for the stop name against every pattern in the pattern list.
+     *
+     * @param patternList compiled sub-query patterns
+     * @param stopName    the stop name being scored
+     * @return a stop score record, or null if no match
+     */
     public static StopScores stopScore (List <Pattern> patternList, String stopName) {
         int totalScore = 0;
 
@@ -100,6 +101,12 @@ public final class StopIndex {
         return patternList.isEmpty() ? null : new StopScores(stopName, totalScore);
     }
 
+    /**
+     * Turns a sub-query into a regex that tolerates accents and optionally ignores case.
+     *
+     * @param subquery the raw sub-query
+     * @return the compiled {@link Pattern}
+     */
     public static Pattern pattern(String subquery) {
         boolean caseSensitive = !subquery.equals(subquery.toLowerCase());
 
@@ -111,12 +118,8 @@ public final class StopIndex {
                         })
                         .collect(Collectors.joining());
 
-
         return caseSensitive ? Pattern.compile(toBeCompiled) :
                 Pattern.compile(toBeCompiled,
                         Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     }
-
-
 }
-

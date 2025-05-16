@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 public record Router(TimeTable timeTable) {
 
     /**
-     *
+     * Computes the pareto front profile for reaching the arrival station id on the given date.
      *
      * @param date the date for which the optimal journeys must be computed
      * @param arrStationId arrival station id
@@ -71,24 +71,21 @@ public record Router(TimeTable timeTable) {
 
             int associatedPayload = i;
 
-            //option 1
             if (arrayOfTransfersDuration[connectionArrStationId] != -1){
 
                 long tuple = PackedCriteria.pack(connectionArrMins +
-                                arrayOfTransfersDuration[connectionArrStationId], 0, associatedPayload);
-
+                                arrayOfTransfersDuration[connectionArrStationId],
+                        0, associatedPayload);
                 front.add(tuple);
             }
 
-            //option 2
             front.addAll(tripsBuilder);
 
-
-            //option 3
             arrStationBuilder.forEach((long criteria) -> {
 
                 if((depMins(criteria) >= connectionArrMins)) {
-                    long packedTuple = pack(arrMins(criteria), changes(criteria) + 1, associatedPayload);
+                    long packedTuple = pack(arrMins(criteria), changes(criteria) + 1,
+                            associatedPayload);
                     front.add(packedTuple);
 
                 }
@@ -96,13 +93,9 @@ public record Router(TimeTable timeTable) {
 
             if (front.isEmpty()) continue;
 
-
-            //mise à jour de la frontière de la course
             tripsBuilder.addAll(front);
             profile.setForTrip(tripId,tripsBuilder);
 
-
-            //mise à jour des frontières des gares
             if (!depStationFront.fullyDominates(front,connectionDepMins)) {
 
                 int firstChangeToDepStation = PackedRange.startInclusive
@@ -112,9 +105,9 @@ public record Router(TimeTable timeTable) {
 
                 for (int j = firstChangeToDepStation; j <= lastChangeToDepStation; j++) {
 
-                    Builder stationToDepStationFront = profile.forStation(transfers.depStationId(j)) != null ?
+                    Builder stationToDepStationFront =
+                            profile.forStation(transfers.depStationId(j)) != null ?
                             profile.forStation(transfers.depStationId(j)) : new Builder();
-
 
                     int d = connectionDepMins - transfers.minutes(j);
 
@@ -126,22 +119,18 @@ public record Router(TimeTable timeTable) {
                         int payl = Bits32_24_8.pack(connectionId,numberOfIntermediateStops);
 
 
-                        long tupleWithoutDepMins = PackedCriteria.pack(arrMins(criteria),changes(criteria),payl);
+                        long tupleWithoutDepMins = PackedCriteria.pack(arrMins(criteria),
+                                changes(criteria),payl);
                         long addedTuple = PackedCriteria.withDepMins(tupleWithoutDepMins, d);
 
                         stationToDepStationFront.add(addedTuple);
 
-
                     });
                     profile.setForStation(transfers.depStationId(j), stationToDepStationFront);
-
                 }
             }
-
             front.clear();
         }
-
         return profile.build();
     }
 }
-

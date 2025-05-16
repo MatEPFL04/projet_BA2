@@ -3,12 +3,24 @@ package ch.epfl.rechor.timetable;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * A lightweight wrapper around a timetable that caches
+ * the most recently requested day’s trips and connections.
+ *
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
+ */
 public class CachedTimeTable implements TimeTable {
     private TimeTable timeTable;
     private Connections connections;
     private Trips trips;
     private LocalDate currentDate;
 
+    /**
+     * Wraps the given timetable with a one-day in-memory cache.
+     *
+     * @param timetable the underlying timetable to be cached
+     */
     public CachedTimeTable (TimeTable timetable) {
         this.timeTable = timetable;
     }

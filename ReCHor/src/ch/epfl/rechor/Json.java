@@ -61,7 +61,6 @@ public sealed interface Json {
         public String toString() {
             return "\"" + jsonString + "\"";
         }
-
     }
 
     /**

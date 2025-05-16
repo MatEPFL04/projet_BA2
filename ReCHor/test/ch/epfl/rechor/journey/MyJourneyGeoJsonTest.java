@@ -17,7 +17,7 @@ public class MyJourneyGeoJsonTest {
         var romont = new Stop("Romont", "1", 6.91181, 46.69351);
         var fribourg = new Stop("Fribourg", "1", 7.15105, 46.80315);
 
-        var d = LocalDate.of(2025, Month.FEBRUARY, 18);
+        var d = LocalDate.of(2025, Month.APRIL, 4);
 
         var l1 = new Journey.Leg.Foot(
                 lausanne,

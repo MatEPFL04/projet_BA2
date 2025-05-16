@@ -1,11 +1,7 @@
 package ch.epfl.rechor.journey;
 
 import ch.epfl.rechor.Json;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * This class helps to convert a journey into a GeoJSON document, representing the route taken.
@@ -16,7 +12,8 @@ import java.util.stream.Stream;
 public class JourneyGeoJsonConverter {
 
     /**
-     *
+     * Converts the given journey into a GeoJSON whose coordinates follow every departure,
+     * intermediate and arrival stop in order.
      *
      * @param journey the journey to convert into GeoJSON format.
      * @return GeoJson document.
@@ -36,11 +33,14 @@ public class JourneyGeoJsonConverter {
         allStops.add(journey.arrStop());
 
         List<Json> listOfCoordinates = allStops.stream()
-                .map(stop -> new Json.JArray(List.of(
-                        new Json.JNumber((int) (stop.longitude() * Math.pow(10, 5)) / Math.pow(10, 5)),
-                        new Json.JNumber((int) (stop.latitude() * Math.pow(10, 5)) / Math.pow(10, 5))
-                )))
-                .map(array -> (Json) array)
+                .map(stop -> {
+                    double longitude = Math.round(stop.longitude() * 1e5) / 1e5; // 5 d.p.
+                    double latitude = Math.round(stop.latitude()  * 1e5) / 1e5;
+                    return (Json) new Json.JArray(List.of(
+                            new Json.JNumber(longitude),
+                            new Json.JNumber(latitude)
+                    ));
+                })
                 .toList();
 
         Json.JArray arrayOfPairOfCoordinates = new Json.JArray(listOfCoordinates);
@@ -51,5 +51,4 @@ public class JourneyGeoJsonConverter {
 
         return new Json.JObject(polyline);
     }
-
 }

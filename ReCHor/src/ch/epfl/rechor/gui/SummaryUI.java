@@ -2,7 +2,6 @@ package ch.epfl.rechor.gui;
 
 import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
-import ch.epfl.rechor.journey.JourneyIcalConverter;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -18,10 +17,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,6 +29,14 @@ import java.util.List;
  */
 public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO) {
 
+    /**
+     * Creates a SummaryUI bound to the supplied observables.
+     *
+     * @param listOfJourneys an observable list of journeys to show (may be {@code null})
+     * @param journeyTime    a reference time used to auto-select the first journey
+     *                       that departs on or after it
+     * @return the new SummaryUI
+     */
     public static SummaryUI create(ObservableValue<List<Journey>> listOfJourneys,
                                    ObservableValue<LocalTime> journeyTime){
 
@@ -59,19 +64,15 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
             }
 
             if (defaultSelection && (listOfJourneys.getValue() != null)) {
-                //Journey lastJourney = listView.getItems().getLast();
                 listView.getSelectionModel().select(listOfJourneys.getValue().getLast());
                 listView.scrollTo(listOfJourneys.getValue().getLast());
             }
-
-
         });
 
         listView.getStylesheets().add("summary.css");
 
         return new SummaryUI(listView, listView.getSelectionModel().selectedItemProperty());
     }
-
 
     private static class JourneyListCell extends ListCell<Journey> {
 
@@ -87,7 +88,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
         private final Line line;
         private final Group group;
         private static final double MARGIN = 5;
-
 
         private JourneyListCell(){
 
@@ -120,9 +120,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                             circle.setCenterY(getHeight()/2.0);
                             circle.setCenterX(circlePos);
                         }
-
                     }
-
                 }
             };
 
@@ -135,7 +133,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
             this.depTime = new Text();
             depTime.getStyleClass().add("departure");
             this.arrTime = new Text();
-
 
             this.borderPane = new BorderPane(centerPane, routeHBox, arrTime, durationHBox, depTime);
             borderPane.getStyleClass().add("journey");
@@ -153,7 +150,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
                 long journeyDuration = journey.duration().toMinutes();
                 LocalDateTime journeyDepTime = journey.depTime();
-
 
                 depTime.setText(FormatterFr.formatTime(journey.depTime()));
                 arrTime.setText(FormatterFr.formatTime(journey.arrTime()));
@@ -186,12 +182,17 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                         group.getChildren().add(transferCircle);
                     }
                 }
-
             }
             setGraphic(borderPane);
         }
-    };
+    }
 
+    /**
+     * Checks journey and returns its first leg, or null if the journey has none.
+     *
+     * @param journey the journey to inspect
+     * @return the first transport leg, or {@code null} when absent
+     */
     public static Journey.Leg.Transport getFirstTransport(Journey journey) {
         for (Journey.Leg leg : journey.legs()) {
             if (leg instanceof Journey.Leg.Transport) {

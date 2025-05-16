@@ -6,12 +6,10 @@ import ch.epfl.rechor.journey.JourneyExtractor;
 import ch.epfl.rechor.journey.Profile;
 import ch.epfl.rechor.journey.Router;
 import ch.epfl.rechor.timetable.*;
-import ch.epfl.rechor.timetable.mapped.BufferedStations;
 import ch.epfl.rechor.timetable.mapped.FileTimeTable;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
@@ -23,16 +21,34 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
+/**
+ * The interface represents a JSON document.
+ *
+ * @author Matteo Lazzari (397247)
+ * @author Pamphil Nedev (380400)
+ */
 public class Main extends Application {
 
-    private static int STAGE_MIN_WIDTH = 800;
-    private static int STAGE_MIN_HEIGHT = 600;
-    private ObservableValue <List<Journey>> observableJourneys;
+    private final static int STAGE_MIN_WIDTH = 800;
+    private final static int STAGE_MIN_HEIGHT = 600;
 
+    /**
+     * Launches the JavFX application.
+     *
+     * @param args command‑line arguments
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Returns the numeric identifier of the station whose name equals the station name
+     * inside stations, or -1 if no match is found.
+     *
+     * @param stations    the station list to search
+     * @param stationName the human‑readable name to look up
+     * @return the station’s index, or -1 when absent
+     */
     static int stationId(Stations stations, String stationName) {
         for (int i = 0; i < stations.size(); i++) {
             if (Objects.equals(stations.name(i), stationName)) {
@@ -42,17 +58,21 @@ public class Main extends Application {
         return -1;
     }
 
+    /**
+     * JavaFX entry‑point.
+     *
+     * @param stage the primary stage supplied by JavaFX
+     * @throws Exception if the timetable fails to load
+     */
     @Override
     public void start(Stage stage) throws Exception {
 
-        Path pathToTimetable = Path.of("timetable");
+        Path pathToTimetable = Path.of("timetable_april");
 
-        // Load timetable
         TimeTable  timetable = FileTimeTable.in(pathToTimetable);
         Stations stations = timetable.stations();
         StationAliases stationAliases = timetable.stationAliases();
 
-        // Observable Journeys
         List<String> stopNames = new LinkedList<>();
 
         for (int i = 0; i < stations.size() ; i++) {
@@ -76,17 +96,15 @@ public class Main extends Application {
         CachedTimeTable cachedTimeTable = new CachedTimeTable(timetable);
         Router router = new Router(cachedTimeTable);
 
-        observableJourneys = Bindings.createObjectBinding( () -> {
+        ObservableValue<List<Journey>> observableJourneys = Bindings.createObjectBinding(() -> {
                     Profile profile = router.profile(dateObserved.getValue(),
                             stationId(stations, arrStopObserved.getValue()));
                     int depStationId = stationId(stations, depStopObserved.getValue());
 
                     return JourneyExtractor.journeys(profile, depStationId);
                 },
-            arrStopObserved, depStopObserved, dateObserved
+                arrStopObserved, depStopObserved, dateObserved
         );
-
-        // Main Window
 
         SummaryUI summaryUI = SummaryUI.create(observableJourneys, timeObserved);
         DetailUI detailUI = DetailUI.create(summaryUI.selectedJourneyO());
