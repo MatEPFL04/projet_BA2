@@ -97,6 +97,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
         private final Line line;
         private final Group group;
         private static final double MARGIN = 5;
+        private static final int CIRCLE_RADIUS = 3;
 
         private JourneyListCell(){
 
@@ -109,8 +110,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
             this.line = new Line();
             this.group = new Group();
-
-            line.setStroke(Color.GRAY);
 
             this.centerPane  = new Pane(line, group) {
 
@@ -159,17 +158,20 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
                 long journeyDuration = journey.duration().toMinutes();
                 LocalDateTime journeyDepTime = journey.depTime();
-
                 depTime.setText(FormatterFr.formatTime(journey.depTime()));
                 arrTime.setText(FormatterFr.formatTime(journey.arrTime()));
-                imageView.setImage(VehicleIcons.iconFor(firstTransport.vehicle()));
-                textDirection.setText(FormatterFr.formatRouteDestination(firstTransport));
+
+                if (firstTransport != null) {
+                    imageView.setImage(VehicleIcons.iconFor(firstTransport.vehicle()));
+                    textDirection.setText(FormatterFr.formatRouteDestination(firstTransport));
+                }
+
                 duration.setText(FormatterFr.formatDuration(journey.duration()));
 
                 group.getChildren().clear();
 
-                Circle depCircle = new Circle(3);
-                Circle arrCircle = new Circle(3);
+                Circle depCircle = new Circle(CIRCLE_RADIUS);
+                Circle arrCircle = new Circle(CIRCLE_RADIUS);
 
                 depCircle.getStyleClass().add("dep-arr");
                 arrCircle.getStyleClass().add("dep-arr");
@@ -178,28 +180,27 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 arrCircle.setUserData(1);
 
                 List<Circle> whiteCircles = new ArrayList<>();
-                whiteCircles.add(depCircle);
-                whiteCircles.add(arrCircle);
 
-                //group.getChildren().add(depCircle);
-                //group.getChildren().add(arrCircle);
+                List <Journey.Leg> journeyLegs = journey.legs();
 
-                for (Journey.Leg leg : journey.legs()) {
-                    if (leg instanceof Journey.Leg.Foot && (journey.legs().getFirst() != leg)
-                            && journey.legs().getLast() != leg) {
-                        LocalDateTime currentTime = leg.depTime();
+                for (int i = 0; i < journeyLegs.size() ; i++) {
+                    Journey.Leg currentLeg = journeyLegs.get(i);
+                    if (currentLeg instanceof Journey.Leg.Foot && i > 0 && i < journeyLegs.size() - 1) {
+                        LocalDateTime currentTime = currentLeg.depTime();
                         double minutesElapsed = Duration.between(journeyDepTime, currentTime).toMinutes();
-                        Circle transferCircle = new Circle(3);
+                        Circle transferCircle = new Circle(CIRCLE_RADIUS);
                         transferCircle.getStyleClass().add("transfer");
                         double ratioToAssign = minutesElapsed / journeyDuration;
                         transferCircle.setUserData(ratioToAssign);
                         whiteCircles.add(transferCircle);
-                        //group.getChildren().add(transferCircle);
                     }
                 }
+
                 group.getChildren().setAll(whiteCircles);
+                group.getChildren().addAll(depCircle, arrCircle);
+                setGraphic(borderPane);
             }
-            setGraphic(borderPane);
+
         }
     }
 

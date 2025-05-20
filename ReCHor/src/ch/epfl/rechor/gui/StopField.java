@@ -26,6 +26,7 @@ import java.util.List;
 public record StopField(TextField textField, ObservableValue<String> stop0) {
 
     private final static int NUMBER_OF_PRESENTED_RESULTS = 30;
+    private final static int LISTVIEW_MAXHEIGHT = 240;
 
     /**
      * Method creates the text field and the popup window.
@@ -46,21 +47,25 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
 
         ListView <String> queryResults = new ListView<>();
         queryResults.setFocusTraversable(false);
-        queryResults.setMaxHeight(240);
+        queryResults.setMaxHeight(LISTVIEW_MAXHEIGHT);
         popup.getContent().add(queryResults);
         popup.setHideOnEscape(false);
 
         textField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-
-            if (event.getCode() == KeyCode.UP ) {
-                queryResults.getSelectionModel().selectPrevious();
-                event.consume();
-            }
+            var selected = queryResults.getSelectionModel();
 
             if (event.getCode() == KeyCode.DOWN) {
-                queryResults.getSelectionModel().selectNext();
+                if (selected.getSelectedIndex() < queryResults.getItems().size() - 1)
+                    selected.selectNext();
                 event.consume();
             }
+
+            if (event.getCode() == KeyCode.UP) {
+                if (selected.getSelectedIndex() > 0)
+                    selected.selectPrevious();
+                event.consume();
+            }
+            queryResults.scrollTo(selected.getSelectedItem());
         });
 
         ArrayList <Subscription>  subscriptions = new ArrayList<>();
@@ -76,7 +81,14 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                     List<String> foundResults = stopIndex.stopsMatching(newText,
                             NUMBER_OF_PRESENTED_RESULTS);
                     queryResults.getItems().setAll(foundResults);
-                    queryResults.getSelectionModel().selectFirst();
+
+                    if (foundResults.isEmpty())
+                        queryResults.getSelectionModel().clearSelection();
+                    else {
+                        queryResults.getSelectionModel().selectFirst();
+                    }
+
+
                 })));
 
                 subscriptions.add(textField.boundsInLocalProperty().subscribe(
@@ -92,10 +104,12 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                 subscriptions.forEach(Subscription::unsubscribe);
                 subscriptions.clear();
                 popup.hide();
-                // Observable value containing the name of the stop
-                if (queryResults.getItems().isEmpty()) {
+
+
+                if (queryResults.getSelectionModel().getSelectedItem() == null) {
                     observableStop.set("");
                     textField.clear();
+
                 }
 
                 else {

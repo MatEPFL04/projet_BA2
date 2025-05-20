@@ -36,8 +36,8 @@ public class Main extends Application {
     private final static int STAGE_MIN_HEIGHT = 600;
     private ObjectBinding<List<Journey>> observableJourneys;
     private Profile profile;
-    private String currentArrStation;
-    private LocalDate currentLocalDate;
+    private String currentArrStation = null;
+    private LocalDate currentLocalDate = null;
 
     /**
      * Launches the JavFX application.
@@ -107,13 +107,12 @@ public class Main extends Application {
 
         observableJourneys = Bindings.createObjectBinding(() -> {
 
-                    boolean isArrStopValid = stationId(stations, arrStopObserved.getValue()) != -1;
-                    boolean isDepStopValid = stationId(stations, depStopObserved.getValue()) != -1;
+                    if (arrStopObserved.getValue().isEmpty()) {
+                        profile = null;
+                    }
 
-                    if (isArrStopValid && (!Objects.equals(currentLocalDate,dateObserved.getValue()) ||
+                    if (!arrStopObserved.getValue().isEmpty() && (!Objects.equals(currentLocalDate,dateObserved.getValue()) ||
                             !Objects.equals(currentArrStation, arrStopObserved.getValue()))){
-                        System.out.println("new profile calculated (arr stop field different " +
-                                        "from previous one OR new date and a valid arr stop field"  );
 
                         profile = router.profile(dateObserved.getValue(),
                                 stationId(stations,arrStopObserved.getValue()));
@@ -121,11 +120,12 @@ public class Main extends Application {
                         currentLocalDate = dateObserved.getValue();
                     }
 
-                    if (isDepStopValid && profile != null) {
+                    if (!depStopObserved.getValue().isEmpty() && profile != null) {
 
                         int depStationId = stationId(stations, depStopObserved.getValue());
                         return JourneyExtractor.journeys(profile, depStationId);
                     }
+
                     return null;
                 },
                 arrStopObserved, depStopObserved, dateObserved

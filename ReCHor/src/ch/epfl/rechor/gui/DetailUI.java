@@ -9,6 +9,7 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -78,14 +79,18 @@ public record DetailUI(Node rootNode) {
 
         noJourneyVBox.visibleProperty().bind(noJourneyTextVisibility);
 
+        List <Circles> listCercles = new ArrayList<>();
+
+
         observableValue.subscribe(journey -> {
+
+            journeyStackPane.getChildren().clear();
+            legsGridPane.getChildren().clear();
+            listCercles.clear();
+
 
             if (journey != null) {
 
-                journeyStackPane.getChildren().clear();
-                legsGridPane.getChildren().clear();
-
-                List <Circles> listCercles = new ArrayList<>();
                 addLegsToGridPane(legsGridPane, journey ,listCercles);
                 Pane paneDrawingLines = getPaneDrawingLines(listCercles);
 
@@ -95,6 +100,9 @@ public record DetailUI(Node rootNode) {
                 mapEvent(map, journey);
                 icalendarEvent(calendar,journey);
             }
+        
+
+
         });
         return new DetailUI(scrollPane);
     }
@@ -219,6 +227,7 @@ public record DetailUI(Node rootNode) {
     }
 
     private static void icalendarEvent(Button button, Journey journey) {
+
         LocalDate date = LocalDate.from(journey.legs().getFirst().depTime());
         button.setOnAction(calendarEvent -> {
             FileChooser fileChooser = new FileChooser();
