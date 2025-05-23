@@ -11,7 +11,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
@@ -25,6 +24,8 @@ import java.util.List;
 /**
  * Record representing the list of journeys.
  *
+ * @param rootNode
+ * @param selectedJourneyO
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  */
@@ -54,7 +55,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 listView.getItems().setAll(journeyList);
             }
             selectJourneyInListView(journeyTime.getValue(), listView);
-
         }));
 
         journeyTime.subscribe( newTime -> {
@@ -200,7 +200,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 group.getChildren().addAll(depCircle, arrCircle);
                 setGraphic(borderPane);
             }
-
         }
     }
 

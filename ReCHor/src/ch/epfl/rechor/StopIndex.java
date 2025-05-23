@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 public final class StopIndex {
     private final List<String> indexedStopNames;
     private final Map<String, String> alternativeNamesMap;
+    private final static int BEGGINING_OCCURENCE_FACTOR = 4;
+    private final static int ENDING_OCCURENCE_FACTOR = 2;
 
     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
     private static final Pattern SPLITTING_PATTERN = Pattern.compile("[aeiouc]");
@@ -60,7 +62,8 @@ public final class StopIndex {
 
                 })
                 .filter(Objects::nonNull)
-                .sorted((firstPair, secondPair) -> Integer.compare(secondPair.score(), firstPair.score()))
+                .sorted((firstPair, secondPair) ->
+                        Integer.compare(secondPair.score(), firstPair.score()))
                 .map((scorePair) -> scorePair.stopName)
                 .map((stopName) -> alternativeNamesMap.getOrDefault(stopName, stopName))
                 .distinct()
@@ -86,11 +89,11 @@ public final class StopIndex {
                 int sequenceFound = matcher.end() - matcher.start();
                 int currentSubQueryScore = (int) ((double) sequenceFound / stopName.length() * 100);
                 if (matcher.start() == 0 || !Character.isLetter(stopName.charAt(matcher.start() - 1))) {
-                    currentSubQueryScore *= 4;
+                    currentSubQueryScore *= BEGGINING_OCCURENCE_FACTOR;
                 }
                 if (matcher.end() == stopName.length() ||
                         !Character.isLetter(stopName.charAt(matcher.end()))) {
-                    currentSubQueryScore *= 2;
+                    currentSubQueryScore *= ENDING_OCCURENCE_FACTOR;
                 }
                 totalScore += currentSubQueryScore;
             }
@@ -105,7 +108,7 @@ public final class StopIndex {
      * Turns a sub-query into a regex that tolerates accents and optionally ignores case.
      *
      * @param subquery the raw sub-query
-     * @return the compiled {@link Pattern}
+     * @return the compiled pattern
      */
     public static Pattern pattern(String subquery) {
         boolean caseSensitive = !subquery.equals(subquery.toLowerCase());

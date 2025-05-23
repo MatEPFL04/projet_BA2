@@ -11,7 +11,7 @@ import static ch.epfl.rechor.journey.PackedCriteria.*;
 import static ch.epfl.rechor.journey.ParetoFront.Builder;
 
 import java.time.LocalDate;
-import java.util.NoSuchElementException;
+import java.util.Arrays;
 
 /**
  * This record represents a router, which is an object capable of getting
@@ -30,7 +30,6 @@ public record Router(TimeTable timeTable) {
      */
     public Profile profile (LocalDate date, int arrStationId) {
 
-
         Profile.Builder profile = new Profile.Builder(timeTable, date, arrStationId);
         Stations stations = timeTable.stations();
 
@@ -40,18 +39,20 @@ public record Router(TimeTable timeTable) {
 
         int[] arrayOfTransfersDuration = new int[stations.size()];
 
-        for (int i = 0; i < stations.size(); i++) {
-            try {
-                arrayOfTransfersDuration[i] = transfers.minutesBetween(i, arrStationId);
-            } catch (NoSuchElementException e){
-                arrayOfTransfersDuration[i] = -1;
-            }
+        Arrays.fill(arrayOfTransfersDuration, -1);
+        int firstChangeToArrStation = PackedRange.startInclusive(transfers.arrivingAt(arrStationId));
+        int lastChangeToArrStation = PackedRange.endExclusive(transfers.arrivingAt(arrStationId));
+
+        for (int i = firstChangeToArrStation; i < lastChangeToArrStation ; i++) {
+
+            int correspondingStation = transfers.depStationId(i);
+            arrayOfTransfersDuration[correspondingStation] =
+                    transfers.minutesBetween(correspondingStation,arrStationId);
         }
 
         Builder front = new Builder();
         Builder arrStationBuilder;
         Builder tripsBuilder;
-
 
         for (int i = 0; i < connections.size(); i++) {
 

@@ -15,6 +15,12 @@ import java.time.format.DateTimeFormatter;
 /**
  * Query interface, helps the user to choose the departure and arrival stops for a certain time.
  *
+ * @param rootNode
+ * @param depStopO
+ * @param arrStopO
+ * @param date0
+ * @param time0
+ *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  */
@@ -22,8 +28,10 @@ public record QueryUI(Node rootNode, ObservableValue<String> depStopO,
                       ObservableValue<String> arrStopO, ObservableValue<LocalDate> date0,
                       ObservableValue<LocalTime> time0) {
 
-    private static DateTimeFormatter STRING_TO_HOUR_MINUTES_USER = DateTimeFormatter.ofPattern("H:mm");
-    private static DateTimeFormatter STRING_TO_HOUR_MINUTES = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter STRING_TO_HOUR_MINUTES_USER =
+            DateTimeFormatter.ofPattern("H:mm");
+    private static final DateTimeFormatter STRING_TO_HOUR_MINUTES =
+            DateTimeFormatter.ofPattern("HH:mm");
 
     /**
      * Builds a QueryUI with stop, date and time selectors.

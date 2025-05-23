@@ -69,4 +69,10 @@ public class MyJourneyGeoJsonTest {
 
         assertEquals(expected.trim(), toGeoJson.toString().trim());
     }
+
+    public static void main(String[] args) {
+        double a =  46.516797;
+        System.out.println((int) (a * 100000));
+        System.out.println(((int)(a * 1e5))/1e5);
+    }
 }

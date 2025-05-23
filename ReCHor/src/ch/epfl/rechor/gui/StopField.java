@@ -26,7 +26,7 @@ import java.util.List;
 public record StopField(TextField textField, ObservableValue<String> stop0) {
 
     private final static int NUMBER_OF_PRESENTED_RESULTS = 30;
-    private final static int LISTVIEW_MAXHEIGHT = 240;
+    private final static int LISTVIEW_MAX_HEIGHT = 240;
 
     /**
      * Method creates the text field and the popup window.
@@ -47,7 +47,7 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
 
         ListView <String> queryResults = new ListView<>();
         queryResults.setFocusTraversable(false);
-        queryResults.setMaxHeight(LISTVIEW_MAXHEIGHT);
+        queryResults.setMaxHeight(LISTVIEW_MAX_HEIGHT);
         popup.getContent().add(queryResults);
         popup.setHideOnEscape(false);
 
@@ -87,8 +87,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                     else {
                         queryResults.getSelectionModel().selectFirst();
                     }
-
-
                 })));
 
                 subscriptions.add(textField.boundsInLocalProperty().subscribe(
@@ -104,7 +102,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                 subscriptions.forEach(Subscription::unsubscribe);
                 subscriptions.clear();
                 popup.hide();
-
 
                 if (queryResults.getSelectionModel().getSelectedItem() == null) {
                     observableStop.set("");

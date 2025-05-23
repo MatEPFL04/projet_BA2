@@ -11,6 +11,8 @@ import java.util.*;
  */
 public class JourneyGeoJsonConverter {
 
+    private final static double FIVE_DIGITS_TRUNCATION = 1e5;
+
     /**
      * Converts the given journey into a GeoJSON whose coordinates follow every departure,
      * intermediate and arrival stop in order.
@@ -46,8 +48,8 @@ public class JourneyGeoJsonConverter {
     }
 
     private static Json getStopArrayForCoordinates (Stop stop) {
-        double longitude = Math.round(stop.longitude() * 1e5) / 1e5;
-        double latitude = Math.round(stop.latitude()  * 1e5) / 1e5;
+        double longitude = (int)(stop.longitude() * FIVE_DIGITS_TRUNCATION) / FIVE_DIGITS_TRUNCATION;
+        double latitude = (int)(stop.latitude()  * FIVE_DIGITS_TRUNCATION) / FIVE_DIGITS_TRUNCATION;
 
         return new Json.JArray(List.of(
                 new Json.JNumber(longitude),

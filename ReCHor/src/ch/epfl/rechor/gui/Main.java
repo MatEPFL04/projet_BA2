@@ -12,9 +12,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -25,7 +23,9 @@ import java.time.LocalTime;
 import java.util.*;
 
 /**
- * The interface represents a JSON document.
+ * Main JavaFX entry point of ReCHor.
+ * It loads the timetable, builds the three UI parts
+ * (query, summary, detail), wires them together and shows the window.
  *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
@@ -60,7 +60,6 @@ public class Main extends Application {
         for (int i = 0; i < stations.size(); i++) {
             if (Objects.equals(stations.name(i), stationName)) {
                 return i;
-
             }
         }
         return -1;
@@ -75,7 +74,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        Path pathToTimetable = Path.of("timetable");
+        Path pathToTimetable = Path.of("timetable 10");
 
         TimeTable timetable = FileTimeTable.in(pathToTimetable);
         Stations stations = timetable.stations();
@@ -104,14 +103,14 @@ public class Main extends Application {
         CachedTimeTable cachedTimeTable = new CachedTimeTable(timetable);
         Router router = new Router(cachedTimeTable);
 
-
         observableJourneys = Bindings.createObjectBinding(() -> {
 
                     if (arrStopObserved.getValue().isEmpty()) {
                         profile = null;
                     }
 
-                    if (!arrStopObserved.getValue().isEmpty() && (!Objects.equals(currentLocalDate,dateObserved.getValue()) ||
+                    if (!arrStopObserved.getValue().isEmpty() && (!Objects.equals(currentLocalDate,
+                            dateObserved.getValue()) ||
                             !Objects.equals(currentArrStation, arrStopObserved.getValue()))){
 
                         profile = router.profile(dateObserved.getValue(),
