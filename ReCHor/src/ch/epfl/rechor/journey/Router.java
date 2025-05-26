@@ -14,8 +14,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 
 /**
- * This record represents a router, which is an object capable of getting
- * from any station to a given arrival station.
+ * This record represents a router, which holds a timetable and whose method based on the
+ * timetable generates a profile for a given date and arrival station. It uses the CSA algorithm.
  *
  * @param timeTable the given timetable to use
  */
@@ -26,18 +26,16 @@ public record Router(TimeTable timeTable) {
      *
      * @param date the date for which the optimal journeys must be computed
      * @param arrStationId arrival station id
-     * @return optimal's journeys profiles
+     * @return profile containing a pareto front for each station.
      */
     public Profile profile (LocalDate date, int arrStationId) {
 
-        Profile.Builder profile = new Profile.Builder(timeTable, date, arrStationId);
-        Stations stations = timeTable.stations();
+        final Profile.Builder profile = new Profile.Builder(timeTable, date, arrStationId);
+        final Stations stations = timeTable.stations();
+        final Connections connections = timeTable.connectionsFor(date);
+        final Transfers transfers = timeTable.transfers();
 
-        Connections connections = timeTable.connectionsFor(date);
-
-        Transfers transfers = timeTable.transfers();
-
-        int[] arrayOfTransfersDuration = new int[stations.size()];
+        final int[] arrayOfTransfersDuration = new int[stations.size()];
 
         Arrays.fill(arrayOfTransfersDuration, -1);
         int firstChangeToArrStation = PackedRange.startInclusive(transfers.arrivingAt(arrStationId));
@@ -63,7 +61,6 @@ public record Router(TimeTable timeTable) {
             int tripId = connections.tripId(i);
 
             int currentConnectionTripPos = connections.tripPos(i);
-
 
             tripsBuilder = profile.forTrip(tripId) != null ?
                     profile.forTrip(tripId) : new Builder();
@@ -92,7 +89,6 @@ public record Router(TimeTable timeTable) {
                     long packedTuple = pack(arrMins(criteria), changes(criteria) + 1,
                             associatedPayload);
                     front.add(packedTuple);
-
                 }
             });
 
@@ -129,7 +125,6 @@ public record Router(TimeTable timeTable) {
                         long addedTuple = PackedCriteria.withDepMins(tupleWithoutDepMins, d);
 
                         stationToDepStationFront.add(addedTuple);
-
                     });
                     profile.setForStation(transfers.depStationId(j), stationToDepStationFront);
                 }

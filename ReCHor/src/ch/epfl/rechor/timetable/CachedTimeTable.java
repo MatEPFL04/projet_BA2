@@ -1,6 +1,5 @@
 package ch.epfl.rechor.timetable;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -12,13 +11,13 @@ import java.util.Objects;
  * @author Pamphil Nedev (380400)
  */
 public class CachedTimeTable implements TimeTable {
-    private TimeTable timeTable;
+    private final TimeTable timeTable;
     private Connections connections;
     private Trips trips;
     private LocalDate currentDate;
 
     /**
-     * Wraps the given timetable with a one-day in-memory cache.
+     * Wraps the given timetable with a cache.
      *
      * @param timetable the underlying timetable to be cached
      */
@@ -57,7 +56,6 @@ public class CachedTimeTable implements TimeTable {
             updateFieds(date);
             return trips;
         }
-
         return trips;
     }
 

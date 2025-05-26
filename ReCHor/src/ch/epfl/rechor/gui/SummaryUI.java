@@ -24,8 +24,9 @@ import java.util.List;
 /**
  * Record representing the list of journeys.
  *
- * @param rootNode
- * @param selectedJourneyO
+ * @param rootNode the root used to represent the summary of the journey for a given date.
+ * @param selectedJourneyO the journey that needs to be seen in DetailUI.
+ *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
  */
@@ -49,7 +50,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
             if (journeyList == null){
                 listView.getItems().setAll(List.of());
-
             }
             else {
                 listView.getItems().setAll(journeyList);
@@ -110,7 +110,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
             this.line = new Line();
             this.group = new Group();
-
             this.centerPane  = new Pane(line, group) {
 
                 @Override
@@ -185,9 +184,11 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
                 for (int i = 0; i < journeyLegs.size() ; i++) {
                     Journey.Leg currentLeg = journeyLegs.get(i);
-                    if (currentLeg instanceof Journey.Leg.Foot && i > 0 && i < journeyLegs.size() - 1) {
+                    if (currentLeg instanceof Journey.Leg.Foot
+                            && i > 0 && i < journeyLegs.size() - 1) {
                         LocalDateTime currentTime = currentLeg.depTime();
-                        double minutesElapsed = Duration.between(journeyDepTime, currentTime).toMinutes();
+                        double minutesElapsed = Duration.between(journeyDepTime, currentTime).
+                                toMinutes();
                         Circle transferCircle = new Circle(CIRCLE_RADIUS);
                         transferCircle.getStyleClass().add("transfer");
                         double ratioToAssign = minutesElapsed / journeyDuration;

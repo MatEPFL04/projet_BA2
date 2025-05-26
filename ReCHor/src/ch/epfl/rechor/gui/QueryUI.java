@@ -28,6 +28,9 @@ public record QueryUI(Node rootNode, ObservableValue<String> depStopO,
                       ObservableValue<String> arrStopO, ObservableValue<LocalDate> date0,
                       ObservableValue<LocalTime> time0) {
 
+    private static final String UNICODE_ARROW = "\u2194";
+    private static final String NARROW_NO_BREAK_SPACE = "\u202f";
+
     private static final DateTimeFormatter STRING_TO_HOUR_MINUTES_USER =
             DateTimeFormatter.ofPattern("H:mm");
     private static final DateTimeFormatter STRING_TO_HOUR_MINUTES =
@@ -45,18 +48,18 @@ public record QueryUI(Node rootNode, ObservableValue<String> depStopO,
         StopField arrivalStopField = StopField.create(stopIndex);
 
         Label labelDeparture = new Label();
-        labelDeparture.setText("Départ\u202f:");
+        labelDeparture.setText("Départ" + NARROW_NO_BREAK_SPACE + ":");
         TextField depStopField = departureStopField.textField();
         depStopField.setPromptText("Nom de l'arrêt de départ");
         depStopField.setId("depStop");
 
         Label labelArrival = new Label();
-        labelArrival.setText("Arrivée\u202f:");
+        labelArrival.setText("Arrivée" + NARROW_NO_BREAK_SPACE + ":");
         TextField arrStopField = arrivalStopField.textField();
         arrStopField.setPromptText("Nom de l'arrêt d'arrivée");
 
         Button button = new Button();
-        button.setText("\u2194");
+        button.setText(UNICODE_ARROW);
         button.setOnAction(e -> {
             String departure = depStopField.getText();
             String arrival = arrStopField.getText();
@@ -67,12 +70,12 @@ public record QueryUI(Node rootNode, ObservableValue<String> depStopO,
         HBox box1 = new HBox(labelDeparture, depStopField,button, labelArrival, arrStopField);
 
         Label labelDate = new Label();
-        labelDate.setText("Date\u202f:");
+        labelDate.setText("Date" + NARROW_NO_BREAK_SPACE + ":");
         DatePicker datePicker = new DatePicker(LocalDate.now());
         datePicker.setId("date");
 
         Label labelTime = new Label();
-        labelTime.setText("Heure\u202f:");
+        labelTime.setText("Heure" + NARROW_NO_BREAK_SPACE + ":");
         TextField textFieldTime = new TextField();
         textFieldTime.setId("time");
 

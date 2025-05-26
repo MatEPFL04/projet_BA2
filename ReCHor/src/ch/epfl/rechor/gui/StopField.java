@@ -106,7 +106,6 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                 if (queryResults.getSelectionModel().getSelectedItem() == null) {
                     observableStop.set("");
                     textField.clear();
-
                 }
 
                 else {
@@ -126,9 +125,9 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
      */
     public void setTo(String stopName) {
 
-        if (stop0 instanceof ObjectProperty stop0) {
+        if (stop0 instanceof ObjectProperty <String> stop) {
             textField.textProperty().set(stopName);
-            stop0.set(stopName);
+            stop.set(stopName);
         }
     }
 }

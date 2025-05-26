@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This class represents an index of stop names in which it's possible to do researches.
+ * This class represents an index of stop names in which it's possible to sort the stops according
+ * to the query that was given.
  *
  * @author Matteo Lazzari (397247)
  * @author Pamphil Nedev (380400)
@@ -15,8 +16,8 @@ import java.util.stream.Stream;
 public final class StopIndex {
     private final List<String> indexedStopNames;
     private final Map<String, String> alternativeNamesMap;
-    private final static int BEGGINING_OCCURENCE_FACTOR = 4;
-    private final static int ENDING_OCCURENCE_FACTOR = 2;
+    private final static int BEGINNING_OCCURRENCE_FACTOR = 4;
+    private final static int ENDING_OCCURRENCE_FACTOR = 2;
 
     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
     private static final Pattern SPLITTING_PATTERN = Pattern.compile("[aeiouc]");
@@ -40,7 +41,7 @@ public final class StopIndex {
     }
 
     /**
-     * Method used to concert a query into a list of corresponding stops.
+     * Method used to convert a query into a list of corresponding stops.
      *
      * @param query            user's query when searching for an arrival station
      * @param maxNumberOfStops the maximum number of stations suggested for a query
@@ -48,8 +49,9 @@ public final class StopIndex {
      */
     public List<String> stopsMatching(String query, int maxNumberOfStops) {
 
-        String[] subQueries = SPACE_PATTERN.split(query);
-        List<Pattern> subQueriesPatterns = new ArrayList<>();
+        final String[] subQueries = SPACE_PATTERN.split(query);
+        final List<Pattern> subQueriesPatterns = new ArrayList<>();
+
         for (String subQuery : subQueries) {
             subQueriesPatterns.add(pattern(subQuery));
         }
@@ -80,7 +82,8 @@ public final class StopIndex {
      * @param stopName    the stop name being scored
      * @return a stop score record, or null if no match
      */
-    public static StopScores stopScore (List <Pattern> patternList, String stopName) {
+    private static StopScores stopScore (List <Pattern> patternList, String stopName) {
+
         int totalScore = 0;
 
         for (Pattern pattern : patternList) {
@@ -89,11 +92,11 @@ public final class StopIndex {
                 int sequenceFound = matcher.end() - matcher.start();
                 int currentSubQueryScore = (int) ((double) sequenceFound / stopName.length() * 100);
                 if (matcher.start() == 0 || !Character.isLetter(stopName.charAt(matcher.start() - 1))) {
-                    currentSubQueryScore *= BEGGINING_OCCURENCE_FACTOR;
+                    currentSubQueryScore *= BEGINNING_OCCURRENCE_FACTOR;
                 }
                 if (matcher.end() == stopName.length() ||
                         !Character.isLetter(stopName.charAt(matcher.end()))) {
-                    currentSubQueryScore *= ENDING_OCCURENCE_FACTOR;
+                    currentSubQueryScore *= ENDING_OCCURRENCE_FACTOR;
                 }
                 totalScore += currentSubQueryScore;
             }

@@ -74,7 +74,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        Path pathToTimetable = Path.of("timetable 10");
+        Path pathToTimetable = Path.of("timetable");
 
         TimeTable timetable = FileTimeTable.in(pathToTimetable);
         Stations stations = timetable.stations();
@@ -124,7 +124,6 @@ public class Main extends Application {
                         int depStationId = stationId(stations, depStopObserved.getValue());
                         return JourneyExtractor.journeys(profile, depStationId);
                     }
-
                     return null;
                 },
                 arrStopObserved, depStopObserved, dateObserved

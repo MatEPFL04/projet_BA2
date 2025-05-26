@@ -43,13 +43,16 @@ import java.util.Objects;
  */
 public record DetailUI(Node rootNode) {
 
+    private static final int ICON_SIDE_LENGTH = 31;
+    private static final int RADIUS_CIRCLE = 3;
+
     private record Circles(Circle depCircle, Circle arrCircle) {}
 
     /**
      * Creates a DetailUI whose content continually mirrors the value
      * of the supplied observable.
      *
-     * @param observableValue an observable value  holding the journey to display
+     * @param observableValue an observable value holding the journey to display
      * @return a detailUI bound to an observable value
      */
     public static DetailUI create(ObservableValue<Journey> observableValue) {
@@ -80,13 +83,11 @@ public record DetailUI(Node rootNode) {
 
         List <Circles> listCercles = new ArrayList<>();
 
-
         observableValue.subscribe(journey -> {
 
             journeyStackPane.getChildren().clear();
             legsGridPane.getChildren().clear();
             listCercles.clear();
-
 
             if (journey != null) {
 
@@ -99,9 +100,6 @@ public record DetailUI(Node rootNode) {
                 mapEvent(map, journey);
                 icalendarEvent(calendar,journey);
             }
-        
-
-
         });
         return new DetailUI(scrollPane);
     }
@@ -143,7 +141,7 @@ public record DetailUI(Node rootNode) {
                     transportdepTimeLabel.getStyleClass().add("departure");
                     GridPane.setHalignment(transportdepTimeLabel, HPos.RIGHT);
 
-                    Circle circle = new Circle(3);
+                    Circle circle = new Circle(RADIUS_CIRCLE);
                     GridPane.setHalignment(circle, HPos.LEFT);
 
                     Label depStopNameLabel = new Label(transport.depStop().name());
@@ -159,8 +157,8 @@ public record DetailUI(Node rootNode) {
                     rowIndex++;
 
                     ImageView icon = new ImageView(VehicleIcons.iconFor(transport.vehicle()));
-                    icon.setFitHeight(31);
-                    icon.setFitWidth(31);
+                    icon.setFitHeight(ICON_SIDE_LENGTH);
+                    icon.setFitWidth(ICON_SIDE_LENGTH);
                     GridPane.setValignment(icon, VPos.CENTER);
                     GridPane.setHalignment(icon, HPos.CENTER);
                     int rowSpan = transport.intermediateStops().isEmpty() ? 1 : 2;
@@ -205,7 +203,7 @@ public record DetailUI(Node rootNode) {
                     Label transportArrTimeLabel =
                             new Label(FormatterFr.formatTime(transport.arrTime()));
                     GridPane.setHalignment(transportArrTimeLabel, HPos.RIGHT);
-                    Circle secondCircle = new Circle(3);
+                    Circle secondCircle = new Circle(RADIUS_CIRCLE);
                     GridPane.setHalignment(secondCircle, HPos.LEFT);
                     Label arrStopNameLabel = new Label(transport.arrStop().name());
                     GridPane.setHalignment(arrStopNameLabel, HPos.LEFT);

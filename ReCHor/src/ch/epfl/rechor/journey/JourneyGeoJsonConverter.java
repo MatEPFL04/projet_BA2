@@ -22,8 +22,8 @@ public class JourneyGeoJsonConverter {
      */
     public static Json toGeoJson(Journey journey) {
 
-        List<Stop> allStops = new ArrayList<>();
-        List < Journey.Leg> listLegs = journey.legs();
+        final List<Stop> allStops = new ArrayList<>();
+        final List < Journey.Leg> listLegs = journey.legs();
 
         for (Journey.Leg leg : listLegs) {
 
@@ -32,6 +32,7 @@ public class JourneyGeoJsonConverter {
                 allStops.add(intermediateStops.stop());
             }
         }
+
         allStops.add(journey.arrStop());
 
         List<Json> listOfCoordinates = allStops.stream()
